@@ -44,3 +44,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# /build skill state (local task tracking, not shared repo content)
+/.claude/state/
