@@ -1,36 +1,72 @@
 import type { Capture, CaptureStatus } from "@/lib/types";
-import { readJsonFile, writeJsonFile } from "@/lib/store/fs-helpers";
+import { getSupabaseAdmin } from "@/lib/supabase/server";
 
-const FILE = "captures.json";
+interface CaptureRow {
+  id: string;
+  created_at: string;
+  images: string[];
+  lat: number | null;
+  lng: number | null;
+  location_accuracy_m: number | null;
+  label: string;
+  notes: string;
+  captured_by: string;
+  property_slug: string | null;
+  status: CaptureStatus;
+}
+
+function rowToCapture(row: CaptureRow): Capture {
+  return {
+    id: row.id,
+    createdAt: row.created_at,
+    images: row.images ?? [],
+    lat: row.lat,
+    lng: row.lng,
+    locationAccuracyM: row.location_accuracy_m,
+    label: row.label,
+    notes: row.notes,
+    capturedBy: row.captured_by,
+    propertySlug: row.property_slug,
+    status: row.status,
+  };
+}
 
 export async function getAllCaptures(): Promise<Capture[]> {
-  const all = await readJsonFile<Capture[]>(FILE, () => []);
-  return [...all].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const { data, error } = await getSupabaseAdmin().from("captures").select("*").order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as CaptureRow[]).map(rowToCapture);
 }
 
 export async function getCapture(id: string): Promise<Capture | undefined> {
-  const all = await getAllCaptures();
-  return all.find((c) => c.id === id);
+  const { data, error } = await getSupabaseAdmin().from("captures").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return data ? rowToCapture(data as CaptureRow) : undefined;
 }
 
 export async function createCapture(capture: Capture): Promise<void> {
-  const all = await readJsonFile<Capture[]>(FILE, () => []);
-  all.push(capture);
-  await writeJsonFile(FILE, all);
+  const { error } = await getSupabaseAdmin().from("captures").insert({
+    id: capture.id,
+    created_at: capture.createdAt,
+    images: capture.images,
+    lat: capture.lat,
+    lng: capture.lng,
+    location_accuracy_m: capture.locationAccuracyM,
+    label: capture.label,
+    notes: capture.notes,
+    captured_by: capture.capturedBy,
+    property_slug: capture.propertySlug,
+    status: capture.status,
+  });
+  if (error) throw error;
 }
 
 export async function setCaptureStatus(id: string, status: CaptureStatus): Promise<void> {
-  const all = await readJsonFile<Capture[]>(FILE, () => []);
-  const idx = all.findIndex((c) => c.id === id);
-  if (idx === -1) throw new Error(`Capture "${id}" not found.`);
-  all[idx] = { ...all[idx], status };
-  await writeJsonFile(FILE, all);
+  const { data, error } = await getSupabaseAdmin().from("captures").update({ status }).eq("id", id).select("id");
+  if (error) throw error;
+  if (!data || data.length === 0) throw new Error(`Capture "${id}" not found.`);
 }
 
 export async function deleteCapture(id: string): Promise<void> {
-  const all = await readJsonFile<Capture[]>(FILE, () => []);
-  await writeJsonFile(
-    FILE,
-    all.filter((c) => c.id !== id)
-  );
+  const { error } = await getSupabaseAdmin().from("captures").delete().eq("id", id);
+  if (error) throw error;
 }

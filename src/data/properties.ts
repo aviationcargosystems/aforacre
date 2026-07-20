@@ -2,9 +2,9 @@ import type { JourneyId, Property, WaterSource } from "@/lib/types";
 import { buildProperty, type PropertyInput } from "@/lib/property-builder";
 import { cardImg, galleryImg, PHOTO_IDS, pick } from "@/lib/images";
 
-// Seed data only — this is loaded once by the file-based store (src/lib/store/properties.ts)
-// to populate .data/properties.json the first time it's read. After that, the store file is
-// the source of truth and admin edits persist there, not here.
+// Historical seed source — no longer imported at runtime (properties now live in Supabase).
+// This is what supabase/seed.sql was generated from; kept as a readable reference for the
+// original 26 listings. Edit properties through /admin, not here.
 
 interface SeedSpec {
   slug: string;

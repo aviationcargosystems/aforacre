@@ -71,9 +71,8 @@ export default async function AdminDashboardPage() {
           <CardContent className="space-y-2">
             <h2 className="font-heading text-base font-semibold text-foreground">Storage</h2>
             <p className="text-sm text-muted-foreground">
-              Data is stored locally in <code className="rounded bg-muted px-1 py-0.5 text-xs">.data/*.json</code> on this
-              server — no external database is connected yet. Uploaded photos are saved under{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-xs">public/uploads/</code>.
+              Properties, professionals, tags, and captures are stored in Supabase. Uploaded photos go to the{" "}
+              <code className="rounded bg-muted px-1 py-0.5 text-xs">{"{SUPABASE_STORAGE_BUCKET}"}</code> Storage bucket.
             </p>
           </CardContent>
         </Card>

@@ -13,9 +13,9 @@ export const professionalCategoryLabels: Record<ProfessionalCategory, string> = 
   "legal-verification": "Legal Verification",
 };
 
-// Seed data only — loaded once by src/lib/store/professionals.ts to populate
-// .data/professionals.json the first time it's read. The store file is the
-// source of truth after that; admin edits persist there, not here.
+// Historical seed source — no longer imported at runtime (professionals now live in
+// Supabase). This is what supabase/seed.sql was generated from; kept as a readable
+// reference for the original 12 profiles. Edit professionals through /admin, not here.
 export const seedProfessionals: Professional[] = [
   {
     slug: "sunfield-solar-farms",

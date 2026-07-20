@@ -1,21 +1,104 @@
 import type { JourneyId, Property } from "@/lib/types";
-import { seedProperties } from "@/data/properties";
-import { readJsonFile, writeJsonFile } from "@/lib/store/fs-helpers";
+import { getSupabaseAdmin } from "@/lib/supabase/server";
 
-const FILE = "properties.json";
+interface PropertyRow {
+  slug: string;
+  title: string;
+  area: string;
+  corridor: string;
+  lat: number;
+  lng: number;
+  extent_acres: number;
+  price_per_acre: number;
+  total_price: number;
+  tags: string[];
+  journey_fit: Record<JourneyId, number>;
+  soil_type: string;
+  water_sources: Property["waterSources"];
+  road_access: string;
+  fencing: boolean;
+  electricity: boolean;
+  images: string[];
+  description: string;
+  taxes: Property["taxes"];
+  suitability: Property["suitability"];
+  legal: Property["legal"];
+  nearby_landmarks: string[];
+  distance_from_bangalore_km: number;
+  featured: boolean;
+}
+
+function rowToProperty(row: PropertyRow): Property {
+  return {
+    slug: row.slug,
+    title: row.title,
+    location: { area: row.area, corridor: row.corridor, lat: row.lat, lng: row.lng },
+    extentAcres: row.extent_acres,
+    pricePerAcre: row.price_per_acre,
+    totalPrice: row.total_price,
+    tags: row.tags ?? [],
+    journeyFit: row.journey_fit,
+    soilType: row.soil_type,
+    waterSources: row.water_sources ?? [],
+    roadAccess: row.road_access,
+    fencing: row.fencing,
+    electricity: row.electricity,
+    images: row.images ?? [],
+    description: row.description,
+    taxes: row.taxes,
+    suitability: row.suitability,
+    legal: row.legal,
+    nearbyLandmarks: row.nearby_landmarks ?? [],
+    distanceFromBangaloreKm: row.distance_from_bangalore_km,
+    featured: row.featured,
+  };
+}
+
+function propertyToRow(p: Property): Omit<PropertyRow, "created_at" | "updated_at"> {
+  return {
+    slug: p.slug,
+    title: p.title,
+    area: p.location.area,
+    corridor: p.location.corridor,
+    lat: p.location.lat,
+    lng: p.location.lng,
+    extent_acres: p.extentAcres,
+    price_per_acre: p.pricePerAcre,
+    total_price: p.totalPrice,
+    tags: p.tags,
+    journey_fit: p.journeyFit,
+    soil_type: p.soilType,
+    water_sources: p.waterSources,
+    road_access: p.roadAccess,
+    fencing: p.fencing,
+    electricity: p.electricity,
+    images: p.images,
+    description: p.description,
+    taxes: p.taxes,
+    suitability: p.suitability,
+    legal: p.legal,
+    nearby_landmarks: p.nearbyLandmarks,
+    distance_from_bangalore_km: p.distanceFromBangaloreKm,
+    featured: !!p.featured,
+  };
+}
 
 export async function getAllProperties(): Promise<Property[]> {
-  return readJsonFile<Property[]>(FILE, () => seedProperties);
+  const { data, error } = await getSupabaseAdmin().from("properties").select("*").order("title");
+  if (error) throw error;
+  return (data as PropertyRow[]).map(rowToProperty);
 }
 
 export async function getProperty(slug: string): Promise<Property | undefined> {
-  const all = await getAllProperties();
-  return all.find((p) => p.slug === slug);
+  const { data, error } = await getSupabaseAdmin().from("properties").select("*").eq("slug", slug).maybeSingle();
+  if (error) throw error;
+  return data ? rowToProperty(data as PropertyRow) : undefined;
 }
 
 export async function featuredProperties(): Promise<Property[]> {
-  const all = await getAllProperties();
-  return all.filter((p) => p.featured);
+  const { data, error } = await getSupabaseAdmin().from("properties").select("*").eq("featured", true).order("title");
+  if (error) throw error;
+  return (data as PropertyRow[]).map(rowToProperty);
 }
 
 export async function propertiesForJourney(journeyId: JourneyId, limit?: number): Promise<Property[]> {
@@ -35,22 +118,19 @@ export async function allCorridors(): Promise<string[]> {
 }
 
 export async function saveProperty(property: Property, opts: { isNew: boolean }): Promise<void> {
-  const all = await getAllProperties();
-  const idx = all.findIndex((p) => p.slug === property.slug);
+  const supabase = getSupabaseAdmin();
   if (opts.isNew) {
-    if (idx !== -1) throw new Error(`A property with slug "${property.slug}" already exists.`);
-    all.push(property);
+    const { data: existing } = await supabase.from("properties").select("slug").eq("slug", property.slug).maybeSingle();
+    if (existing) throw new Error(`A property with slug "${property.slug}" already exists.`);
+    const { error } = await supabase.from("properties").insert(propertyToRow(property));
+    if (error) throw error;
   } else {
-    if (idx === -1) throw new Error(`Property "${property.slug}" not found.`);
-    all[idx] = property;
+    const { error } = await supabase.from("properties").update(propertyToRow(property)).eq("slug", property.slug);
+    if (error) throw error;
   }
-  await writeJsonFile(FILE, all);
 }
 
 export async function deleteProperty(slug: string): Promise<void> {
-  const all = await getAllProperties();
-  await writeJsonFile(
-    FILE,
-    all.filter((p) => p.slug !== slug)
-  );
+  const { error } = await getSupabaseAdmin().from("properties").delete().eq("slug", slug);
+  if (error) throw error;
 }

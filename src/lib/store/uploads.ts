@@ -1,14 +1,11 @@
-import { promises as fs } from "fs";
-import path from "path";
 import { randomUUID } from "crypto";
+import { getSupabaseAdmin, storageBucket } from "@/lib/supabase/server";
 
-// Saves uploaded files under public/uploads/<subdir>/ so they're served directly
-// as static assets by Next.js. Internal/local-server storage only — swap for
-// object storage (S3, etc.) once this goes past internal use.
-const UPLOADS_ROOT = path.join(process.cwd(), "public", "uploads");
-
+// Uploads go to Supabase Storage rather than the local filesystem — a serverless
+// deploy (Vercel etc.) doesn't persist local writes between requests, so this is
+// required for uploads to actually survive past the request that created them.
 function extensionFor(file: File): string {
-  const fromName = path.extname(file.name || "");
+  const fromName = file.name?.includes(".") ? file.name.slice(file.name.lastIndexOf(".")) : "";
   if (fromName) return fromName.toLowerCase();
   if (file.type === "image/png") return ".png";
   if (file.type === "image/webp") return ".webp";
@@ -17,12 +14,16 @@ function extensionFor(file: File): string {
 }
 
 export async function saveUploadedFile(file: File, subdir: string): Promise<string> {
-  const dir = path.join(UPLOADS_ROOT, subdir);
-  await fs.mkdir(dir, { recursive: true });
-  const filename = `${randomUUID()}${extensionFor(file)}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await fs.writeFile(path.join(dir, filename), buffer);
-  return `/uploads/${subdir}/${filename}`;
+  const bucket = storageBucket();
+  const objectPath = `${subdir}/${randomUUID()}${extensionFor(file)}`;
+
+  const { error } = await getSupabaseAdmin()
+    .storage.from(bucket)
+    .upload(objectPath, file, { contentType: file.type || "image/jpeg", upsert: false });
+  if (error) throw error;
+
+  const { data } = getSupabaseAdmin().storage.from(bucket).getPublicUrl(objectPath);
+  return data.publicUrl;
 }
 
 export async function saveUploadedFiles(files: File[], subdir: string): Promise<string[]> {
