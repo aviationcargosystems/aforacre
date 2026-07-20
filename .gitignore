@@ -36,6 +36,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# internal file-based data store + uploaded field-capture images
+# (admin/capture-generated content — not seed data, not meant to be committed)
+/.data/
+/public/uploads/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
