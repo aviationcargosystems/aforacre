@@ -11,7 +11,7 @@ const pinIcon = L.divIcon({
   className: "",
   html: `<div style="
     width:20px;height:20px;border-radius:50%;
-    background:#e07a2b;border:3px solid #fff;
+    background:#c56a4a;border:3px solid #fff;
     box-shadow:0 2px 6px rgba(0,0,0,0.4);
     transform:translate(-50%, -50%);
   "></div>`,

@@ -16,7 +16,7 @@ function pinIcon(active: boolean) {
   return L.divIcon({
     className: "",
     html: `<div style="
-      background:${active ? "#e07a2b" : "#1f4d2e"};
+      background:${active ? "#c56a4a" : "#1f3a2e"};
       color:#fff;
       padding:4px 8px;
       border-radius:999px;

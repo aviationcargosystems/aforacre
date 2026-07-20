@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { journeys } from "@/data/journeys";
 import { NewsletterForm } from "@/components/newsletter-form";
+import { BrandIcon } from "@/components/brand-icon";
 
 // lucide-react no longer ships brand/social glyphs — simple text monograms instead, in the same style as the rest of the footer's decorative row.
 const socialMonograms = ["f", "IG", "yt", "in"];
@@ -11,7 +12,8 @@ export function SiteFooter() {
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-5">
           <div className="md:col-span-2">
-            <Link href="/" className="text-white">
+            <Link href="/" className="flex items-center gap-2 text-white">
+              <BrandIcon className="h-7 w-7 shrink-0" />
               <span className="font-heading text-xl font-semibold">A for Acre</span>
             </Link>
             <p className="mt-3 max-w-xs text-sm text-white/70">

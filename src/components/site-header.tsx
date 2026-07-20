@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu } from "lucide-react";
+import { BrandIcon } from "@/components/brand-icon";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import {
@@ -26,7 +27,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/70 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="text-primary">
+        <Link href="/" className="flex items-center gap-2 text-primary">
+          <BrandIcon className="h-7 w-7 shrink-0" />
           <span className="font-heading text-xl font-semibold">A for Acre</span>
         </Link>
 
@@ -78,7 +80,9 @@ export function SiteHeader() {
           </SheetTrigger>
           <SheetContent side="right" className="w-72">
             <SheetHeader>
-              <SheetTitle className="font-heading text-lg text-primary">A for Acre</SheetTitle>
+              <SheetTitle className="flex items-center gap-2 font-heading text-lg text-primary">
+                <BrandIcon className="h-5 w-5 shrink-0" /> A for Acre
+              </SheetTitle>
             </SheetHeader>
             <nav className="flex flex-col gap-1 px-4">
               <p className="mt-2 mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Journeys</p>

@@ -8,7 +8,8 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-deep-green: var(--deep-green);
-  --font-sans: var(--font-inter);
+  --color-warm-stone: var(--warm-stone);
+  --font-sans: var(--font-montserrat);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-playfair);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -49,7 +50,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* A for Acre — deep forest greens, warm sand/cream surfaces, terracotta-orange accent. */
+/* A for Acre — brand guide: Forest Green / Deep Green / Sand / Terracotta / Warm Stone. */
 :root {
   --background: #faf7f1;
   --foreground: #1a1a1a;
@@ -57,33 +58,34 @@
   --card-foreground: #1a1a1a;
   --popover: #ffffff;
   --popover-foreground: #1a1a1a;
-  --primary: #1f4d2e;
+  --primary: #1f3a2e;
   --primary-foreground: #ffffff;
-  --deep-green: #0e2b1e;
-  --secondary: #f3efe6;
-  --secondary-foreground: #1f4d2e;
-  --muted: #f3efe6;
+  --deep-green: #0e241b;
+  --secondary: #ede6d5;
+  --secondary-foreground: #1f3a2e;
+  --muted: #ede6d5;
   --muted-foreground: #5b5b5b;
-  --accent: #e07a2b;
+  --accent: #c56a4a;
   --accent-foreground: #ffffff;
+  --warm-stone: #b8ad9a;
   --destructive: #d32f2f;
   --border: #e6e2da;
   --input: #e6e2da;
-  --ring: #1f4d2e;
-  --chart-1: #1f4d2e;
-  --chart-2: #e07a2b;
+  --ring: #1f3a2e;
+  --chart-1: #1f3a2e;
+  --chart-2: #c56a4a;
   --chart-3: #7a8f6f;
-  --chart-4: #d9b26a;
+  --chart-4: #b8ad9a;
   --chart-5: #5b5b5b;
   --radius: 0.75rem;
-  --sidebar: #f3efe6;
+  --sidebar: #ede6d5;
   --sidebar-foreground: #1a1a1a;
-  --sidebar-primary: #1f4d2e;
+  --sidebar-primary: #1f3a2e;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #ede6d6;
-  --sidebar-accent-foreground: #1f4d2e;
+  --sidebar-accent: #ede6d5;
+  --sidebar-accent-foreground: #1f3a2e;
   --sidebar-border: #e6e2da;
-  --sidebar-ring: #1f4d2e;
+  --sidebar-ring: #1f3a2e;
 }
 
 .dark {
@@ -95,7 +97,8 @@
   --popover-foreground: #ede6d6;
   --primary: #57a884;
   --primary-foreground: #0f1712;
-  --deep-green: #0e2b1e;
+  --deep-green: #0e241b;
+  --warm-stone: #b8ad9a;
   --secondary: #232c22;
   --secondary-foreground: #ede6d6;
   --muted: #1c241b;
