@@ -1,5 +1,5 @@
+import Image from "next/image";
 import { loginAction } from "./actions";
-import { BrandIcon } from "@/components/brand-icon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -19,7 +19,7 @@ export default async function AdminLoginPage({
       <Card className="w-full max-w-sm">
         <CardContent className="space-y-6">
           <div className="flex flex-col items-center gap-2 text-center">
-            <BrandIcon className="h-9 w-9 text-primary" />
+            <Image src="/brand/icon.png" alt="A for Acre" width={40} height={40} className="h-10 w-10" />
             <div>
               <h1 className="font-heading text-xl font-semibold text-foreground">A for Acre Admin</h1>
               <p className="text-sm text-muted-foreground">Internal access only</p>

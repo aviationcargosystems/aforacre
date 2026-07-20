@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, MapPin, ShieldCheck, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { JourneyCard } from "@/components/journey-card";
@@ -22,14 +21,6 @@ export default async function Home() {
       <section className="relative h-[92vh] min-h-[560px] overflow-hidden">
         <div className="absolute inset-0">
           <HeroVideo poster="/videos/hero-poster.jpg" />
-          <Image
-            src="/videos/hero-poster.jpg"
-            alt="South Bangalore farmland"
-            fill
-            priority
-            sizes="100vw"
-            className="hidden object-cover motion-reduce:block"
-          />
           <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/25 to-black/55" />
         </div>
         <div className="relative mx-auto flex h-full max-w-4xl flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">

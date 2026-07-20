@@ -20,7 +20,7 @@ export function HeroVideo({ poster }: { poster: string }) {
       playsInline
       preload="auto"
       poster={poster}
-      className="h-full w-full object-cover motion-reduce:hidden"
+      className="h-full w-full object-cover"
     >
       <source src="/videos/hero-farmland.mp4" type="video/mp4" />
     </video>

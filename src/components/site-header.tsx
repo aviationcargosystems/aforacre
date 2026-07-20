@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import { BrandIcon } from "@/components/brand-icon";
 import { Button } from "@/components/ui/button";
@@ -23,13 +24,26 @@ const navLinks = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 24);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/70 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2 text-primary">
-          <BrandIcon className="h-7 w-7 shrink-0" />
-          <span className="font-heading text-xl font-semibold">A for Acre</span>
+        <Link href="/" className="flex items-center text-primary">
+          {scrolled ? (
+            <Image src="/brand/icon.png" alt="A for Acre" width={36} height={36} className="h-9 w-9 shrink-0" priority />
+          ) : (
+            <Image src="/brand/logo.png" alt="A for Acre" width={160} height={53} className="h-9 w-auto" priority />
+          )}
         </Link>
 
         <NavigationMenu className="hidden md:flex" viewport={false}>

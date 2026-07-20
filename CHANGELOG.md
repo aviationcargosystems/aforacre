@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-07-20 23:10 IST · Real logo assets + hero video fix
+
+- Fixed hero background video: it was being deliberately hidden (`display:none`) whenever the browser reports `prefers-reduced-motion: reduce` — falling back to a static poster image by design. Confirmed via direct check that this was firing. Removed the gate since the video is muted/looping (broadly acceptable regardless of motion preference) and it was the actual, repeated cause of "video not playing."
+- Replaced the hand-recreated brand mark with the real logo/icon PNGs (no source file existed before, only a reference image)
+- Header now swaps between the full logo (top of page) and icon-only (once scrolled past ~24px) — scroll-based, matches the requested behavior
+- Same real icon now used for the favicon and across admin/login/capture pages (previously a hand-built approximation)
+- User-facing: hero video now visible/plays for everyone; real logo/icon shown everywhere instead of a placeholder
+- `(pending)`
+
 ## 2026-07-20 22:30 IST · Brand refresh — official style guide
 
 - Adopted the official brand palette: Forest Green `#1F3A2E`, Deep Green `#0E241B`, Sand `#EDE6D5`, Terracotta `#C56A4A`, Warm Stone `#B8AD9A` (refines the earlier close-approximation tokens to the authoritative hex values)
