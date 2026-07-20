@@ -7,7 +7,7 @@
 - Header now swaps between the full logo (top of page) and icon-only (once scrolled past ~24px) — scroll-based, matches the requested behavior
 - Same real icon now used for the favicon and across admin/login/capture pages (previously a hand-built approximation)
 - User-facing: hero video now visible/plays for everyone; real logo/icon shown everywhere instead of a placeholder
-- `(pending)`
+- `(0be4ca4)`
 
 ## 2026-07-20 22:30 IST · Brand refresh — official style guide
 
