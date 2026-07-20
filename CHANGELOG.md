@@ -8,7 +8,7 @@
 - Reinstated the icon next to the "A for Acre" wordmark in the header, footer, admin sidebar, admin login, and capture page — using the real brand mark this time, not a placeholder
 - New favicon using the same mark
 - User-facing: site now shows the finalized brand colors, fonts, and logo mark everywhere
-- `(pending)`
+- `(d2f6f7d)`
 
 ## 2026-07-20 21:15 IST · Ignore /build skill's local state directory
 
