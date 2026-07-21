@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-21 16:20 IST · Fix real mobile layout breakage (hero, footer, property/professional pages)
+
+- Root cause: several two-column layout grids used `lg:grid-cols-[...]`/`sm:grid-cols-*` with no base `grid-cols-1`, so below that breakpoint the browser sized the single implicit column to its widest child's intrinsic content (in the homepage hero, the horizontally-scrolling chip row) instead of the viewport — pushing the whole hero/section far wider than the screen
+- This was invisible in my own checks because a page-wide `overflow-x: clip` guard (added earlier) hides the resulting horizontal scrollbar — it masks the symptom but not the cause, so the oversized content was being silently clipped off-screen instead of visibly overflowing. Confirmed live via element-level bounding-box checks, not just scrollWidth.
+- Fixed on: homepage hero, journey-page hero, property-page gallery/header grids, professional-detail page grid, and the shared footer (present on every page)
+- User-facing: mobile layout was genuinely broken (hero text/buttons cut off, not just cosmetically loose) — now renders correctly at narrow widths
+- `(pending)`
+
 ## 2026-07-21 15:55 IST · Editorial Earth polish pass
 
 - Hero: removed a redundant badge/subtitle row above the headline, bumped hero type size further, made the three feature-chip pills horizontally scrollable on mobile instead of wrapping/overflowing, minor copy tweaks

@@ -67,7 +67,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
   return (
     <div className="pb-16">
       <section className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
-        <div className="grid gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
           <div className="relative overflow-hidden rounded-[1.75rem] bg-muted sm:col-span-2 sm:row-span-2 min-h-[340px]">
             <Image
               src={property.images[0]}
@@ -131,7 +131,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
         </div>
       </section>
 
-      <div className="mx-auto mt-10 grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.7fr_0.9fr] lg:px-8">
+      <div className="mx-auto mt-10 grid grid-cols-1 max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.7fr_0.9fr] lg:px-8">
         <div className="space-y-10">
           <Card className="p-6 sm:p-7">
             <CardContent className="space-y-6 p-0">

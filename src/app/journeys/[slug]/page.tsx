@@ -36,7 +36,7 @@ export default async function JourneyPage({ params }: { params: Promise<{ slug: 
           <Image src={journey.heroImage} alt={journey.title} fill priority sizes="100vw" className="object-cover" />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,14,0.18)_0%,rgba(8,18,14,0.45)_40%,rgba(8,18,14,0.82)_100%)]" />
         </div>
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-20 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end lg:px-8 lg:py-24">
+        <div className="mx-auto grid grid-cols-1 max-w-7xl gap-8 px-4 py-20 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end lg:px-8 lg:py-24">
           <div className="max-w-3xl text-white">
             <Badge className="bg-white/15 text-white">{journey.accentTag}</Badge>
             <h1 className="mt-5 font-heading text-5xl font-semibold leading-[0.96] tracking-tight sm:text-6xl lg:text-7xl">

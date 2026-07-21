@@ -34,7 +34,7 @@ export default async function ProfessionalPage({ params }: { params: Promise<{ s
         </div>
       </div>
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-3">
+      <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="space-y-8 lg:col-span-2">
           <section>
             <h2 className="font-heading text-xl font-semibold text-foreground">About</h2>

@@ -35,7 +35,7 @@ export default async function Home() {
           <div className="absolute right-[-6%] top-20 h-[460px] w-[460px] rounded-full bg-primary/12 blur-3xl" />
         </div>
 
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 pb-10 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:px-8 lg:pb-16">
+        <div className="mx-auto grid grid-cols-1 max-w-7xl gap-8 px-4 pb-10 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:px-8 lg:pb-16">
           <div className="max-w-2xl space-y-7">
             <div className="space-y-5">
               <h1 className="max-w-3xl font-heading text-6xl font-semibold leading-[0.96] tracking-tight text-foreground sm:text-7xl lg:text-8xl xl:text-[6.5rem]">

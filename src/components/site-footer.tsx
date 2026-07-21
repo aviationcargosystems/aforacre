@@ -10,7 +10,7 @@ export function SiteFooter() {
     <footer className="relative mt-20 overflow-hidden bg-deep-green text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(197,106,74,0.18),transparent_30%),radial-gradient(circle_at_left,rgba(87,168,132,0.14),transparent_28%)]" />
       <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8">
             <Link href="/" className="flex items-center gap-3 text-white">
               <BrandIcon className="h-8 w-8 shrink-0" />
@@ -38,7 +38,7 @@ export function SiteFooter() {
             </div>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
               <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-white/55">Explore</h3>
               <ul className="mt-4 space-y-3">
