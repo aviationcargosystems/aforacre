@@ -6,7 +6,7 @@
 - `/explore` now accepts a `q` search param and filters by property title, area, corridor, description, and tags — also added a visible, editable search input on the explore page itself so the query can be refined after landing
 - Journeys are still reachable via the header nav and the dedicated journeys section further down the homepage, so nothing was lost by dropping the "Start with a journey" button
 - User-facing: one clear search-first entry point instead of two competing buttons
-- `(pending)`
+- `(f7e2958)`
 
 ## 2026-07-21 16:20 IST · Fix real mobile layout breakage (hero, footer, property/professional pages)
 
