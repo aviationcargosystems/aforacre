@@ -74,10 +74,10 @@ export default async function Home() {
                   <Sprout className="h-3.5 w-3.5 text-primary" /> Search by use case
                 </span>
                 <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/70 bg-white/65 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur-sm">
-                  <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Tax &amp; legal
+                  <Wrench className="h-3.5 w-3.5 text-primary" /> Setup help on tap
                 </span>
                 <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/70 bg-white/65 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur-sm">
-                  <Wrench className="h-3.5 w-3.5 text-primary" /> Setup help on tap
+                  <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Tax &amp; legal
                 </span>
               </div>
             </div>

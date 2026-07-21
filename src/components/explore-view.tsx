@@ -46,14 +46,14 @@ export function ExploreView({
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const filtered = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const queryWords = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
     return properties
       .filter((property) => {
-        if (!normalizedQuery) return true;
+        if (queryWords.length === 0) return true;
         const haystack = [property.title, property.location.area, property.location.corridor, property.description, ...property.tags]
           .join(" ")
           .toLowerCase();
-        return haystack.includes(normalizedQuery);
+        return queryWords.every((word) => haystack.includes(word));
       })
       .filter((property) => (journeyId === "all" ? true : property.journeyFit[journeyId] >= 45))
       .filter((property) => property.distanceFromBangaloreKm <= maxDistance)
@@ -177,12 +177,8 @@ export function ExploreView({
           <div className="max-w-2xl space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent">Browse land</p>
             <h1 className="font-heading text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-              Explore land with a sharper filter.
+              Explore the best land.
             </h1>
-            <p className="text-pretty text-base leading-7 text-muted-foreground sm:text-lg">
-              Compare plots by journey, water, distance, and size. The map and list stay in sync so the search feels
-              like a conversation, not a spreadsheet.
-            </p>
           </div>
 
           <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>

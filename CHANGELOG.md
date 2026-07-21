@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-21 17:25 IST · Search matching fix, pill reorder, explore heading trim
+
+- Search bug fix: query was matched as one literal phrase, so "farm land" (with a space) found zero results even though "farmland" appears throughout the data. Now splits the query into words and requires each word to appear somewhere in the property's searchable text — "farm land" now correctly matches "farmland"
+- Hero feature pills reordered: Search by use case, Setup help on tap, Tax & legal (was Search / Tax & legal / Setup)
+- `/explore` heading trimmed to "Explore the best land." and the descriptive subtext paragraph removed
+- User-facing: search actually returns results for natural multi-word queries now
+- `(pending)`
+
 ## 2026-07-21 17:05 IST · Hero search bar replaces two-button CTA
 
 - Homepage hero: replaced the "Explore all land" / "Start with a journey" button pair with a single search bar (location, tag, or free-text — e.g. "polyhouse", "Kanakapura") plus a "Map" button, both leading into `/explore`
