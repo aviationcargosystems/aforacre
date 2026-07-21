@@ -37,15 +37,8 @@ export default async function Home() {
 
         <div className="mx-auto grid max-w-7xl gap-8 px-4 pb-10 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:px-8 lg:pb-16">
           <div className="max-w-2xl space-y-7">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="secondary" className="px-3 py-1.5">
-                South Bangalore land, rethought
-              </Badge>
-              <span className="text-sm text-muted-foreground">Search by use case, not just by pin code.</span>
-            </div>
-
             <div className="space-y-5">
-              <h1 className="max-w-3xl font-heading text-5xl font-semibold leading-[0.96] tracking-tight text-foreground sm:text-6xl lg:text-7xl xl:text-[5.5rem]">
+              <h1 className="max-w-3xl font-heading text-6xl font-semibold leading-[0.96] tracking-tight text-foreground sm:text-7xl lg:text-8xl xl:text-[6.5rem]">
                 Land that fits your life.
               </h1>
               <p className="max-w-2xl text-pretty text-lg leading-8 text-muted-foreground sm:text-xl">
@@ -65,16 +58,18 @@ export default async function Home() {
               </ScrollToSectionButton>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-white/65 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur-sm">
-                <Sprout className="h-3.5 w-3.5 text-primary" /> Search by use case
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-white/65 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur-sm">
-                <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Tax &amp; legal costs upfront
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-white/65 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur-sm">
-                <Wrench className="h-3.5 w-3.5 text-primary" /> Setup help on tap
-              </span>
+            <div className="-mx-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:overflow-visible sm:px-0 sm:pb-0">
+              <div className="flex w-max gap-2 sm:w-auto sm:flex-wrap">
+                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/70 bg-white/65 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur-sm">
+                  <Sprout className="h-3.5 w-3.5 text-primary" /> Search by use case
+                </span>
+                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/70 bg-white/65 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur-sm">
+                  <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Tax &amp; legal implications covered
+                </span>
+                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/70 bg-white/65 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur-sm">
+                  <Wrench className="h-3.5 w-3.5 text-primary" /> Setup help on tap
+                </span>
+              </div>
             </div>
           </div>
 
@@ -88,9 +83,9 @@ export default async function Home() {
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
-                        A for Acre, in numbers
+                        A for Acre
                       </p>
-                      <p className="mt-1 font-heading text-xl font-semibold">Calm, practical, premium.</p>
+                      <p className="mt-1 font-heading text-xl font-semibold">Calm, practical, reliable.</p>
                     </div>
                     <Badge className="bg-white/15 text-white">Live listing data</Badge>
                   </div>

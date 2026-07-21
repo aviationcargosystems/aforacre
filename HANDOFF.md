@@ -1,63 +1,63 @@
-# 🔀 Context Handoff — A for Acre — 2026-07-20
+# 🔀 Context Handoff — A for Acre (Project A) — 2026-07-21
 
 ## Goal / what we're doing
-Building **A for Acre**, a land-discovery web app for South Bangalore (polyhouse farming, commercial farming, retirement, weekend-getaway journeys), with a mock-data-driven public site, an internal admin backend, and a field-capture tool for site-visit photos/GPS. Real database deliberately deferred — "we'll see about the database... once we send it out."
+"A for Acre" — a South Bangalore land-discovery marketplace (Next.js 16 + Supabase). Full site built, admin backend + field-capture tooling live, brand assets finalized, and live on Vercel. Current thread's main work: a full visual "Editorial Earth" redesign pass inspired by a reference site (sanctityferme.com) the user shared, plus a mobile-overflow bug fix. Latest, still-unanswered ask: user wants enquiry/lead capture wired up ("get in [enquiry] details coming in") — scope not yet confirmed.
 
 ## Project facts
-- Repo: local only — `git remote -v` is empty, no GitHub/remote configured
-- Path: `C:\Users\user\Builds\Project A`
-- Branch: `master`
-- Deploy: none — local dev only (`npm run dev`, port 3000, via `.claude/launch.json` config named `"dev"`)
-- Live now: dev server was running at http://localhost:3000 when this thread ended (session-scoped — restart it in the new thread with `preview_start {name: "dev"}`)
-- Stack: Next.js 16.2.10 (App Router, Turbopack) + TypeScript + Tailwind v4 + shadcn/ui + react-leaflet
-- Storage: file-based JSON under `.data/*.json` (gitignored), seeded once from `src/data/*.ts` on first read. Current counts: 26 properties, 12 professionals, 14 tags, 0 captures.
+- Repo: `https://github.com/aviationcargosystems/aforacre.git` — **the local git remote URL currently has a GitHub PAT embedded in it (`git config --get remote.origin.url`). Do not print/reuse that token. Flag to the user to rotate it and reset the remote to a clean HTTPS/SSH URL.**
+- Branch: `main` (matches Vercel's Production Branch setting)
+- Deploy: Vercel, auto-deploys on push to `main` → live at `https://aforacre.vercel.app`
+- Vercel project is NOT accessible via this session's Vercel MCP tools (outside the `bconclub` team scope) — verify deploys via curl/browser against the live URL, not MCP calls
+- Local dev: `npm run dev` (port 3000), start via Browser-pane `preview_start {name: "project-a"}` — NOT plain Bash
+- Admin password lives in `.env.local` (`ADMIN_PASSWORD`) — never paste its value into chat, and never enter it into the login form myself (hard rule, see Conventions)
+- Supabase backend: Postgres + Storage, credentials in `.env.local` (gitignored)
 
 ## State right now
-- On origin/main: N/A — no remote
-- Local git: **only 1 commit exists** (`68b91c9 Initial commit from Create Next App`). Every feature built across this entire conversation — the full site, the admin backend, the capture tool, all branding/theme work — is **uncommitted** (modified + untracked files in the working tree). Nothing has been pushed or committed since. Do not assume anything is saved to git; if the user wants a commit, ask first per standing instructions.
-- Uncommitted: extensive — see `git status --short` for the full list. Key untracked dirs: `src/app/admin/`, `src/app/capture/`, `src/components/`, `src/data/`, `src/lib/`, `public/unsplash/`, `public/videos/`, `.claude/`.
-- Work queue: no `.claude/state/todo.md` — no active /build queue.
+- On `origin/main`: `6e4cf2c` "Fix changelog commit reference" — local HEAD matches origin (nothing committed-but-unpushed)
+- Uncommitted (working tree): **large** — two overlapping sets of changes:
+  1. **This thread's "Editorial Earth" redesign** (verified, see below): `src/app/page.tsx`, `journeys/[slug]/page.tsx`, `property/[slug]/page.tsx`, `professionals/page.tsx`, `professionals/[slug]/page.tsx`, `components/explore-view.tsx`, `journey-card.tsx`, `professional-card.tsx`, `professionals-directory.tsx`, `property-card.tsx`, `site-footer.tsx`, `ui/button.tsx`, `app/layout.tsx`, plus new files `components/section-heading.tsx` and `components/stat-counter.tsx`. Also the admin mobile-grid-overflow fix: `admin/(protected)/page.tsx`, `admin/(protected)/captures/page.tsx`, `admin/(protected)/professionals/page.tsx`, `components/admin/professional-form.tsx`, `components/admin/property-form.tsx`.
+  2. **Changes NOT authored by this thread's tracked edits — origin unclear, investigate before touching:** `src/components/site-header.tsx` (230-line diff — substantial, not a small tweak), `src/components/hero-video.tsx`, `src/components/newsletter-form.tsx`, `src/components/ui/badge.tsx`, `src/components/ui/card.tsx`, `src/app/explore/page.tsx`, `src/app/globals.css`, `public/brand/logo.png`. Two system-reminders during this thread also noted `stat-counter.tsx` and `section-heading.tsx` were modified outside my edits (kicker-with-lines treatment, bigger type scale, `text-pretty`) — those look like accepted refinements, not conflicts. New untracked files also present: `mobile-home.png`, `public/videos/hero-a-for-acre.mp4`, `src/components/featured-land-carousel.tsx`, `src/components/scroll-to-section-button.tsx`.
+  **→ Before committing/pushing anything, run `git status --short` and `git diff` fresh and actually read what's in the site-header.tsx / explore / globals.css changes — don't assume they're either "mine" or safe.**
+- Work queue: see `.claude/state/todo.md` — 3 pending, 2 blocked, 0 deferred (full detail there; headline copied below)
 
-## What shipped this thread (chronological, newest first)
-1. **Brand correction (final)**: brand name is **"A for Acre"** — a single name, no "Project A" prefix and no separate subtitle. (Earlier in the session it was briefly "Project A" with subtitle "A for Acre" — that was wrong and has been fully reverted. Every occurrence of "Project A" was removed from the codebase.)
-2. **Favicon fix**: was still the default Next.js icon. Replaced with `src/app/icon.svg` — the same Sprout leaf glyph used in the header, on a forest-green rounded background. Deleted the stale `src/app/favicon.ico`.
-3. **Hero fix**: the gradient overlay used to fade to the page's cream background color (`to-background`), which read as "white bleeding into the hero." Changed to a pure black-based gradient (`from-black/65 via-black/25 to-black/55`) that never blends toward white — hard clean edge into the next section instead.
-4. **Hero video**: replaced the static hero photo with a looping background video — aerial Indonesian rice-paddy footage from Mixkit (free license, no attribution required), downloaded to `public/videos/hero-farmland.mp4`, credited in `public/videos/_credits.json`. Falls back to the original still photo for `prefers-reduced-motion` users.
-5. **Admin backend** (the /loop-driven build): full CRUD for properties, professionals, and tags at `/admin/*`, gated by a simple shared-password login (`ADMIN_PASSWORD` env var, defaults to `"projecta-admin"` in dev — **must be set before this is ever exposed beyond localhost**). Session is a stateless hashed cookie (`src/lib/auth.ts`), enforced by `src/proxy.ts` (Next 16 renamed `middleware.ts` → `proxy.ts`) plus a `requireAdmin()` re-check inside every server action.
-6. **Field capture tool**: public `/capture` page — camera photo capture + geolocation (auto with manual lat/lng fallback), submits via a React 19 `useActionState` server action to `/admin/captures`, where an admin can review/status-change/delete or "Use in new property" to prefill a new listing from the capture's photos + coordinates.
-7. **Data-layer refactor**: extracted tax/suitability calc into `src/lib/property-builder.ts` so both the seed data and the admin create/edit forms share one code path. All public pages (`/`, `/explore`, `/journeys/[slug]`, `/property/[slug]`, `/professionals*`) now read from the file-based store (`src/lib/store/*.ts`) instead of static imports, so admin edits show up live. Routes are `force-dynamic` (SSR per request) rather than statically generated, since the data is now mutable.
-8. **Full verification pass**: tsc/eslint/build all clean; live-tested login, property add/edit/delete (tax math hand-verified against the Karnataka formula), professional add/delete, tag add/remove, a real photo-upload capture end-to-end (file confirmed on disk), capture→property prefill, and logout re-locking `/admin`. All test artifacts were cleaned up afterward — data store is back to the clean baseline (26/12/14/0).
+## What shipped this thread (newest first, all still local/uncommitted)
+- Fixed the same mobile-grid-overflow bug (missing base `grid-cols-1` before `sm:`/`lg:` grid variants) across 5 admin files — `tsc`/`eslint` clean; could NOT visually verify live in `/admin` because that requires entering the admin password, which I don't do even for the user's own local dev site (hard rule, not a judgment call) — user should eyeball it next time they're logged in on a narrow viewport.
+- "Editorial Earth" redesign pass: new `pill`/`pill-outline` button variants, oversized hero type with italic accent word (kept Playfair Display — the "different font entirely" the user mentioned is still unnamed, see Blocked), real-numbers stat strip (property count / total acres / professional count / corridors — computed from live Supabase data, not fabricated), softened bigger-radius cards, new `SectionHeading` + `StatCounter` shared components, closing full-bleed CTA band before the footer. Scope: home, journeys/[slug], property/[slug], professionals, professionals/[slug], explore filters. Admin + `/capture` explicitly left untouched by design.
+- Along the way found and fixed a **pre-existing, site-wide** bug: multiple grids had no base `grid-cols-1`, letting the browser's implicit grid track size to a child's intrinsic content width and overflow horizontally on mobile. Fixed on all public pages + the shared footer.
+- Verified: `npx tsc --noEmit` and `npx eslint .` clean; DOM/class-level checks confirm zero horizontal overflow at 375px across all 5 public page types (screenshots and `IntersectionObserver`-based checks were unreliable in-session because the browser tab was backgrounded/`document.hidden`, not a code defect — confirmed via `document.visibilityState`).
+- Before this: header logo bumped 36px→44px + solid white header bg for contrast (`2e5b652`, **pushed**), real logo/icon PNG assets + hero-video `prefers-reduced-motion` fix (`0be4ca4`, **pushed**), full brand-hex/Montserrat refresh (`d2f6f7d`, **pushed**).
 
-Earlier in the conversation (before the /loop build): the entire site was scaffolded from scratch via plan mode — theme ("earthy premium": forest green + terracotta + Fraunces/Inter), mock data for 26 properties across South Bangalore corridors (Kanakapura Road, Sarjapur, Anekal, Bannerghatta Road, etc.), 12 professionals across 9 service categories, 4 journeys, Karnataka tax/legal reference content, and all public pages including the Leaflet-based `/explore` map. Property/professional imagery was later "Indianized" (swapped generic Western stock photos for Indian-context Unsplash photos, credited in `public/unsplash/_credits.json`).
-
-## Blocked
-- None — all deliverables from this thread's work are complete and verified.
+## Blocked (waiting on something)
+- Heading font — user said "a different font entirely" for headings but never named it. This redesign pass deliberately kept Playfair Display and focused on scale/treatment instead. Ask again.
+- "10 pages are so bad" — zero specifics ever given (no page names, no description of what's wrong). Still open.
+- Supabase Storage bucket `project-a-uploads` (public) not yet created in the Supabase dashboard — admin photo uploads fail (`Bucket not found`) until it exists. User needs to create it themselves (dashboard action).
+- Enquiry/lead-capture request — user's message ("Let's set up the pages so that we can be ready to get in no details coming in") came through garbled. My read: wire up the currently-disabled "Request a call back" (property page) / "Request a quote" (professional page) buttons into real Supabase-backed forms, maybe with an admin inbox. I sent an `AskUserQuestion` to confirm scope but it errored out before the user could answer (`AbortError: Tool permission stream closed`) — **re-ask this in the new thread before building anything.**
 
 ## Open decisions for the user
-- When to add a real database (explicitly deferred: "once we send it out, we can probably have the database and everything set up").
-- Whether/when to make the first git commit — nothing has been committed yet.
-- `ADMIN_PASSWORD` needs to be set in `.env.local` before this app goes anywhere near a shared/public environment.
+- Confirm scope of the enquiry-capture request above.
+- Say go on committing + pushing the redesign pass (it's implemented and verified but deliberately held back given the size of the visual change) — but only AFTER the unexplained site-header.tsx / explore / globals.css diffs are reviewed, since pushing blind could ship unreviewed changes.
+- Name the heading font, or confirm Playfair Display stays.
+- Specify which "10 pages" and what's wrong with them.
+- Two GitHub PATs were pasted into chat earlier in this project's history (different thread) — confirm both were revoked, and rotate the one currently embedded in the git remote URL (see Project facts).
 
 ## Re-activate in the new thread
-- Caveman mode: OFF this session (user's global CLAUDE.md has it on by default — no explicit "stop caveman" was said, worth checking user's global instructions if responses seem off-tone)
-- /build queue: not active
-- /loop: not active (last /loop run completed and reported out fully)
-- Plan mode: not active
+- Caveman mode: ON (global `~/.claude/CLAUDE.md`, always active every session — full intensity, not thread-specific)
+- `/build` queue: active — resume from `.claude/state/todo.md`, don't recreate a parallel list
+- `/loop`: not active
+- No GPFC mode, no other stateful mode in play
 
 ## Conventions to follow (carry these over)
-- **Never commit unless explicitly asked** — this project has a large uncommitted working tree by design (nothing has been requested to be committed yet).
-- **Brand name is "A for Acre"** — single name, no "Project A", no subtitle. This was corrected twice in this session; treat it as settled.
-- Image sourcing: use the `unsplash-images` skill for photos (verify HTTP 200 before using, credit in `public/unsplash/_credits.json`); for video, direct-download from a no-attribution-required source (Mixkit worked well) into `public/videos/`, credit in `_credits.json` there too.
-- Admin/capture routes intentionally do NOT show the public marketing header/footer — `src/components/site-chrome.tsx` handles that split by pathname.
-- **Browser-pane automation gotchas** discovered this session, if further live UI testing is needed:
-  - `computer` (screenshot/click/type) has been unreliable/timing out in this environment — prefer `javascript_tool` with `requestSubmit()` on precisely-scoped forms, and manual `Object.getOwnPropertyDescriptor(...).set` value-setting for React-controlled/uncontrolled inputs.
-  - Admin pages have multiple `<form>` elements per page (e.g. sidebar logout form + the actual content form) — never use a bare `document.querySelector('form')`; scope by submit-button text or a specific container instead, or you'll accidentally submit the wrong form (this caused an accidental logout mid-testing).
-  - `confirm()` dialogs (delete buttons) block the page's JS thread entirely if triggered without first overriding `window.confirm = () => true` — a stuck dialog previously wedged a tab hard enough that even `navigate` timed out; had to close and reopen the tab.
-  - Each `javascript_exec` call seems to share script scope with prior calls on the same page — wrap scripts in an IIFE with locally-scoped `const`/`let` names to avoid "already declared" errors.
-  - File uploads can be simulated via a synthetic `File` + `DataTransfer` assigned to the input's `.files`, then dispatch a `change` event — confirmed working for testing the capture photo upload path.
+- Never paste secrets/tokens into chat or embed them in Bash commands — if the user pastes one, stop and hand them manual terminal commands instead of routing around the block.
+- Verify claims against live behavior, not "it's done" — this project's history had repeated cases where "it ran successfully" didn't match live state.
+- After every push: confirm the deploy landed (curl/browser against `aforacre.vercel.app`), not just that git accepted the push.
+- Default git branch is `main` (matches Vercel Production Branch) going forward.
+- Never enter passwords into login forms myself, including this project's own admin login — hard rule, applies even to the user's own local dev site.
+- This project's `AGENTS.md`/`CLAUDE.md` says: read `node_modules/next/dist/docs/` before writing Next.js code — this app is on a Next.js version with breaking changes vs. training-data assumptions.
 
 ## Links
-- None external — everything is local-only right now.
+- Live site: https://aforacre.vercel.app
+- Repo: https://github.com/aviationcargosystems/aforacre (see PAT warning above — do not construct URLs with embedded credentials)
+- Local dev: http://localhost:3000 (start via Browser-pane `preview_start` with name `project-a`, NOT plain Bash)
 
 ## ▶️ Start here in the new thread
-Ask the user what's next (no open task was mid-flight when this handoff was written). If they want to keep working on the app, start the dev server first: `preview_start {name: "dev"}`, then `preview_list` to confirm the port before navigating.
+Run `git status --short` and `git diff src/components/site-header.tsx src/app/explore/page.tsx src/app/globals.css` fresh to understand the unexplained changes before doing anything else — then re-ask the user to confirm the enquiry-capture scope (the `AskUserQuestion` that errored out), and separately get their go-ahead to commit/push the verified "Editorial Earth" redesign once the site-header question is resolved.

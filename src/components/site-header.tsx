@@ -58,7 +58,8 @@ export function SiteHeader() {
             </div>
           </Link>
 
-          <NavigationMenu className="hidden flex-1 justify-center lg:flex" viewport={false}>
+          <div className="hidden min-w-0 flex-1 justify-center lg:flex">
+            <NavigationMenu viewport={false}>
             <NavigationMenuList className="gap-1">
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="rounded-full bg-transparent px-4 text-sm font-medium text-foreground hover:bg-muted/70">
@@ -98,7 +99,8 @@ export function SiteHeader() {
                 </NavigationMenuItem>
               ))}
             </NavigationMenuList>
-          </NavigationMenu>
+            </NavigationMenu>
+          </div>
 
           <div className="hidden items-center gap-2 lg:flex">
             <Button asChild variant="ghost" size="sm" className="rounded-full px-4">

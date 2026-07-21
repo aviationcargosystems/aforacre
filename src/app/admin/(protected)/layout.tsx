@@ -49,7 +49,7 @@ export default function AdminProtectedLayout({ children }: { children: React.Rea
         </div>
       </aside>
 
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         {/* Mobile top bar */}
         <div className="flex items-center justify-between border-b border-border bg-background px-4 py-3 sm:hidden">
           <Link href="/admin" className="flex items-center gap-2 text-primary">
