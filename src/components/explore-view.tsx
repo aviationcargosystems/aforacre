@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, X } from "lucide-react";
 import type { JourneyId, Property, WaterSource } from "@/lib/types";
 import { journeys } from "@/data/journeys";
 import { formatINR } from "@/lib/tax";
@@ -28,11 +28,14 @@ export function ExploreView({
   properties,
   allTags,
   initialJourney,
+  initialQuery,
 }: {
   properties: Property[];
   allTags: string[];
   initialJourney?: JourneyId | null;
+  initialQuery?: string;
 }) {
+  const [query, setQuery] = useState(initialQuery ?? "");
   const [journeyId, setJourneyId] = useState<JourneyId | "all">(initialJourney ?? "all");
   const [maxDistance, setMaxDistance] = useState(MAX_DISTANCE);
   const [acreRange, setAcreRange] = useState<[number, number]>([0, MAX_ACRES]);
@@ -43,7 +46,15 @@ export function ExploreView({
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const filtered = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
     return properties
+      .filter((property) => {
+        if (!normalizedQuery) return true;
+        const haystack = [property.title, property.location.area, property.location.corridor, property.description, ...property.tags]
+          .join(" ")
+          .toLowerCase();
+        return haystack.includes(normalizedQuery);
+      })
       .filter((property) => (journeyId === "all" ? true : property.journeyFit[journeyId] >= 45))
       .filter((property) => property.distanceFromBangaloreKm <= maxDistance)
       .filter((property) => property.extentAcres >= acreRange[0] && property.extentAcres <= acreRange[1])
@@ -51,9 +62,10 @@ export function ExploreView({
       .filter((property) => (selectedTags.length === 0 ? true : selectedTags.some((tag) => property.tags.includes(tag))))
       .filter((property) => (selectedWater.length === 0 ? true : selectedWater.some((source) => property.waterSources.includes(source))))
       .sort((a, b) => (journeyId === "all" ? 0 : b.journeyFit[journeyId] - a.journeyFit[journeyId]));
-  }, [properties, journeyId, maxDistance, acreRange, maxPrice, selectedTags, selectedWater]);
+  }, [properties, query, journeyId, maxDistance, acreRange, maxPrice, selectedTags, selectedWater]);
 
   const activeFilterCount =
+    (query.trim() ? 1 : 0) +
     (journeyId !== "all" ? 1 : 0) +
     (maxDistance < MAX_DISTANCE ? 1 : 0) +
     (acreRange[0] > 0 || acreRange[1] < MAX_ACRES ? 1 : 0) +
@@ -62,6 +74,7 @@ export function ExploreView({
     selectedWater.length;
 
   function resetFilters() {
+    setQuery("");
     setJourneyId("all");
     setMaxDistance(MAX_DISTANCE);
     setAcreRange([0, MAX_ACRES]);
@@ -187,7 +200,18 @@ export function ExploreView({
           </Sheet>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+        <div className="relative mt-6">
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="text"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search by location, tag, or type — e.g. rental farmland"
+            className="w-full rounded-full border border-border/70 bg-background/80 py-2.5 pl-11 pr-4 text-sm text-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          />
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <span className="rounded-full bg-primary/10 px-3 py-1 font-medium text-primary">
             {filtered.length} of {properties.length} listings
           </span>

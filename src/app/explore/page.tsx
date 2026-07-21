@@ -13,11 +13,11 @@ export const metadata = {
 export default async function ExplorePage({
   searchParams,
 }: {
-  searchParams: Promise<{ journey?: string }>;
+  searchParams: Promise<{ journey?: string; q?: string }>;
 }) {
-  const { journey } = await searchParams;
+  const { journey, q } = await searchParams;
   const initialJourney = journeys.some((journeyItem) => journeyItem.id === journey) ? (journey as JourneyId) : null;
   const [properties, tags] = await Promise.all([getAllProperties(), allTags()]);
 
-  return <ExploreView properties={properties} allTags={tags} initialJourney={initialJourney} />;
+  return <ExploreView properties={properties} allTags={tags} initialJourney={initialJourney} initialQuery={q ?? ""} />;
 }

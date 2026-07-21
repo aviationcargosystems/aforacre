@@ -1,12 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, MapPin, ShieldCheck, Sprout, Wrench } from "lucide-react";
+import { ArrowRight, Map as MapIcon, MapPin, Search, ShieldCheck, Sprout, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { JourneyCard } from "@/components/journey-card";
 import { FeaturedLandCarousel } from "@/components/featured-land-carousel";
-import { ScrollToSectionButton } from "@/components/scroll-to-section-button";
 import { ProfessionalCard } from "@/components/professional-card";
 import { SectionHeading } from "@/components/section-heading";
 import { journeys } from "@/data/journeys";
@@ -47,16 +46,27 @@ export default async function Home() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-              <Button asChild variant="pill" size="pill" className="w-full sm:w-auto">
-                <Link href="/explore">
-                  Explore all land <ArrowRight className="ml-1 h-4 w-4" />
-                </Link>
-              </Button>
-              <ScrollToSectionButton targetId="journeys" className="w-full sm:w-auto">
-                Start with a journey
-              </ScrollToSectionButton>
-            </div>
+            <form action="/explore" className="flex flex-col gap-2.5 sm:flex-row sm:items-center">
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  name="q"
+                  placeholder="Search location, land type, or use case — e.g. rental farmland"
+                  className="w-full rounded-full border border-border/70 bg-white/80 py-3 pl-11 pr-4 text-sm text-foreground shadow-sm outline-none backdrop-blur-sm focus-visible:ring-3 focus-visible:ring-ring/50"
+                />
+              </div>
+              <div className="flex gap-2.5">
+                <Button type="submit" variant="pill" size="pill" className="flex-1 sm:flex-none">
+                  Search <ArrowRight className="ml-1 h-4 w-4" />
+                </Button>
+                <Button asChild variant="pill-outline" size="pill" className="flex-1 sm:flex-none">
+                  <Link href="/explore">
+                    <MapIcon className="mr-1.5 h-4 w-4" /> Map
+                  </Link>
+                </Button>
+              </div>
+            </form>
 
             <div className="-mx-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:overflow-visible sm:px-0 sm:pb-0">
               <div className="flex w-max gap-2 sm:w-auto sm:flex-wrap">

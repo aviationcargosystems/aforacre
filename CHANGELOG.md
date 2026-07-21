@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-21 17:05 IST · Hero search bar replaces two-button CTA
+
+- Homepage hero: replaced the "Explore all land" / "Start with a journey" button pair with a single search bar (location, tag, or free-text — e.g. "polyhouse", "Kanakapura") plus a "Map" button, both leading into `/explore`
+- `/explore` now accepts a `q` search param and filters by property title, area, corridor, description, and tags — also added a visible, editable search input on the explore page itself so the query can be refined after landing
+- Journeys are still reachable via the header nav and the dedicated journeys section further down the homepage, so nothing was lost by dropping the "Start with a journey" button
+- User-facing: one clear search-first entry point instead of two competing buttons
+- `(pending)`
+
 ## 2026-07-21 16:20 IST · Fix real mobile layout breakage (hero, footer, property/professional pages)
 
 - Root cause: several two-column layout grids used `lg:grid-cols-[...]`/`sm:grid-cols-*` with no base `grid-cols-1`, so below that breakpoint the browser sized the single implicit column to its widest child's intrinsic content (in the homepage hero, the horizontally-scrolling chip row) instead of the viewport — pushing the whole hero/section far wider than the screen
