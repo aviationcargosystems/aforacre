@@ -6,7 +6,7 @@
 - Hero feature pills reordered: Search by use case, Setup help on tap, Tax & legal (was Search / Tax & legal / Setup)
 - `/explore` heading trimmed to "Explore the best land." and the descriptive subtext paragraph removed
 - User-facing: search actually returns results for natural multi-word queries now
-- `(pending)`
+- `(0224d73)`
 
 ## 2026-07-21 17:05 IST · Hero search bar replaces two-button CTA
 
