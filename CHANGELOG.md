@@ -4,7 +4,7 @@
 
 - Header logo/icon bumped up (36px → 44px) and header background changed from translucent cream-blur to solid white, so the dark-green logo has clean contrast instead of blending into a busy/translucent backdrop
 - User-facing: logo reads more clearly in the header
-- `(pending)`
+- `(2e5b652)`
 
 ## 2026-07-20 23:10 IST · Real logo assets + hero video fix
 
