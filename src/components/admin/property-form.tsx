@@ -53,7 +53,7 @@ export function PropertyForm({
 
       <section className="space-y-4">
         <h2 className="font-heading text-lg font-semibold text-foreground">Basics</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Title" htmlFor="title">
             <input
               id="title"
@@ -128,7 +128,7 @@ export function PropertyForm({
 
       <section className="space-y-4">
         <h2 className="font-heading text-lg font-semibold text-foreground">Pricing</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Field label="Extent (acres)" htmlFor="extentAcres">
             <input
               id="extentAcres"
@@ -196,7 +196,7 @@ export function PropertyForm({
 
       <section className="space-y-4">
         <h2 className="font-heading text-lg font-semibold text-foreground">Journey fit (0–100)</h2>
-        <div className="grid gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
           {JOURNEY_FIELDS.map((j) => (
             <Field key={j.id} label={j.label} htmlFor={journeyFieldName(j.id)}>
               <input
@@ -216,7 +216,7 @@ export function PropertyForm({
 
       <section className="space-y-4">
         <h2 className="font-heading text-lg font-semibold text-foreground">Land details</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Soil type" htmlFor="soilType">
             <input id="soilType" name="soilType" required defaultValue={property?.soilType} className={inputClass} />
           </Field>
@@ -300,7 +300,7 @@ export function PropertyForm({
 
       <section className="space-y-4">
         <h2 className="font-heading text-lg font-semibold text-foreground">Legal</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Khata" htmlFor="khata">
             <select id="khata" name="khata" defaultValue={property?.legal.khata ?? "A"} className={inputClass}>
               {KHATA_OPTIONS.map((k) => (

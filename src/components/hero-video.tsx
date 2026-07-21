@@ -22,7 +22,7 @@ export function HeroVideo({ poster }: { poster: string }) {
       poster={poster}
       className="h-full w-full object-cover"
     >
-      <source src="/videos/hero-farmland.mp4" type="video/mp4" />
+      <source src="/videos/hero-a-for-acre.mp4" type="video/mp4" />
     </video>
   );
 }

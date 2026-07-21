@@ -2,6 +2,7 @@ import type { Professional, ProfessionalCategory } from "@/lib/types";
 import { avatarImg, PHOTO_IDS } from "@/lib/images";
 
 export const professionalCategoryLabels: Record<ProfessionalCategory, string> = {
+  broker: "Land Broker",
   solar: "Solar Installation",
   irrigation: "Irrigation Systems",
   borewell: "Borewell Drilling",

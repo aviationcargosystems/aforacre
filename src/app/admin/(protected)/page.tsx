@@ -30,7 +30,7 @@ export default async function AdminDashboardPage() {
       <h1 className="font-heading text-2xl font-semibold text-foreground">Dashboard</h1>
       <p className="mt-1 text-sm text-muted-foreground">Manage listings, professionals, tags, and incoming field captures.</p>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
           <Link key={card.href} href={card.href}>
             <Card className="transition-shadow hover:shadow-md">
@@ -47,7 +47,7 @@ export default async function AdminDashboardPage() {
         ))}
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Card>
           <CardContent className="space-y-3">
             <h2 className="font-heading text-base font-semibold text-foreground">Quick actions</h2>

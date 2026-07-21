@@ -9,6 +9,7 @@ export type JourneyId =
   | "getaway";
 
 export type ProfessionalCategory =
+  | "broker"
   | "solar"
   | "irrigation"
   | "borewell"

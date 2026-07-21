@@ -55,7 +55,7 @@ export default async function AdminCapturesPage({
         ))}
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((capture) => (
           <CaptureCard key={capture.id} capture={capture} linkedPropertyTitle={capture.propertySlug ? propertyTitleBySlug.get(capture.propertySlug) : undefined} />
         ))}

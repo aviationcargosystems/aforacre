@@ -46,7 +46,7 @@ export function ProfessionalForm({
 
       <section className="space-y-4">
         <h2 className="font-heading text-lg font-semibold text-foreground">Basics</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Name" htmlFor="name">
             <input
               id="name"
@@ -97,7 +97,7 @@ export function ProfessionalForm({
         <Field label="Services" htmlFor="services" hint="One per line.">
           <textarea id="services" name="services" rows={4} defaultValue={professional?.services.join("\n")} className={inputClass} />
         </Field>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Field label="Starting price" htmlFor="startingPrice" hint="Free text, e.g. ₹35,000/acre">
             <input id="startingPrice" name="startingPrice" required defaultValue={professional?.startingPrice} className={inputClass} />
           </Field>
@@ -124,7 +124,7 @@ export function ProfessionalForm({
             />
           </Field>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Rating (0–5)" htmlFor="rating">
             <input
               id="rating"

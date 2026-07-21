@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
-import { BrandIcon } from "@/components/brand-icon";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import {
@@ -16,9 +15,10 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { journeys } from "@/data/journeys";
+import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { href: "/explore", label: "Explore Land" },
+  { href: "/explore", label: "Explore" },
   { href: "/professionals", label: "Professionals" },
 ];
 
@@ -28,102 +28,158 @@ export function SiteHeader() {
 
   useEffect(() => {
     function onScroll() {
-      setScrolled(window.scrollY > 24);
+      setScrolled(window.scrollY > 18);
     }
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/70 bg-white">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center text-primary">
-          {scrolled ? (
-            <Image src="/brand/icon.png" alt="A for Acre" width={44} height={44} className="h-11 w-11 shrink-0" priority />
-          ) : (
-            <Image src="/brand/logo.png" alt="A for Acre" width={190} height={63} className="h-11 w-auto" priority />
-          )}
-        </Link>
+    <header className="sticky top-0 z-50 px-3 pt-3 sm:px-4">
+      <div
+        className={cn(
+          "mx-auto max-w-7xl rounded-[1.75rem] border border-white/70 bg-white/70 shadow-[0_18px_60px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-all",
+          scrolled && "border-white/80 bg-white/80 shadow-[0_18px_65px_rgba(15,23,42,0.12)]"
+        )}
+      >
+        <div className="flex h-18 items-center gap-4 px-4 sm:px-6 lg:h-20">
+          <Link href="/" className="flex items-center text-primary" aria-label="A for Acre home">
+            <div className="relative h-12 w-[144px] sm:h-14 sm:w-[168px]">
+              <Image
+                src="/brand/logo.png"
+                alt="A for Acre"
+                fill
+                priority
+                sizes="(max-width: 640px) 144px, 168px"
+                className="object-contain object-left"
+              />
+            </div>
+          </Link>
 
-        <NavigationMenu className="hidden md:flex" viewport={false}>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Journeys</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid w-[320px] gap-1 p-2">
-                  {journeys.map((journey) => (
-                    <li key={journey.id}>
-                      <NavigationMenuLink asChild>
-                        <Link href={`/journeys/${journey.id}`} className="flex flex-col gap-0.5 rounded-md px-3 py-2 hover:bg-secondary">
-                          <span className="font-medium text-foreground">{journey.shortTitle}</span>
-                          <span className="text-xs text-muted-foreground">{journey.tagline}</span>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                  ))}
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            {navLinks.map((link) => (
-              <NavigationMenuItem key={link.href}>
-                <NavigationMenuLink asChild>
-                  <Link href={link.href} className="px-4 py-2 text-sm font-medium">
-                    {link.label}
-                  </Link>
-                </NavigationMenuLink>
+          <NavigationMenu className="hidden flex-1 justify-center lg:flex" viewport={false}>
+            <NavigationMenuList className="gap-1">
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="rounded-full bg-transparent px-4 text-sm font-medium text-foreground hover:bg-muted/70">
+                  Journeys
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[340px] gap-1 p-2">
+                    {journeys.map((journey) => (
+                      <li key={journey.id}>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            href={`/journeys/${journey.id}`}
+                            className="flex flex-col gap-0.5 rounded-2xl px-3 py-2.5 transition-colors hover:bg-secondary/70"
+                          >
+                            <span className="font-medium text-foreground">{journey.shortTitle}</span>
+                            <span className="text-xs text-muted-foreground">{journey.tagline}</span>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
               </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
-
-        <div className="hidden items-center gap-3 md:flex">
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/professionals">For Professionals</Link>
-          </Button>
-          <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
-            <Link href="/explore">Explore Land</Link>
-          </Button>
-        </div>
-
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon" aria-label="Open menu">
-              <Menu className="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-72">
-            <SheetHeader>
-              <SheetTitle className="flex items-center gap-2 font-heading text-lg text-primary">
-                <BrandIcon className="h-5 w-5 shrink-0" /> A for Acre
-              </SheetTitle>
-            </SheetHeader>
-            <nav className="flex flex-col gap-1 px-4">
-              <p className="mt-2 mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Journeys</p>
-              {journeys.map((journey) => (
-                <Link
-                  key={journey.id}
-                  href={`/journeys/${journey.id}`}
-                  onClick={() => setOpen(false)}
-                  className="rounded-md px-2 py-2 text-sm hover:bg-secondary"
-                >
-                  {journey.shortTitle}
-                </Link>
-              ))}
-              <div className="my-2 h-px bg-border" />
               {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="rounded-md px-2 py-2 text-sm font-medium hover:bg-secondary"
-                >
-                  {link.label}
-                </Link>
+                <NavigationMenuItem key={link.href}>
+                  <NavigationMenuLink asChild>
+                    <Link
+                      href={link.href}
+                      className={cn(
+                        "rounded-full px-4 py-2 text-sm font-medium transition-colors hover:bg-muted/70",
+                        "text-foreground/80 hover:text-foreground"
+                      )}
+                    >
+                      {link.label}
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
               ))}
-            </nav>
-          </SheetContent>
-        </Sheet>
+            </NavigationMenuList>
+          </NavigationMenu>
+
+          <div className="hidden items-center gap-2 lg:flex">
+            <Button asChild variant="ghost" size="sm" className="rounded-full px-4">
+              <Link href="/professionals">For Professionals</Link>
+            </Button>
+            <Button asChild variant="pill" size="sm">
+              <Link href="/explore">Explore land</Link>
+            </Button>
+          </div>
+
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild className="ml-auto lg:hidden">
+              <Button variant="ghost" size="icon" aria-label="Open menu" className="rounded-full">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-80 border-border/70 bg-background/95 backdrop-blur-xl">
+              <SheetHeader>
+                <SheetTitle className="flex items-center gap-3 text-left font-heading text-lg text-primary">
+                  <div className="relative h-7 w-7 shrink-0">
+                    <Image src="/brand/icon.png" alt="A for Acre icon" fill sizes="28px" className="object-contain" />
+                  </div>
+                  A for Acre
+                </SheetTitle>
+              </SheetHeader>
+              <div className="px-4 pb-8">
+                <p className="mt-2 text-sm text-muted-foreground">
+                  South Bangalore land discovery, with clearer pricing, taxes, and local help.
+                </p>
+                <nav className="mt-6 flex flex-col gap-1">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                    Journeys
+                  </p>
+                  {journeys.map((journey) => (
+                    <Link
+                      key={journey.id}
+                      href={`/journeys/${journey.id}`}
+                      onClick={() => setOpen(false)}
+                      className="rounded-2xl px-3 py-2.5 text-sm transition-colors hover:bg-secondary/70"
+                    >
+                      {journey.shortTitle}
+                    </Link>
+                  ))}
+                  <div className="my-3 h-px bg-border/70" />
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setOpen(false)}
+                      className="rounded-2xl px-3 py-2.5 text-sm font-medium transition-colors hover:bg-secondary/70"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </nav>
+                <div className="mt-6 grid gap-2">
+                  <Button asChild variant="pill" size="sm" className="w-full">
+                    <Link href="/explore" onClick={() => setOpen(false)}>
+                      Explore land
+                    </Link>
+                  </Button>
+                  <Button asChild variant="pill-outline" size="sm" className="w-full">
+                    <Link href="/professionals" onClick={() => setOpen(false)}>
+                      For professionals
+                    </Link>
+                  </Button>
+                </div>
+                <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-border/70 bg-muted/35">
+                  <Image
+                    src="/brand/logo.png"
+                    alt="A for Acre"
+                    width={520}
+                    height={180}
+                    className="h-auto w-full p-4"
+                    priority
+                  />
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   );

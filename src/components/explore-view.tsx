@@ -10,13 +10,7 @@ import { PropertyMap } from "@/components/map/property-map";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 const WATER_SOURCES: { value: WaterSource; label: string }[] = [
@@ -26,7 +20,7 @@ const WATER_SOURCES: { value: WaterSource; label: string }[] = [
   { value: "canal", label: "Canal" },
 ];
 
-const MAX_PRICE = 100000000; // 10 Cr ceiling for the slider
+const MAX_PRICE = 100000000;
 const MAX_ACRES = 8;
 const MAX_DISTANCE = 110;
 
@@ -50,12 +44,12 @@ export function ExploreView({
 
   const filtered = useMemo(() => {
     return properties
-      .filter((p) => (journeyId === "all" ? true : p.journeyFit[journeyId] >= 45))
-      .filter((p) => p.distanceFromBangaloreKm <= maxDistance)
-      .filter((p) => p.extentAcres >= acreRange[0] && p.extentAcres <= acreRange[1])
-      .filter((p) => p.totalPrice <= maxPrice)
-      .filter((p) => (selectedTags.length === 0 ? true : selectedTags.some((t) => p.tags.includes(t))))
-      .filter((p) => (selectedWater.length === 0 ? true : selectedWater.some((w) => p.waterSources.includes(w))))
+      .filter((property) => (journeyId === "all" ? true : property.journeyFit[journeyId] >= 45))
+      .filter((property) => property.distanceFromBangaloreKm <= maxDistance)
+      .filter((property) => property.extentAcres >= acreRange[0] && property.extentAcres <= acreRange[1])
+      .filter((property) => property.totalPrice <= maxPrice)
+      .filter((property) => (selectedTags.length === 0 ? true : selectedTags.some((tag) => property.tags.includes(tag))))
+      .filter((property) => (selectedWater.length === 0 ? true : selectedWater.some((source) => property.waterSources.includes(source))))
       .sort((a, b) => (journeyId === "all" ? 0 : b.journeyFit[journeyId] - a.journeyFit[journeyId]));
   }, [properties, journeyId, maxDistance, acreRange, maxPrice, selectedTags, selectedWater]);
 
@@ -77,26 +71,26 @@ export function ExploreView({
   }
 
   function toggleTag(tag: string) {
-    setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
+    setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((value) => value !== tag) : [...prev, tag]));
   }
 
-  function toggleWater(w: WaterSource) {
-    setSelectedWater((prev) => (prev.includes(w) ? prev.filter((x) => x !== w) : [...prev, w]));
+  function toggleWater(source: WaterSource) {
+    setSelectedWater((prev) => (prev.includes(source) ? prev.filter((value) => value !== source) : [...prev, source]));
   }
 
   const filterPanel = (
     <div className="space-y-6">
       <div>
         <label className="text-sm font-medium text-foreground">Journey</label>
-        <Select value={journeyId} onValueChange={(v) => setJourneyId(v as JourneyId | "all")}>
-          <SelectTrigger className="mt-2 w-full">
+        <Select value={journeyId} onValueChange={(value) => setJourneyId(value as JourneyId | "all")}>
+          <SelectTrigger className="mt-2 w-full rounded-full border-border/70 bg-background/80">
             <SelectValue placeholder="All journeys" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All journeys</SelectItem>
-            {journeys.map((j) => (
-              <SelectItem key={j.id} value={j.id}>
-                {j.shortTitle}
+            {journeys.map((journey) => (
+              <SelectItem key={journey.id} value={journey.id}>
+                {journey.shortTitle}
               </SelectItem>
             ))}
           </SelectContent>
@@ -106,33 +100,19 @@ export function ExploreView({
       <div>
         <div className="flex items-center justify-between text-sm font-medium text-foreground">
           <span>Max distance from city</span>
-          <span className="text-muted-foreground">{maxDistance}km</span>
+          <span className="text-muted-foreground">{maxDistance} km</span>
         </div>
-        <Slider
-          className="mt-3"
-          value={[maxDistance]}
-          onValueChange={([v]) => setMaxDistance(v)}
-          min={10}
-          max={MAX_DISTANCE}
-          step={5}
-        />
+        <Slider className="mt-3" value={[maxDistance]} onValueChange={([value]) => setMaxDistance(value)} min={10} max={MAX_DISTANCE} step={5} />
       </div>
 
       <div>
         <div className="flex items-center justify-between text-sm font-medium text-foreground">
           <span>Extent (acres)</span>
           <span className="text-muted-foreground">
-            {acreRange[0]} – {acreRange[1] === MAX_ACRES ? `${MAX_ACRES}+` : acreRange[1]}
+            {acreRange[0]} - {acreRange[1] === MAX_ACRES ? `${MAX_ACRES}+` : acreRange[1]}
           </span>
         </div>
-        <Slider
-          className="mt-3"
-          value={acreRange}
-          onValueChange={(v) => setAcreRange(v as [number, number])}
-          min={0}
-          max={MAX_ACRES}
-          step={0.5}
-        />
+        <Slider className="mt-3" value={acreRange} onValueChange={(value) => setAcreRange(value as [number, number])} min={0} max={MAX_ACRES} step={0.5} />
       </div>
 
       <div>
@@ -140,23 +120,16 @@ export function ExploreView({
           <span>Max total price</span>
           <span className="text-muted-foreground">{formatINR(maxPrice)}</span>
         </div>
-        <Slider
-          className="mt-3"
-          value={[maxPrice]}
-          onValueChange={([v]) => setMaxPrice(v)}
-          min={2000000}
-          max={MAX_PRICE}
-          step={500000}
-        />
+        <Slider className="mt-3" value={[maxPrice]} onValueChange={([value]) => setMaxPrice(value)} min={2000000} max={MAX_PRICE} step={500000} />
       </div>
 
       <div>
         <p className="text-sm font-medium text-foreground">Water source</p>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {WATER_SOURCES.map((w) => (
-            <button key={w.value} type="button" onClick={() => toggleWater(w.value)}>
-              <Badge variant={selectedWater.includes(w.value) ? "default" : "outline"} className="cursor-pointer">
-                {w.label}
+        <div className="mt-3 flex flex-wrap gap-2">
+          {WATER_SOURCES.map((source) => (
+            <button key={source.value} type="button" onClick={() => toggleWater(source.value)}>
+              <Badge variant={selectedWater.includes(source.value) ? "default" : "outline"} className="cursor-pointer px-3 py-1.5">
+                {source.label}
               </Badge>
             </button>
           ))}
@@ -165,10 +138,10 @@ export function ExploreView({
 
       <div>
         <p className="text-sm font-medium text-foreground">Tags</p>
-        <div className="mt-2 flex flex-wrap gap-1.5">
+        <div className="mt-3 flex flex-wrap gap-2">
           {allTags.map((tag) => (
             <button key={tag} type="button" onClick={() => toggleTag(tag)}>
-              <Badge variant={selectedTags.includes(tag) ? "default" : "outline"} className="cursor-pointer">
+              <Badge variant={selectedTags.includes(tag) ? "default" : "outline"} className="cursor-pointer px-3 py-1.5">
                 {tag}
               </Badge>
             </button>
@@ -177,7 +150,7 @@ export function ExploreView({
       </div>
 
       {activeFilterCount > 0 && (
-        <Button variant="ghost" size="sm" onClick={resetFilters} className="w-full">
+        <Button variant="pill-outline" size="sm" onClick={resetFilters} className="w-full">
           <X className="mr-1 h-4 w-4" /> Clear all filters
         </Button>
       )}
@@ -186,35 +159,53 @@ export function ExploreView({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-heading text-3xl font-semibold text-foreground">Explore land</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{filtered.length} of {properties.length} listings match your filters</p>
+      <div className="rounded-[2rem] border border-white/70 bg-white/70 p-5 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent">Browse land</p>
+            <h1 className="font-heading text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+              Explore land with a sharper filter.
+            </h1>
+            <p className="text-pretty text-base leading-7 text-muted-foreground sm:text-lg">
+              Compare plots by journey, water, distance, and size. The map and list stay in sync so the search feels
+              like a conversation, not a spreadsheet.
+            </p>
+          </div>
+
+          <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+            <SheetTrigger asChild className="lg:hidden">
+              <Button variant="pill-outline" className="rounded-full">
+                <SlidersHorizontal className="mr-1.5 h-4 w-4" /> Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-80 overflow-y-auto border-border/70 bg-background/95 backdrop-blur-xl">
+              <SheetHeader>
+                <SheetTitle>Filters</SheetTitle>
+              </SheetHeader>
+              <div className="px-4 pb-8">{filterPanel}</div>
+            </SheetContent>
+          </Sheet>
         </div>
-        <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
-          <SheetTrigger asChild className="lg:hidden">
-            <Button variant="outline">
-              <SlidersHorizontal className="mr-1.5 h-4 w-4" /> Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-80 overflow-y-auto">
-            <SheetHeader>
-              <SheetTitle>Filters</SheetTitle>
-            </SheetHeader>
-            <div className="px-4 pb-8">{filterPanel}</div>
-          </SheetContent>
-        </Sheet>
+
+        <div className="mt-6 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+          <span className="rounded-full bg-primary/10 px-3 py-1 font-medium text-primary">
+            {filtered.length} of {properties.length} listings
+          </span>
+          {activeFilterCount > 0 && <span>{activeFilterCount} active filters</span>}
+        </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr_1fr]">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[320px_minmax(0,1fr)_minmax(360px,0.95fr)]">
         <aside className="hidden lg:block">
-          <div className="sticky top-24 rounded-xl border border-border bg-card p-5">{filterPanel}</div>
+          <div className="sticky top-28 rounded-[1.75rem] border border-white/70 bg-white/70 p-5 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+            {filterPanel}
+          </div>
         </aside>
 
-        <div className="order-2 lg:order-1 lg:col-span-1 space-y-4 max-h-[calc(100vh-180px)] overflow-y-auto pr-1 lg:sticky lg:top-24">
+        <div className="order-2 space-y-4 lg:order-1 lg:max-h-[calc(100vh-190px)] lg:overflow-y-auto lg:pr-1 lg:sticky lg:top-28">
           {filtered.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
-              No land matches these filters yet. Try widening your distance or price range.
+            <div className="rounded-[1.75rem] border border-dashed border-border/70 bg-white/65 p-10 text-center text-muted-foreground backdrop-blur-sm">
+              No land matches these filters yet. Try widening the distance, price range, or tags.
             </div>
           ) : (
             filtered.map((property) => (
@@ -222,7 +213,7 @@ export function ExploreView({
                 key={property.slug}
                 onMouseEnter={() => setHoveredSlug(property.slug)}
                 onMouseLeave={() => setHoveredSlug(null)}
-                className={hoveredSlug === property.slug ? "rounded-xl ring-2 ring-accent" : ""}
+                className={hoveredSlug === property.slug ? "rounded-[1.75rem] ring-2 ring-accent/60" : ""}
               >
                 <PropertyCard
                   property={property}
@@ -233,7 +224,7 @@ export function ExploreView({
           )}
         </div>
 
-        <div className="order-1 h-[400px] overflow-hidden rounded-xl border border-border lg:order-2 lg:sticky lg:top-24 lg:h-[calc(100vh-180px)]">
+        <div className="order-1 h-[460px] overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/70 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:order-2 lg:sticky lg:top-28 lg:h-[calc(100vh-190px)]">
           <PropertyMap properties={filtered} hoveredSlug={hoveredSlug} onHover={setHoveredSlug} />
         </div>
       </div>

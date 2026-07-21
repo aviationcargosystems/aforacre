@@ -128,14 +128,28 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
+    @apply h-full;
+    overflow-x: clip;
+  }
+  body {
+    @apply min-h-full bg-background text-foreground antialiased;
+    background:
+      radial-gradient(circle at top left, rgba(201, 110, 69, 0.18), transparent 30%),
+      radial-gradient(circle at top right, rgba(31, 58, 46, 0.16), transparent 26%),
+      linear-gradient(180deg, #fbf7f0 0%, #f3ede4 52%, #efe6d8 100%);
+    background-attachment: fixed;
+    font-feature-settings: "ss01" 1, "cv01" 1, "cv02" 1;
+  }
+  html,
+  body {
     @apply font-sans;
   }
   h1, h2, h3, h4 {
     @apply font-heading;
+  }
+  a {
+    @apply transition-colors;
   }
 }
 
@@ -155,4 +169,9 @@
 .property-popup .leaflet-popup-content {
   margin: 0;
   width: auto !important;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--foreground);
 }

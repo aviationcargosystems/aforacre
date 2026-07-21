@@ -26,7 +26,7 @@ export default async function AdminProfessionalsPage() {
         </Button>
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {professionals.map((p) => (
           <div key={p.slug} className="rounded-xl border border-border bg-background p-4">
             <div className="flex items-center gap-3">

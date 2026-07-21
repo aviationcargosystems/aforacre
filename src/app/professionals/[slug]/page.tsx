@@ -22,7 +22,7 @@ export default async function ProfessionalPage({ params }: { params: Promise<{ s
         </div>
         <div className="flex-1">
           <Badge variant="secondary">{professionalCategoryLabels[professional.category]}</Badge>
-          <h1 className="mt-2 font-heading text-3xl font-semibold text-foreground">{professional.name}</h1>
+          <h1 className="mt-2 font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{professional.name}</h1>
           <p className="mt-1 text-muted-foreground">{professional.tagline}</p>
           <div className="mt-3 flex flex-wrap items-center gap-4 text-sm">
             <span className="flex items-center gap-1 font-medium text-foreground">
@@ -72,7 +72,7 @@ export default async function ProfessionalPage({ params }: { params: Promise<{ s
                 <p className="text-xs text-muted-foreground">Starting from</p>
                 <p className="font-heading text-lg font-semibold text-foreground">{professional.startingPrice}</p>
               </div>
-              <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled>
+              <Button variant="pill" size="pill" className="w-full" disabled>
                 <Phone className="mr-1.5 h-4 w-4" /> Request a quote
               </Button>
               <p className="text-xs text-muted-foreground">

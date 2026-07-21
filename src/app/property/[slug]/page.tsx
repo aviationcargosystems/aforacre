@@ -22,6 +22,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ProfessionalCard } from "@/components/professional-card";
 import { PropertyLocationMap } from "@/components/map/property-location-map";
+import { SectionHeading } from "@/components/section-heading";
 
 export const dynamic = "force-dynamic";
 
@@ -35,18 +36,15 @@ const suitabilityLabels: Record<string, string> = {
 
 function ScoreBar({ label, score, note }: { label: string; score: number; note?: string }) {
   return (
-    <div>
+    <div className="rounded-2xl border border-border/70 bg-white/70 p-4 shadow-[0_10px_28px_rgba(15,23,42,0.04)] backdrop-blur-sm">
       <div className="flex items-center justify-between text-sm">
         <span className="font-medium text-foreground">{label}</span>
         <span className="text-muted-foreground">{score}/100</span>
       </div>
-      <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-muted">
-        <div
-          className="h-full rounded-full bg-primary"
-          style={{ width: `${score}%` }}
-        />
+      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted">
+        <div className="h-full rounded-full bg-primary" style={{ width: `${score}%` }} />
       </div>
-      {note && <p className="mt-1.5 text-xs text-muted-foreground">{note}</p>}
+      {note && <p className="mt-2 text-xs leading-6 text-muted-foreground">{note}</p>}
     </div>
   );
 }
@@ -56,156 +54,203 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
   const property = await getProperty(slug);
   if (!property) notFound();
 
-  const topJourney = journeys.reduce((best, j) =>
-    property.journeyFit[j.id] > property.journeyFit[best.id] ? j : best
-  , journeys[0]);
+  const topJourney = journeys.reduce(
+    (best, journey) => (property.journeyFit[journey.id] > property.journeyFit[best.id] ? journey : best),
+    journeys[0]
+  );
 
   const professionals = await getAllProfessionals();
   const matchedProfessionals = professionals
-    .filter((p) => topJourney.relevantProfessionalCategories.includes(p.category))
+    .filter((professional) => topJourney.relevantProfessionalCategories.includes(professional.category))
     .slice(0, 3);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Gallery */}
-      <div className="grid gap-2 sm:grid-cols-3 sm:grid-rows-2">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted sm:col-span-2 sm:row-span-2 sm:aspect-auto">
-          <Image src={property.images[0]} alt={property.title} fill sizes="(max-width: 768px) 100vw, 66vw" className="object-cover" priority />
-        </div>
-        {property.images.slice(1).map((img, i) => (
-          <div key={i} className="relative hidden aspect-[4/3] overflow-hidden rounded-xl bg-muted sm:block">
-            <Image src={img} alt={`${property.title} photo ${i + 2}`} fill sizes="33vw" className="object-cover" />
-          </div>
-        ))}
-      </div>
-
-      {/* Header */}
-      <div className="mt-6 flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <div className="flex flex-wrap gap-1.5">
-            {property.tags.map((tag) => (
-              <Badge key={tag} variant="secondary">{tag}</Badge>
-            ))}
-          </div>
-          <h1 className="mt-2 font-heading text-3xl font-semibold text-foreground">{property.title}</h1>
-          <p className="mt-1 flex items-center gap-1.5 text-muted-foreground">
-            <MapPin className="h-4 w-4" />
-            {property.location.area}, {property.location.corridor} · {property.distanceFromBangaloreKm}km from Bangalore
-          </p>
-        </div>
-        <div className="text-left sm:text-right">
-          <p className="font-heading text-3xl font-semibold text-primary">{formatINR(property.totalPrice)}</p>
-          <p className="text-sm text-muted-foreground">{formatINR(property.pricePerAcre)}/acre · {property.extentAcres} acres</p>
-        </div>
-      </div>
-
-      <div className="mt-8 grid gap-10 lg:grid-cols-3">
-        <div className="space-y-10 lg:col-span-2">
-          {/* Description */}
-          <section>
-            <h2 className="font-heading text-xl font-semibold text-foreground">About this land</h2>
-            <p className="mt-3 leading-relaxed text-muted-foreground">{property.description}</p>
-          </section>
-
-          {/* Key facts */}
-          <section>
-            <h2 className="font-heading text-xl font-semibold text-foreground">Key facts</h2>
-            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
-              <FactItem icon={Ruler} label="Extent" value={`${property.extentAcres} acres`} />
-              <FactItem icon={Droplets} label="Water source" value={property.waterSources.join(", ") || "None"} />
-              <FactItem icon={Route} label="Road access" value={property.roadAccess} />
-              <FactItem icon={Fence} label="Fencing" value={property.fencing ? "Fenced" : "Not fenced"} />
-              <FactItem icon={Zap} label="Electricity" value={property.electricity ? "Connected" : "Not connected"} />
-              <FactItem icon={ScrollText} label="Soil type" value={property.soilType} />
+    <div className="pb-16">
+      <section className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
+        <div className="grid gap-4 sm:grid-cols-4">
+          <div className="relative overflow-hidden rounded-[1.75rem] bg-muted sm:col-span-2 sm:row-span-2 min-h-[340px]">
+            <Image
+              src={property.images[0]}
+              alt={property.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 66vw"
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,14,0.02)_0%,rgba(8,18,14,0.12)_45%,rgba(8,18,14,0.70)_100%)]" />
+            <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+              {property.featured && <Badge className="bg-white/90 text-foreground">Featured</Badge>}
+              <Badge className="bg-white/15 text-white">{property.journeyFit[topJourney.id]}% match</Badge>
             </div>
-          </section>
+            <div className="absolute inset-x-4 bottom-4 rounded-[1.5rem] border border-white/15 bg-white/10 p-4 text-white backdrop-blur-xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">Property overview</p>
+              <h1 className="mt-2 font-heading text-3xl font-semibold leading-tight sm:text-4xl">{property.title}</h1>
+              <p className="mt-2 flex items-center gap-1.5 text-sm text-white/80">
+                <MapPin className="h-4 w-4" />
+                {property.location.area}, {property.location.corridor} - {property.distanceFromBangaloreKm}km from Bangalore
+              </p>
+            </div>
+          </div>
+          {property.images.slice(1, 4).map((image, index) => (
+            <div key={image} className="relative hidden overflow-hidden rounded-[1.75rem] bg-muted sm:block">
+              <Image
+                src={image}
+                alt={`${property.title} photo ${index + 2}`}
+                fill
+                sizes="33vw"
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
 
-          {/* Journey fit + suitability */}
-          <section>
-            <h2 className="font-heading text-xl font-semibold text-foreground">Land suitability</h2>
-            <p className="mt-1 text-sm text-muted-foreground">How this plot scores across common uses.</p>
-            <div className="mt-5 grid gap-5 sm:grid-cols-2">
-              {(Object.keys(property.suitability) as (keyof typeof property.suitability)[]).map((key) => (
-                <ScoreBar
-                  key={key}
-                  label={suitabilityLabels[key]}
-                  score={property.suitability[key].score}
-                  note={property.suitability[key].note}
-                />
+      <section className="mx-auto mt-8 max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-6 border-b border-border/70 pb-8 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="flex flex-wrap gap-2">
+              {property.tags.map((tag) => (
+                <Badge key={tag} variant="secondary" className="px-3 py-1.5">
+                  {tag}
+                </Badge>
               ))}
             </div>
-          </section>
-
-          {/* Tax breakdown */}
-          <section>
-            <h2 className="font-heading text-xl font-semibold text-foreground">Taxes & charges (Karnataka)</h2>
+            <SectionHeading
+              kicker="Listing detail"
+              title={property.title}
+              subtitle={property.description}
+              className="mt-4"
+            />
+          </div>
+          <div className="rounded-[1.75rem] border border-white/70 bg-white/70 p-5 text-left shadow-[0_16px_45px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:text-right">
+            <p className="font-heading text-4xl font-semibold tracking-tight text-primary">{formatINR(property.totalPrice)}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Indicative estimate based on guidance value of {formatINR(property.taxes.guidanceValuePerAcre)}/acre. Always confirm with a registered document writer before transacting.
+              {formatINR(property.pricePerAcre)}/acre - {property.extentAcres} acres
             </p>
-            <Card className="mt-4">
-              <CardContent className="divide-y divide-border p-0">
-                {property.taxes.lineItems.map((item) => (
-                  <div key={item.label} className="flex items-start justify-between gap-4 px-5 py-3">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{item.label}</p>
-                      {item.note && <p className="text-xs text-muted-foreground">{item.note}</p>}
-                    </div>
-                    <p className="whitespace-nowrap text-sm font-medium text-foreground">{formatINRFull(item.amount)}</p>
-                  </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="mx-auto mt-10 grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.7fr_0.9fr] lg:px-8">
+        <div className="space-y-10">
+          <Card className="p-6 sm:p-7">
+            <CardContent className="space-y-6 p-0">
+              <SectionHeading
+                kicker="About"
+                title="What this land feels like"
+                subtitle="A clean read on the site before you start comparing paperwork or site visits."
+              />
+              <p className="max-w-3xl text-pretty leading-8 text-muted-foreground">{property.description}</p>
+            </CardContent>
+          </Card>
+
+          <Card className="p-6 sm:p-7">
+            <CardContent className="space-y-6 p-0">
+              <SectionHeading kicker="Key facts" title="Core property details" />
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                <FactItem icon={Ruler} label="Extent" value={`${property.extentAcres} acres`} />
+                <FactItem icon={Droplets} label="Water source" value={property.waterSources.join(", ") || "None"} />
+                <FactItem icon={Route} label="Road access" value={property.roadAccess} />
+                <FactItem icon={Fence} label="Fencing" value={property.fencing ? "Fenced" : "Not fenced"} />
+                <FactItem icon={Zap} label="Electricity" value={property.electricity ? "Connected" : "Not connected"} />
+                <FactItem icon={ScrollText} label="Soil type" value={property.soilType} />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="p-6 sm:p-7">
+            <CardContent className="space-y-6 p-0">
+              <SectionHeading kicker="Suitability" title="How this land scores" subtitle="Each score is a quick read on whether the site works for a specific use." />
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {(Object.keys(property.suitability) as (keyof typeof property.suitability)[]).map((key) => (
+                  <ScoreBar
+                    key={key}
+                    label={suitabilityLabels[key]}
+                    score={property.suitability[key].score}
+                    note={property.suitability[key].note}
+                  />
                 ))}
-                <div className="flex items-center justify-between bg-secondary/50 px-5 py-4">
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="p-6 sm:p-7">
+            <CardContent className="space-y-6 p-0">
+              <SectionHeading kicker="Taxes" title="Karnataka charges, summarized" />
+              <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+                Indicative estimate based on guidance value of {formatINR(property.taxes.guidanceValuePerAcre)}/acre.
+                Always confirm with a registered document writer before transacting.
+              </p>
+              <div className="overflow-hidden rounded-[1.5rem] border border-border/70 bg-white/75 shadow-[0_14px_40px_rgba(15,23,42,0.05)]">
+                <div className="divide-y divide-border/70">
+                  {property.taxes.lineItems.map((item) => (
+                    <div key={item.label} className="flex items-start justify-between gap-4 px-5 py-4">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{item.label}</p>
+                        {item.note && <p className="mt-1 text-xs leading-6 text-muted-foreground">{item.note}</p>}
+                      </div>
+                      <p className="whitespace-nowrap text-sm font-medium text-foreground">{formatINRFull(item.amount)}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between bg-secondary/45 px-5 py-4">
                   <p className="font-heading text-base font-semibold text-foreground">Total charges</p>
                   <p className="font-heading text-lg font-semibold text-primary">{formatINRFull(property.taxes.total)}</p>
                 </div>
-              </CardContent>
-            </Card>
-            <p className="mt-3 text-xs text-muted-foreground">
-              Est. annual land revenue: {formatINRFull(property.taxes.estimatedAnnualLandRevenue)}. Figures are illustrative, not a legal quote.
-            </p>
-          </section>
+              </div>
+              <p className="text-xs leading-6 text-muted-foreground">
+                Est. annual land revenue: {formatINRFull(property.taxes.estimatedAnnualLandRevenue)}. Figures are
+                illustrative, not a legal quote.
+              </p>
+            </CardContent>
+          </Card>
 
-          {/* Legal status */}
-          <section>
-            <h2 className="font-heading text-xl font-semibold text-foreground">Legal status</h2>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <LegalRow label="Khata" value={property.legal.khata === "none" ? "Not applicable" : `Khata ${property.legal.khata}`} />
-              <LegalRow label="DC conversion" value={property.legal.dcConverted ? "Converted" : "Not converted"} />
-              <LegalRow label="RTC available" value={property.legal.rtcAvailable ? "Yes" : "No"} />
-              <LegalRow label="Encumbrance" value={property.legal.encumbranceClear ? "Clear" : "Needs verification"} />
-              <LegalRow label="Survey number" value={property.legal.surveyNumber} span />
-            </div>
-            {property.legal.notes.length > 0 && (
-              <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
-                {property.legal.notes.map((note) => (
-                  <li key={note}>· {note}</li>
+          <Card className="p-6 sm:p-7">
+            <CardContent className="space-y-6 p-0">
+              <SectionHeading kicker="Legal" title="Legal status" />
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <LegalRow label="Khata" value={property.legal.khata === "none" ? "Not applicable" : `Khata ${property.legal.khata}`} />
+                <LegalRow label="DC conversion" value={property.legal.dcConverted ? "Converted" : "Not converted"} />
+                <LegalRow label="RTC available" value={property.legal.rtcAvailable ? "Yes" : "No"} />
+                <LegalRow label="Encumbrance" value={property.legal.encumbranceClear ? "Clear" : "Needs verification"} />
+                <LegalRow label="Survey number" value={property.legal.surveyNumber} span />
+              </div>
+              {property.legal.notes.length > 0 && (
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  {property.legal.notes.map((note) => (
+                    <li key={note}>- {note}</li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="p-6 sm:p-7">
+            <CardContent className="space-y-6 p-0">
+              <SectionHeading kicker="Location" title="Where it sits" />
+              <div className="h-[340px] overflow-hidden rounded-[1.5rem] border border-border/70">
+                <PropertyLocationMap property={property} />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {property.nearbyLandmarks.map((landmark) => (
+                  <Badge key={landmark} variant="outline" className="px-3 py-1.5">
+                    {landmark}
+                  </Badge>
                 ))}
-              </ul>
-            )}
-          </section>
-
-          {/* Map */}
-          <section>
-            <h2 className="font-heading text-xl font-semibold text-foreground">Location</h2>
-            <div className="mt-4 h-[320px] overflow-hidden rounded-xl border border-border">
-              <PropertyLocationMap property={property} />
-            </div>
-            <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
-              {property.nearbyLandmarks.map((landmark) => (
-                <span key={landmark}>· {landmark}</span>
-              ))}
-            </div>
-          </section>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          <Card>
-            <CardContent className="space-y-4">
-              <h3 className="font-heading text-lg font-semibold text-foreground">Interested in this land?</h3>
-              <p className="text-sm text-muted-foreground">
-                Enquiries connect you with the listing broker for a site visit. This is a demo build — enquiry submission isn&apos;t wired up yet.
+        <aside className="space-y-6">
+          <Card className="p-6">
+            <CardContent className="space-y-4 p-0">
+              <h3 className="font-heading text-2xl font-semibold text-foreground">Interested in this land?</h3>
+              <p className="text-sm leading-7 text-muted-foreground">
+                Enquiries connect you with the listing broker for a site visit. This is a demo build - enquiry
+                submission isn&apos;t wired up yet.
               </p>
-              <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled>
+              <Button variant="pill" size="pill" className="w-full" disabled>
                 <Phone className="mr-1.5 h-4 w-4" /> Request a call back
               </Button>
             </CardContent>
@@ -213,9 +258,12 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
 
           {matchedProfessionals.length > 0 && (
             <div>
-              <h3 className="font-heading text-lg font-semibold text-foreground">Set this land up</h3>
-              <p className="mt-1 text-sm text-muted-foreground">Matched for {topJourney.shortTitle.toLowerCase()}.</p>
-              <div className="mt-4 space-y-4">
+              <SectionHeading
+                kicker="Support"
+                title="Set this land up"
+                subtitle={`Matched for ${topJourney.shortTitle.toLowerCase()}.`}
+              />
+              <div className="mt-5 space-y-4">
                 {matchedProfessionals.map((professional) => (
                   <ProfessionalCard key={professional.slug} professional={professional} />
                 ))}
@@ -223,13 +271,13 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
             </div>
           )}
 
-          <Card>
-            <CardContent className="space-y-3">
-              <h3 className="font-heading text-base font-semibold text-foreground">Karnataka land basics</h3>
+          <Card className="p-6">
+            <CardContent className="space-y-4 p-0">
+              <h3 className="font-heading text-lg font-semibold text-foreground">Karnataka land basics</h3>
               {karnatakaLegalTerms.slice(0, 3).map((term) => (
                 <div key={term.term}>
                   <p className="text-sm font-medium text-foreground">{term.term}</p>
-                  <p className="text-xs text-muted-foreground">{term.explanation}</p>
+                  <p className="mt-1 text-xs leading-6 text-muted-foreground">{term.explanation}</p>
                 </div>
               ))}
               <Separator />
@@ -238,19 +286,27 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
               </Link>
             </CardContent>
           </Card>
-        </div>
+        </aside>
       </div>
     </div>
   );
 }
 
-function FactItem({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
+function FactItem({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+}) {
   return (
-    <div className="flex items-start gap-2.5 rounded-lg border border-border p-3">
+    <div className="flex items-start gap-2.5 rounded-2xl border border-border/70 bg-white/75 p-4 backdrop-blur-sm">
       <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
       <div>
         <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-sm font-medium capitalize text-foreground">{value}</p>
+        <p className="mt-1 text-sm font-medium capitalize text-foreground">{value}</p>
       </div>
     </div>
   );
@@ -258,7 +314,11 @@ function FactItem({ icon: Icon, label, value }: { icon: React.ComponentType<{ cl
 
 function LegalRow({ label, value, span }: { label: string; value: string; span?: boolean }) {
   return (
-    <div className={`flex items-center justify-between rounded-lg border border-border px-3 py-2.5 ${span ? "sm:col-span-2" : ""}`}>
+    <div
+      className={`flex items-center justify-between rounded-2xl border border-border/70 bg-white/75 px-4 py-3 backdrop-blur-sm ${
+        span ? "sm:col-span-2" : ""
+      }`}
+    >
       <span className="text-sm text-muted-foreground">{label}</span>
       <span className="text-sm font-medium text-foreground">{value}</span>
     </div>
