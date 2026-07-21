@@ -7,7 +7,7 @@
 - Professional cards: rating badge moved inline next to the name; tagline and service-area rows now have fixed heights so cards line up evenly in the grid
 - Header + admin layout: added `min-w-0` on flex containers to prevent horizontal overflow (same class of fix as the grid-overflow fix already on main)
 - User-facing: tighter, more consistent visual polish on top of the Editorial Earth redesign; no functional changes
-- `(pending)`
+- `(5d058c4)`
 
 ## 2026-07-21 00:05 IST · Header logo sizing + contrast fix
 
