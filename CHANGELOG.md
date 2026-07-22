@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-21 18:30 IST · Fix icon/logo mismatch
+
+- `public/brand/icon.png` and the icon embedded inside `public/brand/logo.png` were two different renderings of the same mark — different corner radius (rounded vs. sharp) and different color treatment (two-tone with gold accent vs. single-tone green). Admin (which uses the standalone icon) and the public header's unscrolled state (which uses the full logo) looked like different logos side by side.
+- Fixed by cropping the icon directly out of `logo.png`, so both are now pixel-consistent — same source, same rendering, everywhere.
+- User-facing: the icon in admin/login/capture now matches the one in the header exactly
+- `(pending)`
+
 ## 2026-07-21 17:25 IST · Search matching fix, pill reorder, explore heading trim
 
 - Search bug fix: query was matched as one literal phrase, so "farm land" (with a space) found zero results even though "farmland" appears throughout the data. Now splits the query into words and requires each word to appear somewhere in the property's searchable text — "farm land" now correctly matches "farmland"
