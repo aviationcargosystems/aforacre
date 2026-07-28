@@ -14,10 +14,9 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 
-const navLinks = [
-  { href: "/explore", label: "Explore" },
-  { href: "/match", label: "Match Quiz" },
-];
+// Explore is the only nav item. The quiz is not a destination a buyer picks
+// off a menu, it is what happens when they say they want to explore land.
+const navLinks = [{ href: "/explore", label: "Explore" }];
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -82,7 +81,7 @@ export function SiteHeader() {
               <Link href="/submit-land">List your land</Link>
             </Button>
             <Button asChild variant="pill" size="sm">
-              <Link href="/explore">Explore land</Link>
+              <Link href="/match">Explore land</Link>
             </Button>
           </div>
 
@@ -119,7 +118,7 @@ export function SiteHeader() {
                 </nav>
                 <div className="mt-6 grid gap-2">
                   <Button asChild variant="pill" size="sm" className="w-full">
-                    <Link href="/explore" onClick={() => setOpen(false)}>
+                    <Link href="/match" onClick={() => setOpen(false)}>
                       Explore land
                     </Link>
                   </Button>

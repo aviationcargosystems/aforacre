@@ -1,14 +1,18 @@
-import { getAllProperties } from "@/lib/store/properties";
-import { MatchQuiz } from "@/components/match-quiz";
+import { getMatchablePlots } from "@/lib/store/plots";
+import { MatchFlow } from "@/components/match/match-flow";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Find Your Match — A for Acre",
-  description: "Answer a few questions and we'll match you to land across South Bangalore — not just by budget.",
+  title: "Find your match - A for Acre",
+  description:
+    "Seven questions, then the farmland in South Bangalore that actually fits how you will use it, and why.",
 };
 
 export default async function MatchPage() {
-  const properties = await getAllProperties();
-  return <MatchQuiz properties={properties} />;
+  // Scoring runs in the browser so answers feel instant, but the plots come
+  // from the server: sending the whole inventory once is cheap at this size and
+  // avoids a round trip per question.
+  const plots = await getMatchablePlots();
+  return <MatchFlow plots={plots} />;
 }

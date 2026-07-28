@@ -15,7 +15,7 @@ import {
 import { getProperty } from "@/lib/store/properties";
 import { USE_CASES } from "@/data/use-cases";
 import { karnatakaLegalTerms } from "@/data/legal";
-import { formatINR, formatINRFull } from "@/lib/tax";
+import { formatINR } from "@/lib/tax";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -61,11 +61,25 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
     USE_CASES[0]
   );
 
+  // Up to two companion shots. The layout adapts to however many exist rather
+  // than assuming a full set.
+  const extraImages = property.images.slice(1, 3);
+
   return (
     <div className="pb-16">
       <section className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-          <div className="relative overflow-hidden rounded-[1.75rem] bg-muted sm:col-span-2 sm:row-span-2 min-h-[340px]">
+        {/* Two explicit columns rather than a 4-up grid with spans. The old
+            version reserved four columns and gave the hero two of them, so a
+            listing with fewer than four photos left dead space beside the hero
+            and the whole header read as broken. */}
+        <div
+          className={
+            extraImages.length > 0
+              ? "grid grid-cols-1 gap-4 lg:grid-cols-[1.7fr_1fr]"
+              : "grid grid-cols-1 gap-4"
+          }
+        >
+          <div className="relative min-h-[380px] overflow-hidden rounded-[1.75rem] bg-muted sm:min-h-[460px]">
             <Image
               src={property.images[0]}
               alt={property.title}
@@ -91,23 +105,30 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
               </p>
             </div>
           </div>
-          {property.images.slice(1, 4).map((image, index) => (
-            <div key={image} className="relative hidden overflow-hidden rounded-[1.75rem] bg-muted sm:block">
-              <Image
-                src={image}
-                alt={`${property.title} photo ${index + 2}`}
-                fill
-                sizes="33vw"
-                className="object-cover"
-              />
+          {extraImages.length > 0 && (
+            <div className="hidden gap-4 lg:grid lg:grid-rows-2">
+              {extraImages.map((image, index) => (
+                <div key={image} className="relative overflow-hidden rounded-[1.75rem] bg-muted">
+                  <Image
+                    src={image}
+                    alt={`${property.title} photo ${index + 2}`}
+                    fill
+                    sizes="33vw"
+                    className="object-cover"
+                  />
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
       </section>
 
       <section className="mx-auto mt-8 max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-6 border-b border-border/70 pb-8 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl">
+        {/* A fixed sidebar column, not justify-between. The old flex row let the
+            price card drift to the far edge of a wide screen, leaving a canyon
+            between it and the copy. */}
+        <div className="grid grid-cols-1 items-start gap-6 border-b border-border/70 pb-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="min-w-0">
             <div className="flex flex-wrap gap-2">
               {property.tags.map((tag) => (
                 <Badge key={tag} variant="secondary" className="px-3 py-1.5">
@@ -122,10 +143,12 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
               className="mt-4"
             />
           </div>
-          <div className="rounded-[1.75rem] border border-white/70 bg-white/70 p-5 text-left shadow-[0_16px_45px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:text-right">
-            <p className="font-heading text-4xl font-semibold tracking-tight text-primary">{formatINR(property.totalPrice)}</p>
+          <div className="rounded-[1.75rem] border border-white/70 bg-white/70 p-5 shadow-[0_16px_45px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+            <p className="font-heading text-4xl font-semibold tracking-tight text-primary">
+              {formatINR(property.totalPrice)}
+            </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {formatINR(property.pricePerAcre)}/acre - {property.extentAcres} acres
+              {formatINR(property.pricePerAcre)}/acre · {property.extentAcres} acres
             </p>
             <p className="mt-2 text-xs text-muted-foreground">Standard 2% platform fee applies on purchase.</p>
           </div>
@@ -172,37 +195,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                   />
                 ))}
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="p-6 sm:p-7">
-            <CardContent className="space-y-6 p-0">
-              <SectionHeading kicker="Taxes" title="Karnataka charges, summarized" />
-              <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
-                Indicative estimate based on guidance value of {formatINR(property.taxes.guidanceValuePerAcre)}/acre.
-                Always confirm with a registered document writer before transacting.
-              </p>
-              <div className="overflow-hidden rounded-[1.5rem] border border-border/70 bg-white/75 shadow-[0_14px_40px_rgba(15,23,42,0.05)]">
-                <div className="divide-y divide-border/70">
-                  {property.taxes.lineItems.map((item) => (
-                    <div key={item.label} className="flex items-start justify-between gap-4 px-5 py-4">
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{item.label}</p>
-                        {item.note && <p className="mt-1 text-xs leading-6 text-muted-foreground">{item.note}</p>}
-                      </div>
-                      <p className="whitespace-nowrap text-sm font-medium text-foreground">{formatINRFull(item.amount)}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex items-center justify-between bg-secondary/45 px-5 py-4">
-                  <p className="font-heading text-base font-semibold text-foreground">Total charges</p>
-                  <p className="font-heading text-lg font-semibold text-primary">{formatINRFull(property.taxes.total)}</p>
-                </div>
-              </div>
-              <p className="text-xs leading-6 text-muted-foreground">
-                Est. annual land revenue: {formatINRFull(property.taxes.estimatedAnnualLandRevenue)}. Figures are
-                illustrative, not a legal quote.
-              </p>
             </CardContent>
           </Card>
 
