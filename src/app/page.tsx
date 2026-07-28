@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   Sprout,
   TrendingUp,
-  Wrench,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,14 +40,15 @@ export default async function Home() {
   return (
     <div className="pb-16">
       <section className="relative isolate overflow-hidden pt-8 sm:pt-10">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute left-[-8%] top-0 h-[520px] w-[520px] rounded-full bg-accent/12 blur-3xl" />
-          <div className="absolute right-[-6%] top-20 h-[460px] w-[460px] rounded-full bg-primary/12 blur-3xl" />
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="animate-drift-slow absolute left-[-10%] top-[-6%] h-[560px] w-[560px] rounded-full bg-accent/30 blur-2xl" />
+          <div className="animate-drift-slower absolute right-[-8%] top-10 h-[500px] w-[500px] rounded-full bg-primary/26 blur-2xl" />
+          <div className="animate-drift-slow absolute left-[38%] top-[42%] h-[320px] w-[320px] rounded-full bg-[#e0bd7c]/26 blur-2xl [animation-delay:-7s]" />
         </div>
 
         {/* Centered hero. The old two-column split fought the display type for
             width and left the headline wrapping awkwardly at every breakpoint. */}
-        <div className="mx-auto flex max-w-4xl flex-col items-center px-4 pb-4 text-center sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-4xl flex-col items-center px-4 pb-2 text-center sm:px-6 lg:px-8">
           <h1 className="font-heading text-6xl font-semibold leading-[0.96] tracking-tight text-balance text-foreground sm:text-7xl lg:text-8xl">
             Land that fits your life.
           </h1>
@@ -71,50 +71,29 @@ export default async function Home() {
             </Button>
           </div>
 
-          <p className="mt-4 text-sm text-muted-foreground">
-            Seven questions, about two minutes. We tell you what fits and why.
-          </p>
-
-          <div className="-mx-4 mt-8 w-screen overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:w-auto sm:overflow-visible sm:px-0 sm:pb-0">
-            <div className="flex w-max gap-2 sm:w-auto sm:flex-wrap sm:justify-center">
-              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/70 bg-white/65 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur-sm">
-                <Sprout className="h-3.5 w-3.5 text-primary" /> Minimum 1 acre
-              </span>
-              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/70 bg-white/65 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur-sm">
-                <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Verified before listing
-              </span>
-              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border/70 bg-white/65 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur-sm">
-                <Wrench className="h-3.5 w-3.5 text-primary" /> Tax and legal covered
-              </span>
-            </div>
-          </div>
         </div>
 
-        {/* Landscape video, floating over the section boundary so it reads as
-            one object sitting on the page rather than a banner strip. */}
-        <div className="mx-auto -mb-16 mt-14 max-w-6xl px-4 sm:px-6 lg:-mb-24 lg:px-8">
-          <div className="relative">
-            <div className="absolute inset-x-8 -bottom-6 h-24 rounded-[3rem] bg-deep-green/20 blur-3xl" />
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/70 shadow-[0_40px_100px_rgba(15,23,42,0.22)] sm:rounded-[2.5rem]">
-              <div className="relative aspect-[16/10] sm:aspect-[16/8]">
-                <HeroVideo poster="/videos/hero-poster.jpg" />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,14,0.05)_0%,rgba(8,18,14,0.10)_55%,rgba(8,18,14,0.60)_100%)]" />
-                <div className="absolute inset-x-4 bottom-4 flex flex-wrap items-center justify-between gap-3 sm:inset-x-6 sm:bottom-6">
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">A for Acre</p>
-                    <p className="mt-1 font-heading text-xl font-semibold text-white sm:text-2xl">
-                      Verified before it reaches you.
-                    </p>
-                  </div>
-                  <Badge className="bg-white/15 text-white backdrop-blur">South Bangalore</Badge>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-16 pt-28 sm:px-6 lg:px-8 lg:pt-40">
+      <section className="relative pb-20 pt-10 lg:pt-14">
+        <div className="absolute inset-x-0 top-1/2 -z-10 h-[420px] -translate-y-1/2 bg-[radial-gradient(circle_at_center,rgba(87,168,132,0.12),transparent_60%)]" />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+            <SectionHeading
+              kicker="Live listings"
+              title="Featured land"
+              subtitle="Browse featured listings in a swipeable row instead of a static wall of cards."
+            />
+            <Button asChild variant="pill-outline" size="pill">
+              <Link href="/explore">
+                View all listings <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+          <FeaturedLandCarousel properties={featured} />
+        </div>
+      </section>
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <SectionHeading
           align="center"
           className="mx-auto mb-10"
@@ -131,25 +110,6 @@ export default async function Home() {
               <p className="mt-1.5 text-xs leading-6 text-muted-foreground">{item.description}</p>
             </div>
           ))}
-        </div>
-      </section>
-
-      <section className="relative py-20">
-        <div className="absolute inset-x-0 top-1/2 -z-10 h-[420px] -translate-y-1/2 bg-[radial-gradient(circle_at_center,rgba(87,168,132,0.12),transparent_60%)]" />
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
-            <SectionHeading
-              kicker="Live listings"
-              title="Featured land"
-              subtitle="Browse featured listings in a swipeable row instead of a static wall of cards."
-            />
-            <Button asChild variant="pill-outline" size="pill">
-              <Link href="/explore">
-                View all listings <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-          <FeaturedLandCarousel properties={featured} />
         </div>
       </section>
 

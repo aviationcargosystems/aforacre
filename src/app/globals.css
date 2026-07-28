@@ -176,6 +176,42 @@
   color: var(--foreground);
 }
 
+/* Hero gradient blobs. They drift on long, offset cycles so the background has
+   perceptible movement without ever pulling focus from the headline. Transform
+   and opacity only, so it stays on the compositor and costs no layout. */
+@keyframes drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.75;
+  }
+  33% {
+    transform: translate3d(4%, -3%, 0) scale(1.08);
+    opacity: 1;
+  }
+  66% {
+    transform: translate3d(-3%, 4%, 0) scale(0.96);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.75;
+  }
+}
+.animate-drift-slow {
+  animation: drift 18s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.animate-drift-slower {
+  animation: drift 26s ease-in-out infinite reverse;
+  will-change: transform, opacity;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift-slow,
+  .animate-drift-slower {
+    animation: none;
+  }
+}
+
 /* Continuous "zoom through" illusion for ZoomThrough — every layer plays the
    same scale+fade timeline, staggered by animation-delay so they hand off to
    each other in a loop. GPU-composited (transform + opacity only), no JS
