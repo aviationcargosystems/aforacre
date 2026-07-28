@@ -1,5 +1,14 @@
-import type { JourneyId, KhataType, LandSuitability, Property, WaterSource } from "@/lib/types";
+import type { JourneyId, KhataType, LandSuitability, Property, VerifiedChecklist, WaterSource } from "@/lib/types";
 import { computeKarnatakaTaxes } from "@/lib/tax";
+
+export const EMPTY_VERIFIED: VerifiedChecklist = {
+  ownership: false,
+  survey: false,
+  gps: false,
+  physicalInspection: false,
+  roadAccess: false,
+  documents: false,
+};
 
 type Tier = "excellent" | "good" | "moderate" | "limited";
 
@@ -122,6 +131,8 @@ export interface PropertyInput {
   nearbyLandmarks: string[];
   distanceFromBangaloreKm: number;
   featured?: boolean;
+  fid?: string | null;
+  verified?: VerifiedChecklist;
 }
 
 export function buildProperty(input: PropertyInput): Property {
@@ -170,6 +181,8 @@ export function buildProperty(input: PropertyInput): Property {
     nearbyLandmarks: input.nearbyLandmarks,
     distanceFromBangaloreKm: input.distanceFromBangaloreKm,
     featured: input.featured,
+    fid: input.fid ?? null,
+    verified: input.verified ?? EMPTY_VERIFIED,
   };
 }
 

@@ -1,15 +1,19 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Camera, LayoutDashboard, MapPinned, Tag, Users } from "lucide-react";
+import { Camera, IdCard, LayoutDashboard, MapPinned, MessageCircle, Route, Tag, Upload, Users } from "lucide-react";
 import { logoutAction } from "@/app/admin/login/actions";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/properties", label: "Properties", icon: MapPinned },
+  { href: "/admin/recces", label: "Recces", icon: Route },
+  { href: "/admin/agents", label: "Agents", icon: IdCard },
+  { href: "/admin/land-submissions", label: "Land Submissions", icon: Upload },
+  { href: "/admin/enquiries", label: "Enquiries", icon: MessageCircle },
+  { href: "/admin/captures", label: "Field Captures", icon: Camera },
   { href: "/admin/professionals", label: "Professionals", icon: Users },
   { href: "/admin/tags", label: "Tags", icon: Tag },
-  { href: "/admin/captures", label: "Field Captures", icon: Camera },
 ];
 
 export default function AdminProtectedLayout({ children }: { children: React.ReactNode }) {

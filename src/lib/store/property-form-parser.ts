@@ -83,6 +83,15 @@ export async function parsePropertyForm(
     nearbyLandmarks: lines(formData, "nearbyLandmarks"),
     distanceFromBangaloreKm: num(formData, "distanceFromBangaloreKm"),
     featured: formData.get("featured") === "on",
+    fid: str(formData, "fid") || null,
+    verified: {
+      ownership: formData.get("verified_ownership") === "on",
+      survey: formData.get("verified_survey") === "on",
+      gps: formData.get("verified_gps") === "on",
+      physicalInspection: formData.get("verified_physicalInspection") === "on",
+      roadAccess: formData.get("verified_roadAccess") === "on",
+      documents: formData.get("verified_documents") === "on",
+    },
   };
 
   return { input, newTags };

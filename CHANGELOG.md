@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-07-23 23:10 IST · Agent login + recce, AFORACRE doc alignment, zoom prototype
+
+Three batches of work that had been sitting local, now shipped together.
+
+**Agent login + recce (new)**
+- Field agents get their own accounts and portal (`/agent/login`, `/agent`, `/agent/recce/[id]`), completely separate from the shared admin password — different cookie, different secret, different check. An admin session grants no agent access and vice versa.
+- A "recce" is an assigned site survey with a lifecycle (assigned → submitted → approved/sent back), covering three kinds: scouting unlisted land, pre-visit checks on a listed plot, and being the on-site contact for a client visit.
+- Admin side: `/admin/agents` (create, disable, reset password) and `/admin/recces` (assign, review).
+- Security notes: passwords are scrypt-hashed (`node:crypto`, no new dependency), session tokens are WebCrypto HMAC so Edge middleware can verify them without a DB hit, and `requireAgent()` re-reads the `active` flag on every request so disabling an agent takes effect immediately. Agents can only ever read their own recces — enforced in the database query, not just hidden in the UI.
+
+**AFORACRE document alignment**
+- FID numbers + a 6-point Verified Badge on properties, editable in admin.
+- Real enquiry capture wired into the property page, professional page, the match quiz's weak-match fallback, and a "Schedule a visit" flow — plus an `/admin/enquiries` inbox. Replaces the old disabled placeholder buttons.
+- Match quiz: scenery options merged 6→5 per the doc's revision, AFORACRE persona naming, schedule-a-visit CTA.
+- Seller "Submit Land" intake at `/submit-land` (gunta-based sizing with live acres conversion) → `/admin/land-submissions` review queue → approval assigns a FID and creates a draft listing.
+- Homepage: 5-point "holistic land" section from the source docs.
+
+**Zoom prototype**
+- `/zoom` — a continuous zoom-through effect built from real forest/farmland photography. Pure CSS transform+opacity, GPU-composited, no JS per-frame work.
+
+**User-facing:** agents can now be issued logins and sent on site surveys from their phones; enquiry buttons actually submit instead of being disabled placeholders.
+
+**Needs a migration:** `supabase/schema.sql` gained `agents` and `recces` tables. Until it's re-run in the Supabase SQL Editor, those two features show graceful placeholders rather than persisting — everything else works.
+
+- `(pending)`
+
 ## 2026-07-21 18:30 IST · Fix icon/logo mismatch
 
 - `public/brand/icon.png` and the icon embedded inside `public/brand/logo.png` were two different renderings of the same mark — different corner radius (rounded vs. sharp) and different color treatment (two-tone with gold accent vs. single-tone green). Admin (which uses the standalone icon) and the public header's unscrolled state (which uses the full logo) looked like different logos side by side.

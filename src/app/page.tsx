@@ -1,6 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Map as MapIcon, MapPin, Search, ShieldCheck, Sprout, Wrench } from "lucide-react";
+import {
+  ArrowRight,
+  Clock,
+  LayoutGrid,
+  Map as MapIcon,
+  MapPin,
+  Route,
+  Search,
+  ShieldCheck,
+  Sprout,
+  TrendingUp,
+  Wrench,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,6 +26,18 @@ import { getAllProfessionals } from "@/lib/store/professionals";
 import { HeroVideo } from "@/components/hero-video";
 
 export const dynamic = "force-dynamic";
+
+const HOLISTIC_CRITERIA = [
+  { icon: Sprout, title: "Rich soil", description: "Fertile land, ready to grow." },
+  {
+    icon: LayoutGrid,
+    title: "Fit for everything",
+    description: "Room for a polyhouse, garden, pet house, container home, and staff quarters — all in one plot.",
+  },
+  { icon: Route, title: "Real road access", description: "Every plot reachable by vehicle, no guesswork." },
+  { icon: Clock, title: "1–1.5 hrs from the city", description: "Close enough for a weekend, far enough to feel like an escape." },
+  { icon: TrendingUp, title: "Built to appreciate", description: "Selected for long-term land value, not just today's price." },
+];
 
 export default async function Home() {
   const [allProperties, featured, professionals] = await Promise.all([
@@ -41,8 +65,8 @@ export default async function Home() {
                 Land that fits your life.
               </h1>
               <p className="max-w-2xl text-pretty text-lg leading-8 text-muted-foreground sm:text-xl">
-                Farmland, farmhouse plots, and weekend escapes across South Bangalore, matched to how you&apos;ll
-                actually use them.
+                Holistic farmland, farmhouse plots, and weekend escapes across South Bangalore, matched to how
+                you&apos;ll actually use them.
               </p>
             </div>
 
@@ -67,6 +91,10 @@ export default async function Home() {
                 </Button>
               </div>
             </form>
+
+            <Link href="/match" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+              Not sure yet? Take our 2-minute match quiz <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
 
             <div className="-mx-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:overflow-visible sm:px-0 sm:pb-0">
               <div className="flex w-max gap-2 sm:w-auto sm:flex-wrap">
@@ -117,6 +145,26 @@ export default async function Home() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <SectionHeading
+          align="center"
+          className="mx-auto mb-10"
+          kicker="What makes land holistic"
+          title="Every plot we list, checked against five things."
+        />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {HOLISTIC_CRITERIA.map((item) => (
+            <div key={item.title} className="rounded-2xl border border-border/70 bg-white/70 p-5 text-center backdrop-blur-sm">
+              <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <item.icon className="h-5 w-5" />
+              </div>
+              <h3 className="mt-3 font-heading text-base font-semibold text-foreground">{item.title}</h3>
+              <p className="mt-1.5 text-xs leading-6 text-muted-foreground">{item.description}</p>
+            </div>
+          ))}
         </div>
       </section>
 

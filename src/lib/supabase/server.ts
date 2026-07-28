@@ -28,3 +28,14 @@ export function getSupabaseAdmin(): SupabaseClient {
 export function storageBucket(): string {
   return process.env.SUPABASE_STORAGE_BUCKET || "project-a-uploads";
 }
+
+/**
+ * True when a Supabase error means "this table/column doesn't exist yet" —
+ * i.e. a pending schema migration (supabase/schema.sql) hasn't been run.
+ * Lets read paths for newer tables degrade to empty instead of hard-crashing
+ * pages that otherwise don't depend on the migration.
+ */
+export function isMissingSchemaError(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false;
+  return error.code === "PGRST205" || error.code === "42P01" || error.code === "42703";
+}

@@ -1,28 +1,52 @@
 import Link from "next/link";
-import { Camera, MapPinned, Tag, Users } from "lucide-react";
+import { Camera, MapPinned, MessageCircle, Route, Tag, Upload, Users } from "lucide-react";
 import { getAllProperties } from "@/lib/store/properties";
 import { getAllProfessionals } from "@/lib/store/professionals";
 import { getAllTags } from "@/lib/store/tags";
 import { getAllCaptures } from "@/lib/store/captures";
+import { getAllLandSubmissions } from "@/lib/store/land-submissions";
+import { getAllEnquiries } from "@/lib/store/enquiries";
+import { getAllRecces } from "@/lib/store/recces";
 import { Card, CardContent } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  const [properties, professionals, tags, captures] = await Promise.all([
+  const [properties, professionals, tags, captures, landSubmissions, enquiries, recces] = await Promise.all([
     getAllProperties(),
     getAllProfessionals(),
     getAllTags(),
     getAllCaptures(),
+    getAllLandSubmissions(),
+    getAllEnquiries(),
+    getAllRecces(),
   ]);
 
   const newCaptures = captures.filter((c) => c.status === "new").length;
+  const pendingSubmissions = landSubmissions.filter((s) => s.status === "pending").length;
+  const newEnquiries = enquiries.filter((e) => e.status === "new").length;
+  const submittedRecces = recces.filter((r) => r.status === "submitted").length;
 
   const cards = [
+    {
+      href: "/admin/recces",
+      label: "Recces",
+      count: recces.length,
+      sublabel: `${submittedRecces} to review`,
+      icon: Route,
+    },
     { href: "/admin/properties", label: "Properties", count: properties.length, icon: MapPinned },
+    {
+      href: "/admin/land-submissions",
+      label: "Land submissions",
+      count: landSubmissions.length,
+      sublabel: `${pendingSubmissions} pending`,
+      icon: Upload,
+    },
+    { href: "/admin/enquiries", label: "Enquiries", count: enquiries.length, sublabel: `${newEnquiries} new`, icon: MessageCircle },
+    { href: "/admin/captures", label: "Field captures", count: captures.length, sublabel: `${newCaptures} new`, icon: Camera },
     { href: "/admin/professionals", label: "Professionals", count: professionals.length, icon: Users },
     { href: "/admin/tags", label: "Tags", count: tags.length, icon: Tag },
-    { href: "/admin/captures", label: "Field captures", count: captures.length, sublabel: `${newCaptures} new`, icon: Camera },
   ];
 
   return (

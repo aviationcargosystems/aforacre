@@ -2,13 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
+  CheckCircle2,
   Droplets,
   Fence,
   MapPin,
-  Phone,
   Route,
   Ruler,
   ScrollText,
+  ShieldCheck,
   Zap,
 } from "lucide-react";
 import { getProperty } from "@/lib/store/properties";
@@ -17,12 +18,13 @@ import { journeys } from "@/data/journeys";
 import { karnatakaLegalTerms } from "@/data/legal";
 import { formatINR, formatINRFull } from "@/lib/tax";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ProfessionalCard } from "@/components/professional-card";
 import { PropertyLocationMap } from "@/components/map/property-location-map";
 import { SectionHeading } from "@/components/section-heading";
+import { VERIFIED_FIELDS } from "@/components/admin/property-form-shared";
+import { EnquiryForm } from "@/components/enquiry-form";
 
 export const dynamic = "force-dynamic";
 
@@ -80,6 +82,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,14,0.02)_0%,rgba(8,18,14,0.12)_45%,rgba(8,18,14,0.70)_100%)]" />
             <div className="absolute left-4 top-4 flex flex-wrap gap-2">
               {property.featured && <Badge className="bg-white/90 text-foreground">Featured</Badge>}
+              {property.fid && <Badge className="bg-white/90 text-foreground">FID {property.fid}</Badge>}
               <Badge className="bg-white/15 text-white">{property.journeyFit[topJourney.id]}% match</Badge>
             </div>
             <div className="absolute inset-x-4 bottom-4 rounded-[1.5rem] border border-white/15 bg-white/10 p-4 text-white backdrop-blur-xl">
@@ -127,6 +130,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
             <p className="mt-1 text-sm text-muted-foreground">
               {formatINR(property.pricePerAcre)}/acre - {property.extentAcres} acres
             </p>
+            <p className="mt-2 text-xs text-muted-foreground">Standard 2% platform fee applies on purchase.</p>
           </div>
         </div>
       </section>
@@ -227,6 +231,28 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
 
           <Card className="p-6 sm:p-7">
             <CardContent className="space-y-6 p-0">
+              <SectionHeading kicker="Verification" title="Verified Badge" />
+              {(() => {
+                const checked = VERIFIED_FIELDS.filter((f) => property.verified[f.key]);
+                return checked.length > 0 ? (
+                  <ul className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                    {checked.map((f) => (
+                      <li key={f.key} className="flex items-center gap-2 text-sm text-foreground">
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" /> {f.label}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <ShieldCheck className="h-4 w-4 shrink-0" /> Verification in progress — check back soon.
+                  </p>
+                );
+              })()}
+            </CardContent>
+          </Card>
+
+          <Card className="p-6 sm:p-7">
+            <CardContent className="space-y-6 p-0">
               <SectionHeading kicker="Location" title="Where it sits" />
               <div className="h-[340px] overflow-hidden rounded-[1.5rem] border border-border/70">
                 <PropertyLocationMap property={property} />
@@ -247,12 +273,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
             <CardContent className="space-y-4 p-0">
               <h3 className="font-heading text-2xl font-semibold text-foreground">Interested in this land?</h3>
               <p className="text-sm leading-7 text-muted-foreground">
-                Enquiries connect you with the listing broker for a site visit. This is a demo build - enquiry
-                submission isn&apos;t wired up yet.
+                Leave your number and our team will call you back to arrange a site visit.
               </p>
-              <Button variant="pill" size="pill" className="w-full" disabled>
-                <Phone className="mr-1.5 h-4 w-4" /> Request a call back
-              </Button>
+              <EnquiryForm context="property" propertySlug={property.slug} ctaLabel="Request a call back" />
             </CardContent>
           </Card>
 

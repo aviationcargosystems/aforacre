@@ -31,7 +31,9 @@ export function PropertyCard({ property, highlightJourney }: { property: Propert
           </div>
           <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-4 text-white">
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">South Bangalore</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">
+                South Bangalore{property.fid && ` · FID ${property.fid}`}
+              </p>
               <p className="mt-1 line-clamp-2 font-heading text-xl font-semibold leading-tight">{property.title}</p>
             </div>
             <div className="min-w-[108px] shrink-0 rounded-2xl border border-white/15 bg-white/10 px-3 py-2 text-right backdrop-blur">

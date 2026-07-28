@@ -1,11 +1,11 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { CheckCircle2, MapPin, Phone, Star } from "lucide-react";
+import { CheckCircle2, MapPin, Star } from "lucide-react";
 import { professionalCategoryLabels } from "@/data/professionals";
 import { getProfessional } from "@/lib/store/professionals";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { EnquiryForm } from "@/components/enquiry-form";
 
 export const dynamic = "force-dynamic";
 
@@ -72,12 +72,8 @@ export default async function ProfessionalPage({ params }: { params: Promise<{ s
                 <p className="text-xs text-muted-foreground">Starting from</p>
                 <p className="font-heading text-lg font-semibold text-foreground">{professional.startingPrice}</p>
               </div>
-              <Button variant="pill" size="pill" className="w-full" disabled>
-                <Phone className="mr-1.5 h-4 w-4" /> Request a quote
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                This is a demo build — quote requests aren&apos;t wired up yet. Reference contact: {professional.phone}
-              </p>
+              <EnquiryForm context="professional" ctaLabel="Request a quote" />
+              <p className="text-xs text-muted-foreground">Reference contact: {professional.phone}</p>
             </CardContent>
           </Card>
         </div>

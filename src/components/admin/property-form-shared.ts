@@ -1,4 +1,4 @@
-import type { JourneyId, WaterSource } from "@/lib/types";
+import type { JourneyId, VerifiedChecklist, WaterSource } from "@/lib/types";
 
 export const JOURNEY_FIELDS: { id: JourneyId; label: string }[] = [
   { id: "polyhouse", label: "Polyhouse Farming" },
@@ -24,3 +24,12 @@ export const KHATA_OPTIONS = [
 export function journeyFieldName(id: JourneyId) {
   return `journeyFit_${id}`;
 }
+
+export const VERIFIED_FIELDS: { key: keyof VerifiedChecklist; label: string }[] = [
+  { key: "ownership", label: "Ownership verified" },
+  { key: "survey", label: "Survey checked" },
+  { key: "gps", label: "GPS verified" },
+  { key: "physicalInspection", label: "Physical inspection completed" },
+  { key: "roadAccess", label: "Road access confirmed" },
+  { key: "documents", label: "Documents screened" },
+];

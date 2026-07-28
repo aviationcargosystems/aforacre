@@ -3,7 +3,13 @@
 import { useState } from "react";
 import Image from "next/image";
 import type { Property } from "@/lib/types";
-import { JOURNEY_FIELDS, KHATA_OPTIONS, WATER_SOURCE_OPTIONS, journeyFieldName } from "@/components/admin/property-form-shared";
+import {
+  JOURNEY_FIELDS,
+  KHATA_OPTIONS,
+  VERIFIED_FIELDS,
+  WATER_SOURCE_OPTIONS,
+  journeyFieldName,
+} from "@/components/admin/property-form-shared";
 import { Button } from "@/components/ui/button";
 
 const inputClass =
@@ -331,6 +337,29 @@ export function PropertyForm({
         <Field label="Legal notes" htmlFor="legalNotes" hint="One note per line.">
           <textarea id="legalNotes" name="legalNotes" rows={3} defaultValue={property?.legal.notes.join("\n")} className={inputClass} />
         </Field>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="font-heading text-lg font-semibold text-foreground">Verification</h2>
+        <Field label="FID (Farm ID)" htmlFor="fid" hint="e.g. 0042 — shown publicly as 'FID 0042'. Leave blank if not yet assigned.">
+          <input id="fid" name="fid" defaultValue={property?.fid ?? ""} placeholder="0042" className={inputClass} />
+        </Field>
+        <div>
+          <p className={labelClass}>Verified checklist</p>
+          <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {VERIFIED_FIELDS.map((f) => (
+              <label key={f.key} className="flex items-center gap-1.5 text-sm text-foreground">
+                <input
+                  type="checkbox"
+                  name={`verified_${f.key}`}
+                  defaultChecked={property?.verified?.[f.key]}
+                  className="h-4 w-4"
+                />
+                {f.label}
+              </label>
+            ))}
+          </div>
+        </div>
       </section>
 
       <div className="flex items-center gap-3 border-t border-border pt-6">

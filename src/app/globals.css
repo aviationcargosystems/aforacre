@@ -175,3 +175,29 @@
   background: color-mix(in srgb, var(--accent) 22%, transparent);
   color: var(--foreground);
 }
+
+/* Continuous "zoom through" illusion for ZoomThrough — every layer plays the
+   same scale+fade timeline, staggered by animation-delay so they hand off to
+   each other in a loop. GPU-composited (transform + opacity only), no JS
+   per-frame work. */
+@keyframes zoom-through {
+  0% {
+    transform: scale(1);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.35);
+    opacity: 0;
+  }
+}
+.animate-zoom-through {
+  animation-name: zoom-through;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}

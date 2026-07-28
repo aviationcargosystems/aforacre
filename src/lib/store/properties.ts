@@ -1,5 +1,14 @@
-import type { JourneyId, Property } from "@/lib/types";
-import { getSupabaseAdmin } from "@/lib/supabase/server";
+import type { JourneyId, Property, VerifiedChecklist } from "@/lib/types";
+import { getSupabaseAdmin, isMissingSchemaError } from "@/lib/supabase/server";
+
+const DEFAULT_VERIFIED: VerifiedChecklist = {
+  ownership: false,
+  survey: false,
+  gps: false,
+  physicalInspection: false,
+  roadAccess: false,
+  documents: false,
+};
 
 interface PropertyRow {
   slug: string;
@@ -26,6 +35,8 @@ interface PropertyRow {
   nearby_landmarks: string[];
   distance_from_bangalore_km: number;
   featured: boolean;
+  fid: string | null;
+  verified: Property["verified"];
 }
 
 function rowToProperty(row: PropertyRow): Property {
@@ -51,6 +62,8 @@ function rowToProperty(row: PropertyRow): Property {
     nearbyLandmarks: row.nearby_landmarks ?? [],
     distanceFromBangaloreKm: row.distance_from_bangalore_km,
     featured: row.featured,
+    fid: row.fid ?? null,
+    verified: row.verified ?? DEFAULT_VERIFIED,
   };
 }
 
@@ -80,6 +93,8 @@ function propertyToRow(p: Property): Omit<PropertyRow, "created_at" | "updated_a
     nearby_landmarks: p.nearbyLandmarks,
     distance_from_bangalore_km: p.distanceFromBangaloreKm,
     featured: !!p.featured,
+    fid: p.fid ?? null,
+    verified: p.verified ?? DEFAULT_VERIFIED,
   };
 }
 
@@ -119,18 +134,48 @@ export async function allCorridors(): Promise<string[]> {
 
 export async function saveProperty(property: Property, opts: { isNew: boolean }): Promise<void> {
   const supabase = getSupabaseAdmin();
+  const row = propertyToRow(property);
+  // `fid`/`verified` are only in the row payload once the migration in
+  // supabase/schema.sql has been run — if the columns don't exist yet, retry
+  // without them rather than breaking property save entirely.
+  const rowWithoutMigrationFields: Partial<PropertyRow> = { ...row };
+  delete rowWithoutMigrationFields.fid;
+  delete rowWithoutMigrationFields.verified;
+
   if (opts.isNew) {
     const { data: existing } = await supabase.from("properties").select("slug").eq("slug", property.slug).maybeSingle();
     if (existing) throw new Error(`A property with slug "${property.slug}" already exists.`);
-    const { error } = await supabase.from("properties").insert(propertyToRow(property));
-    if (error) throw error;
+    const { error } = await supabase.from("properties").insert(row);
+    if (error) {
+      if (!isMissingSchemaError(error)) throw error;
+      const { error: retryError } = await supabase.from("properties").insert(rowWithoutMigrationFields);
+      if (retryError) throw retryError;
+    }
   } else {
-    const { error } = await supabase.from("properties").update(propertyToRow(property)).eq("slug", property.slug);
-    if (error) throw error;
+    const { error } = await supabase.from("properties").update(row).eq("slug", property.slug);
+    if (error) {
+      if (!isMissingSchemaError(error)) throw error;
+      const { error: retryError } = await supabase.from("properties").update(rowWithoutMigrationFields).eq("slug", property.slug);
+      if (retryError) throw retryError;
+    }
   }
 }
 
 export async function deleteProperty(slug: string): Promise<void> {
   const { error } = await getSupabaseAdmin().from("properties").delete().eq("slug", slug);
   if (error) throw error;
+}
+
+/** Next sequential "FID 0042"-style number — highest existing fid + 1, formatted to 4 digits. */
+export async function nextFid(): Promise<string> {
+  const { data, error } = await getSupabaseAdmin().from("properties").select("fid").not("fid", "is", null);
+  if (error) {
+    if (isMissingSchemaError(error)) return "0001"; // migration not run yet
+    throw error;
+  }
+  const highest = (data as { fid: string | null }[]).reduce((max, row) => {
+    const n = row.fid ? parseInt(row.fid, 10) : 0;
+    return Number.isFinite(n) && n > max ? n : max;
+  }, 0);
+  return String(highest + 1).padStart(4, "0");
 }

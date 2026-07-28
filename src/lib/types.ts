@@ -87,6 +87,15 @@ export interface PropertyLocation {
   lng: number;
 }
 
+export interface VerifiedChecklist {
+  ownership: boolean;
+  survey: boolean;
+  gps: boolean;
+  physicalInspection: boolean;
+  roadAccess: boolean;
+  documents: boolean;
+}
+
 export interface Property {
   slug: string;
   title: string;
@@ -109,6 +118,9 @@ export interface Property {
   nearbyLandmarks: string[];
   distanceFromBangaloreKm: number;
   featured?: boolean;
+  /** "Farm ID", shown as "FID 0042" — admin-assigned, not set by sellers. */
+  fid: string | null;
+  verified: VerifiedChecklist;
 }
 
 export interface Professional {
@@ -159,4 +171,72 @@ export interface Capture {
   capturedBy: string;
   propertySlug: string | null;
   status: CaptureStatus;
+}
+
+export type EnquiryStatus = "new" | "contacted" | "closed";
+
+export interface Enquiry {
+  id: string;
+  createdAt: string;
+  name: string;
+  phone: string;
+  context: string; // e.g. "quiz", "schedule-visit", "property", "professional"
+  propertySlug: string | null;
+  message: string;
+  status: EnquiryStatus;
+}
+
+export interface Agent {
+  id: string;
+  name: string;
+  phone: string;
+  username: string;
+  active: boolean;
+  createdAt: string;
+}
+
+export type RecceType = "scout" | "pre_visit" | "client_visit";
+export type RecceStatus = "assigned" | "in_progress" | "submitted" | "approved" | "rejected";
+
+export interface Recce {
+  id: string;
+  type: RecceType;
+  status: RecceStatus;
+  agentId: string | null;
+  propertySlug: string | null;
+  area: string;
+  lat: number | null;
+  lng: number | null;
+  scheduledFor: string | null;
+  instructions: string;
+  images: string[];
+  notes: string;
+  submittedLat: number | null;
+  submittedLng: number | null;
+  submittedAt: string | null;
+  reviewNote: string;
+  createdAt: string;
+}
+
+export type LandSubmissionOwnerType = "broker" | "reseller" | "owner";
+export type LandSubmissionStatus = "pending" | "approved" | "rejected";
+
+export interface LandSubmission {
+  id: string;
+  createdAt: string;
+  images: string[];
+  videos: string[];
+  area: string;
+  lat: number | null;
+  lng: number | null;
+  extentGunta: number | null;
+  extentAcres: number | null;
+  expectedPricePerGunta: number | null;
+  ownerName: string;
+  ownerType: LandSubmissionOwnerType;
+  phone: string;
+  tags: string[];
+  notes: string;
+  status: LandSubmissionStatus;
+  propertySlug: string | null;
 }
