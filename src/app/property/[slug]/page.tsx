@@ -25,6 +25,7 @@ import { GrowthAnchors } from "@/components/property/growth-anchors";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { PlotAreaView } from "@/components/map/plot-area-view";
+import { PlotTerrainView } from "@/components/map/plot-terrain-view";
 import { SectionHeading } from "@/components/section-heading";
 import { VERIFIED_FIELDS } from "@/components/admin/property-form-shared";
 import { EnquiryForm } from "@/components/enquiry-form";
@@ -279,6 +280,18 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                   not a pin, see PlotAreaMap. */}
               <div className="h-[420px] overflow-hidden rounded-[1.5rem] border border-border/70">
                 <PlotAreaView lat={property.location.lat} lng={property.location.lng} area={property.location.area} />
+              </div>
+
+              {/* Satellite draped over real elevation, tilted. Free route to a
+                  Google Earth feel: what Google's paid 3D tiles add is
+                  photogrammetric buildings and canopy, and open farmland has
+                  little of either. */}
+              <div className="h-[460px] overflow-hidden rounded-[1.5rem] border border-border/70">
+                <PlotTerrainView
+                  lat={property.location.lat}
+                  lng={property.location.lng}
+                  area={property.location.area}
+                />
               </div>
               <div className="flex flex-wrap gap-2">
                 {property.nearbyLandmarks.map((landmark) => (
