@@ -34,7 +34,7 @@ seed data superseded by `supabase/seed.sql`), `stat-counter.tsx`, and
 `/explore`; zero occurrences of "journey" in the rendered DOM of `/`, `/explore`,
 `/match` and a property page; tsc, eslint and `next build` all clean.
 
-- `(pending)`
+- `(8872df6)`
 
 ## 2026-07-28 14:05 IST · Admin dashboard redesign + remove professionals directory
 
