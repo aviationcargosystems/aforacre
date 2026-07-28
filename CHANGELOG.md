@@ -66,7 +66,7 @@ clean. Every file added in this phase is free of em dashes.
 partner account exists: the full capture, submit, review, approve loop. See the
 notes in `.claude/state/todo.md`.
 
-- `(pending)`
+- `(79cba69)`
 
 ## 2026-07-28 16:40 IST · Phase 2: schema and auth
 
