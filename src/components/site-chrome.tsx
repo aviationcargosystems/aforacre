@@ -12,6 +12,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   const isBareRoute =
     pathname.startsWith("/admin") ||
     pathname.startsWith("/agent") ||
+    pathname.startsWith("/partner") ||
     pathname === "/capture" ||
     pathname === "/zoom";
 

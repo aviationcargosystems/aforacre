@@ -1,5 +1,66 @@
 # Changelog
 
+## 2026-07-28 16:40 IST · Phase 2: schema and auth
+
+**Migrations, not a hand-pasted file.** `supabase/migrations/` now holds six
+numbered files applied in order. The old `schema.sql` was one idempotent blob
+pasted into the SQL editor with nothing tracking which environment had run
+which version, which is exactly why `agents` and `recces` never reached
+production. `supabase/README.md` documents the order and the one-time
+super-admin bootstrap.
+
+**New schema:** `profiles` (role, partner_type, kyc_status), `submissions`,
+`plots`, `plot_suitability`, `plot_media`, `quiz_responses`, `matches`,
+`visits`, `professionals`, `professional_intro_requests`, `audit_log`.
+
+Three constraints do real work rather than documenting intent:
+- **FID comes from a sequence**, so concurrent approvals cannot collide and a
+  number is never handed out twice. It is minted on approval only.
+- **`visits` carries an exclusion constraint** on overlapping time ranges per
+  plot, limited to live bookings. Two buyers cannot be booked onto the same
+  plot at once even if the application logic loses a race.
+- **`submissions` cannot be rejected without a reason**, and a `profiles` row
+  must have a `partner_type` if and only if the role is partner.
+
+**RLS on every table, deny by default.** A partner is a supplier, not a member
+of the business: they can insert submissions and read or edit only their own
+while still open, and have zero read on plots, buyers, or anyone else's
+submissions. Agents read all live plots but can only edit ones where they are
+POC, and cannot approve or reject. `commission_pct` and `contact_phone` sit on
+the professionals table, which is staff-only; buyers read a
+`professionals_public` view that does not contain those columns, so a leak
+would require adding a column to the view rather than forgetting a filter.
+The self-update policy on `profiles` pins `role` and `kyc_status` to their
+current values, otherwise a buyer could promote themselves to super_admin.
+
+**Audit log is trigger-only.** No application code inserts into it, so a code
+path cannot forget to log or choose not to. Covers plots, submissions, visits,
+and role or KYC changes on profiles.
+
+**Supabase Auth wired up:** `/login` with mobile OTP for partners and email
+magic link for staff, `/auth/callback`, `/auth/redirect` (server decides the
+landing route from the role, the client cannot guess it), and `/auth/signout`.
+`getSessionProfile()` uses `getUser()` rather than `getSession()`, so
+authorization never trusts a client-controlled cookie payload.
+
+**Middleware guards** `/admin` (super_admin), `/agent` (agent and above) and
+`/partner` (partner and above). `/partner` is Supabase-only. `/admin` and
+`/agent` accept a Supabase session first and fall back to the existing shared
+password and standalone agent accounts, so the running product does not lose
+access mid-rebuild. Those fallbacks are removed in Phase 7 when both surfaces
+move onto the new schema.
+
+**Verified:** `/login` 200; `/admin` and `/agent` still redirect to their
+existing logins (no regression); `/partner` and `/partner/capture` redirect to
+the new login. tsc, eslint and `next build` all clean.
+
+**Not done yet, deliberately:** the `lib/store/*` modules still use the
+service-role key, which bypasses RLS. They move onto per-user clients as each
+surface is rebuilt in Phases 3 and 7. Running the migrations does not change
+the live site, because nothing reads the new tables yet.
+
+- `(pending)`
+
 ## 2026-07-28 15:20 IST · Phase 1: delete the journeys layer
 
 Journeys let a buyer self-select a category, which pre-empts the match quiz and
