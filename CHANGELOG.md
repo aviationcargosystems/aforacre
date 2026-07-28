@@ -18,7 +18,7 @@
 
 **User-facing:** no more professionals directory anywhere on the site; admin is legible.
 
-- `(pending)`
+- `(aa5bb26)`
 
 ## 2026-07-23 23:10 IST · Agent login + recce, AFORACRE doc alignment, zoom prototype
 
