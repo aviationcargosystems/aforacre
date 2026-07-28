@@ -14,9 +14,9 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 
-// Explore is the only nav item. The quiz is not a destination a buyer picks
-// off a menu, it is what happens when they say they want to explore land.
-const navLinks = [{ href: "/explore", label: "Explore" }];
+// Nothing in the middle. The two actions on the right are the whole nav: one
+// for sellers, one for buyers, and the quiz is what "Explore land" opens.
+const navLinks: { href: string; label: string }[] = [];
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);

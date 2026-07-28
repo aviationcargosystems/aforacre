@@ -139,7 +139,12 @@
       radial-gradient(circle at top right, rgba(31, 58, 46, 0.16), transparent 26%),
       linear-gradient(180deg, #fbf7f0 0%, #f3ede4 52%, #efe6d8 100%);
     background-attachment: fixed;
-    font-feature-settings: "ss01" 1, "cv01" 1, "cv02" 1;
+    /* ss01/cv01/cv02 are Inter-family stylistic sets. Applying them globally
+       also hit Playfair, which swapped in alternate glyphs: digits rendered as
+       old-style figures sitting at different heights, and the fi ligature came
+       out malformed. Scoped off, with lining tabular figures so prices align. */
+    font-variant-numeric: lining-nums tabular-nums;
+    font-variant-ligatures: common-ligatures;
   }
   html,
   body {
@@ -147,6 +152,10 @@
   }
   h1, h2, h3, h4 {
     @apply font-heading;
+    /* Playfair defaults to old-style figures in headings, which reads as a
+       typo next to a price. Force lining figures everywhere a number appears. */
+    font-variant-numeric: lining-nums;
+    font-feature-settings: "lnum" 1, "onum" 0;
   }
   a {
     @apply transition-colors;

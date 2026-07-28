@@ -75,6 +75,23 @@ export default async function Home() {
 
       </section>
 
+      {/* Second section. No separate background: it sits inside the same
+          gradient wrapper as the hero so the colour runs straight through
+          instead of stopping at a section edge. Narrower than before and
+          dimmed, because it is atmosphere behind the page, not a banner
+          asking to be read. */}
+      <section className="relative px-4 pb-6 pt-4 sm:px-6 lg:px-8">
+        <div className="relative mx-auto max-w-[52rem]">
+          <div className="absolute inset-x-12 -bottom-8 h-24 rounded-[3rem] bg-deep-green/25 blur-3xl" />
+          <div className="relative overflow-hidden rounded-[1.75rem] border border-white/60 shadow-[0_34px_90px_rgba(15,23,42,0.24)] sm:rounded-[2rem]">
+            <div className="relative aspect-video">
+              <HeroVideo poster="/videos/hero-poster.jpg" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(8,18,14,0.52)_0%,rgba(8,18,14,0.34)_55%,rgba(8,18,14,0.20)_100%)]" />
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="relative pb-20 pt-10 lg:pt-14">
         <div className="absolute inset-x-0 top-1/2 -z-10 h-[420px] -translate-y-1/2 bg-[radial-gradient(circle_at_center,rgba(87,168,132,0.12),transparent_60%)]" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

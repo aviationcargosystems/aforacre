@@ -156,7 +156,7 @@ export function ExploreView({
           </div>
 
           <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
-            <SheetTrigger asChild className="lg:hidden">
+            <SheetTrigger asChild>
               <Button variant="pill-outline" className="rounded-full">
                 <SlidersHorizontal className="mr-1.5 h-4 w-4" /> Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
               </Button>
@@ -189,16 +189,14 @@ export function ExploreView({
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[320px_minmax(0,1fr)_minmax(360px,0.95fr)]">
-        <aside className="hidden lg:block">
-          <div className="sticky top-28 rounded-[1.75rem] border border-white/70 bg-white/70 p-5 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl">
-            {filterPanel}
-          </div>
-        </aside>
-
-        <div className="order-2 space-y-4 lg:order-1 lg:max-h-[calc(100vh-190px)] lg:overflow-y-auto lg:pr-1 lg:sticky lg:top-28">
+      {/* No permanent filter rail. With seven listings a full filter set is
+          furniture, so it lives behind a button and the space goes to the
+          listings and the map instead. */}
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)]">
+        <div className="order-2 lg:order-1 lg:sticky lg:top-28 lg:max-h-[calc(100vh-190px)] lg:overflow-y-auto lg:pr-1">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {filtered.length === 0 ? (
-            <div className="rounded-[1.75rem] border border-dashed border-border/70 bg-white/65 p-10 text-center text-muted-foreground backdrop-blur-sm">
+            <div className="sm:col-span-2 rounded-[1.75rem] border border-dashed border-border/70 bg-white/65 p-10 text-center text-muted-foreground backdrop-blur-sm">
               No land matches these filters yet. Try widening the distance, price range, or tags.
             </div>
           ) : (
@@ -213,9 +211,10 @@ export function ExploreView({
               </div>
             ))
           )}
+          </div>
         </div>
 
-        <div className="order-1 h-[460px] overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/70 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:order-2 lg:sticky lg:top-28 lg:h-[calc(100vh-190px)]">
+        <div className="order-1 h-[460px] overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/70 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:order-2 lg:sticky lg:top-28 lg:h-[calc(100vh-170px)]">
           <PropertyMap properties={filtered} hoveredSlug={hoveredSlug} onHover={setHoveredSlug} />
         </div>
       </div>
