@@ -39,7 +39,7 @@ export function MatchCard({ match }: { match: PlotMatch }) {
         </p>
 
         <div className="mt-3 flex items-baseline gap-2">
-          <span className="font-heading text-xl font-semibold text-foreground">{formatINR(plot.priceTotal)}</span>
+          <span className="text-xl font-semibold tracking-tight text-foreground tabular-nums">{formatINR(plot.priceTotal)}</span>
           <span className="text-xs text-muted-foreground">{plot.areaAcres} acres</span>
         </div>
 

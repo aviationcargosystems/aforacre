@@ -64,7 +64,7 @@ export function PropertyCard({ property, highlightLabel }: { property: Property;
           <div className="flex items-center justify-between border-t border-border/70 pt-4">
             <div>
               <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Per acre</p>
-              <p className="font-heading text-base font-semibold text-primary">{formatINR(property.pricePerAcre)}</p>
+              <p className="text-base font-semibold tracking-tight text-primary tabular-nums">{formatINR(property.pricePerAcre)}</p>
             </div>
             <span className="inline-flex items-center gap-1 text-sm font-medium text-foreground transition-transform group-hover:translate-x-0.5">
               View listing

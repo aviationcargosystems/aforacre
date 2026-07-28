@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Check, Circle, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Circle, RotateCcw, X } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -161,6 +161,16 @@ export function MatchFlow({ plots }: { plots: MatchablePlot[] }) {
   if (stage === "results") {
     return (
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mb-8 flex justify-end">
+          <Link
+            href="/"
+            aria-label="Leave the quiz"
+            className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-white/70 hover:text-foreground"
+          >
+            <X className="h-5 w-5" />
+          </Link>
+        </div>
+
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent">You are</p>
           <h1 className="mt-3 font-heading text-4xl font-semibold leading-tight text-foreground sm:text-5xl">
@@ -230,6 +240,13 @@ export function MatchFlow({ plots }: { plots: MatchablePlot[] }) {
           <span className="shrink-0 text-xs font-medium text-muted-foreground">
             {step + 1} of {QUIZ_QUESTIONS.length}
           </span>
+          <Link
+            href="/"
+            aria-label="Leave the quiz"
+            className="shrink-0 rounded-full p-2 text-muted-foreground transition-colors hover:bg-white/70 hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+          </Link>
         </div>
 
         <div className="flex flex-1 flex-col justify-center py-10">

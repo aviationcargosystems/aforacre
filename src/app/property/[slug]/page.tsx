@@ -144,7 +144,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
             />
           </div>
           <div className="rounded-[1.75rem] border border-white/70 bg-white/70 p-5 shadow-[0_16px_45px_rgba(15,23,42,0.08)] backdrop-blur-xl">
-            <p className="font-heading text-4xl font-semibold tracking-tight text-primary">
+            <p className="text-4xl font-semibold tracking-tight text-primary tabular-nums">
               {formatINR(property.totalPrice)}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">

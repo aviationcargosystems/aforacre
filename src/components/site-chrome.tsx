@@ -14,6 +14,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     pathname.startsWith("/agent") ||
     pathname.startsWith("/partner") ||
     pathname === "/capture" ||
+    pathname === "/match" ||
     pathname === "/zoom";
 
   if (isBareRoute) {

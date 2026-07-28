@@ -51,14 +51,14 @@ export default async function Home() {
         <div className="animate-drift-slow absolute left-[30%] top-[48%] h-[460px] w-[460px] rounded-full bg-[#e0bd7c]/10 blur-3xl [animation-delay:-9s]" />
       </div>
 
-      <div className="relative pt-8 sm:pt-10">
+      <div className="relative pt-16 sm:pt-24 lg:pt-32">
         {/* Centered hero. The old two-column split fought the display type for
             width and left the headline wrapping awkwardly at every breakpoint. */}
-        <div className="mx-auto flex max-w-4xl flex-col items-center px-4 pb-2 text-center sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-4xl flex-col items-center px-4 pb-6 text-center sm:px-6 lg:px-8">
           <h1 className="font-heading text-6xl font-semibold leading-[0.96] tracking-tight text-balance text-foreground sm:text-7xl lg:text-8xl">
             Land that fits your life.
           </h1>
-          <p className="mt-6 max-w-2xl text-pretty text-lg leading-8 text-muted-foreground sm:text-xl">
+          <p className="mt-8 max-w-2xl text-pretty text-lg leading-8 text-muted-foreground sm:text-xl">
             Holistic farmland, farmhouse plots, and weekend escapes across South Bangalore, matched to how
             you&apos;ll actually use them.
           </p>
@@ -66,13 +66,13 @@ export default async function Home() {
           {/* No search box. With this few listings a search returns either
               everything or nothing, and it hands the buyer a job the match flow
               is meant to do for them. */}
-          <div className="mt-9 flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row sm:items-center">
-            <Button asChild variant="pill" size="pill" className="w-full sm:w-auto">
+          <div className="mt-11 grid w-full max-w-md grid-cols-1 gap-3 sm:grid-cols-2">
+            <Button asChild variant="pill" size="pill" className="w-full">
               <Link href="/match">
-                Find my match <ArrowRight className="ml-1 h-4 w-4" />
+                Find land <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild variant="pill-outline" size="pill" className="w-full sm:w-auto">
+            <Button asChild variant="pill-outline" size="pill" className="w-full">
               <Link href="/explore">See every plot</Link>
             </Button>
           </div>
@@ -84,7 +84,7 @@ export default async function Home() {
           instead of stopping at a section edge. Narrower than before and
           dimmed, because it is atmosphere behind the page, not a banner
           asking to be read. */}
-        <div className="relative px-4 pb-10 pt-4 sm:px-6 lg:px-8">
+        <div className="relative px-4 pb-20 pt-14 sm:px-6 lg:px-8 lg:pb-28 lg:pt-20">
           <div className="relative mx-auto max-w-[52rem]">
             <div className="relative overflow-hidden rounded-[1.75rem] border border-white/60 shadow-[0_24px_60px_rgba(15,23,42,0.16)] sm:rounded-[2rem]">
               <div className="relative aspect-video">
@@ -96,7 +96,7 @@ export default async function Home() {
         </div>
       </div>
 
-      <section className="relative pb-20 pt-10 lg:pt-14">
+      <section className="relative pb-24 pt-4 lg:pb-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
             <SectionHeading
@@ -113,7 +113,7 @@ export default async function Home() {
           <FeaturedLandCarousel properties={featured} />
         </div>
       </section>
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-28">
         <SectionHeading
           align="center"
           className="mx-auto mb-10"
@@ -133,7 +133,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-28">
         <SectionHeading
           align="center"
           className="mx-auto mb-14"
