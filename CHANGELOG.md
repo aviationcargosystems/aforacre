@@ -59,7 +59,7 @@ service-role key, which bypasses RLS. They move onto per-user clients as each
 surface is rebuilt in Phases 3 and 7. Running the migrations does not change
 the live site, because nothing reads the new tables yet.
 
-- `(pending)`
+- `(1617769)`
 
 ## 2026-07-28 15:20 IST · Phase 1: delete the journeys layer
 
