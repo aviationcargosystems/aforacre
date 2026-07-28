@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/admin/require-admin";
-import { createAgent, resetAgentPassword, setAgentActive } from "@/lib/store/agents";
+import { LegacyTableMissingError, createAgent, resetAgentPassword, setAgentActive } from "@/lib/store/agents";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -27,6 +27,9 @@ export async function createAgentAction(formData: FormData) {
     // 23505 = unique_violation on agents.username
     if ((error as { code?: string })?.code === "23505") {
       redirect("/admin/agents?error=duplicate");
+    }
+    if (error instanceof LegacyTableMissingError) {
+      redirect("/admin/agents?error=legacy");
     }
     throw error;
   }

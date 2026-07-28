@@ -64,6 +64,17 @@ export async function getAgentCredentialsByUsername(
   return { id: row.id, passwordHash: row.password_hash, active: row.active };
 }
 
+/** Thrown when a legacy table is gone, so callers can show a real explanation. */
+export class LegacyTableMissingError extends Error {
+  constructor(table: string) {
+    super(
+      `The "${table}" table no longer exists. Agents are now profiles with role='agent'; ` +
+        `this screen is superseded by the Phase 7 users admin.`
+    );
+    this.name = "LegacyTableMissingError";
+  }
+}
+
 export async function createAgent(input: {
   name: string;
   phone: string;
@@ -80,16 +91,25 @@ export async function createAgent(input: {
     password_hash: passwordHash,
     active: true,
   });
-  if (error) throw error;
+  if (error) {
+    if (isMissingSchemaError(error)) throw new LegacyTableMissingError("agents");
+    throw error;
+  }
 }
 
 export async function setAgentActive(id: string, active: boolean): Promise<void> {
   const { error } = await getSupabaseAdmin().from("agents").update({ active }).eq("id", id);
-  if (error) throw error;
+  if (error) {
+    if (isMissingSchemaError(error)) throw new LegacyTableMissingError("agents");
+    throw error;
+  }
 }
 
 export async function resetAgentPassword(id: string, password: string): Promise<void> {
   const passwordHash = await hashAgentPassword(password);
   const { error } = await getSupabaseAdmin().from("agents").update({ password_hash: passwordHash }).eq("id", id);
-  if (error) throw error;
+  if (error) {
+    if (isMissingSchemaError(error)) throw new LegacyTableMissingError("agents");
+    throw error;
+  }
 }

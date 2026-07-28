@@ -12,6 +12,9 @@ const ERROR_MESSAGES: Record<string, string> = {
   username: "A username is required.",
   password: "Password must be at least 8 characters.",
   duplicate: "That username is already taken.",
+  legacy:
+    "This screen writes to the old agents table, which no longer exists. Agents are now profiles with role 'agent'. " +
+    "Use the users admin once Phase 7 ships; creating one here cannot work.",
 };
 
 export default async function AdminAgentsPage({

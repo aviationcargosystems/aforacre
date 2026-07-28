@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { GrowthAnchors } from "@/components/property/growth-anchors";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { PropertyLocationMap } from "@/components/map/property-location-map";
+import { PlotAreaView } from "@/components/map/plot-area-view";
 import { SectionHeading } from "@/components/section-heading";
 import { VERIFIED_FIELDS } from "@/components/admin/property-form-shared";
 import { EnquiryForm } from "@/components/enquiry-form";
@@ -274,8 +274,11 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
           <Card className="p-6 sm:p-7">
             <CardContent className="space-y-6 p-0">
               <SectionHeading kicker="Location" title="Where it sits" />
-              <div className="h-[340px] overflow-hidden rounded-[1.5rem] border border-border/70">
-                <PropertyLocationMap property={property} />
+              {/* Satellite, so the setting is legible: tree cover, neighbouring
+                  land, where the water and roads are. Deliberately an area and
+                  not a pin, see PlotAreaMap. */}
+              <div className="h-[420px] overflow-hidden rounded-[1.5rem] border border-border/70">
+                <PlotAreaView lat={property.location.lat} lng={property.location.lng} area={property.location.area} />
               </div>
               <div className="flex flex-wrap gap-2">
                 {property.nearbyLandmarks.map((landmark) => (
