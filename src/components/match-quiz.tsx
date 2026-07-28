@@ -115,7 +115,7 @@ export function MatchQuiz({ properties }: { properties: Property[] }) {
         {matches.length > 0 && (
           <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {matches.map(({ property, score }) => (
-              <PropertyCard key={property.slug} property={property} highlightJourney={`${score}% Match`} />
+              <PropertyCard key={property.slug} property={property} highlightLabel={`${score}% Match`} />
             ))}
           </div>
         )}

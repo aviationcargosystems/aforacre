@@ -1,7 +1,7 @@
-import type { JourneyId, KhataType, WaterSource } from "@/lib/types";
+import type { KhataType, UseCase, WaterSource } from "@/lib/types";
 import type { PropertyInput } from "@/lib/property-builder";
 import { slugify } from "@/lib/property-builder";
-import { journeyFieldName } from "@/components/admin/property-form-shared";
+import { fieldNameForUseCase } from "@/components/admin/property-form-shared";
 import { saveUploadedFiles } from "@/lib/store/uploads";
 
 function num(formData: FormData, key: string, fallback = 0): number {
@@ -33,12 +33,12 @@ export async function parsePropertyForm(
   const slugRaw = str(formData, "slug");
   const slug = slugify(slugRaw || title);
 
-  const journeyFit = {
-    polyhouse: num(formData, journeyFieldName("polyhouse")),
-    "commercial-farming": num(formData, journeyFieldName("commercial-farming")),
-    retirement: num(formData, journeyFieldName("retirement")),
-    getaway: num(formData, journeyFieldName("getaway")),
-  } satisfies Record<JourneyId, number>;
+  const useCaseFit = {
+    polyhouse: num(formData, fieldNameForUseCase("polyhouse")),
+    "commercial-farming": num(formData, fieldNameForUseCase("commercial-farming")),
+    retirement: num(formData, fieldNameForUseCase("retirement")),
+    getaway: num(formData, fieldNameForUseCase("getaway")),
+  } satisfies Record<UseCase, number>;
 
   const checkedTags = checkboxList<string>(formData, "tags");
   const newTagsRaw = str(formData, "newTags");
@@ -66,7 +66,7 @@ export async function parsePropertyForm(
     pricePerAcre: num(formData, "pricePerAcre"),
     guidanceValuePerAcre: num(formData, "guidanceValuePerAcre"),
     tags,
-    journeyFit,
+    useCaseFit,
     soilType: str(formData, "soilType"),
     waterSources: checkboxList<WaterSource>(formData, "waterSources"),
     roadAccess: str(formData, "roadAccess"),

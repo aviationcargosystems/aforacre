@@ -13,7 +13,7 @@ import {
   Zap,
 } from "lucide-react";
 import { getProperty } from "@/lib/store/properties";
-import { journeys } from "@/data/journeys";
+import { USE_CASES } from "@/data/use-cases";
 import { karnatakaLegalTerms } from "@/data/legal";
 import { formatINR, formatINRFull } from "@/lib/tax";
 import { Badge } from "@/components/ui/badge";
@@ -54,9 +54,11 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
   const property = await getProperty(slug);
   if (!property) notFound();
 
-  const topJourney = journeys.reduce(
-    (best, journey) => (property.journeyFit[journey.id] > property.journeyFit[best.id] ? journey : best),
-    journeys[0]
+  // Best use for this plot, from its stored scores. A plot attribute, not a
+  // category the buyer picked.
+  const topUseCase = USE_CASES.reduce(
+    (best, useCase) => (property.useCaseFit[useCase.id] > property.useCaseFit[best.id] ? useCase : best),
+    USE_CASES[0]
   );
 
   return (
@@ -76,7 +78,9 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
             <div className="absolute left-4 top-4 flex flex-wrap gap-2">
               {property.featured && <Badge className="bg-white/90 text-foreground">Featured</Badge>}
               {property.fid && <Badge className="bg-white/90 text-foreground">FID {property.fid}</Badge>}
-              <Badge className="bg-white/15 text-white">{property.journeyFit[topJourney.id]}% match</Badge>
+              <Badge className="bg-white/15 text-white">
+                {property.useCaseFit[topUseCase.id]}% fit for {topUseCase.label.toLowerCase()}
+              </Badge>
             </div>
             <div className="absolute inset-x-4 bottom-4 rounded-[1.5rem] border border-white/15 bg-white/10 p-4 text-white backdrop-blur-xl">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">Property overview</p>

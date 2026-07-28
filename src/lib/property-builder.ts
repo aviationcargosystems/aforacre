@@ -1,4 +1,4 @@
-import type { JourneyId, KhataType, LandSuitability, Property, VerifiedChecklist, WaterSource } from "@/lib/types";
+import type { UseCase, KhataType, LandSuitability, Property, VerifiedChecklist, WaterSource } from "@/lib/types";
 import { computeKarnatakaTaxes } from "@/lib/tax";
 
 export const EMPTY_VERIFIED: VerifiedChecklist = {
@@ -78,18 +78,18 @@ function suitabilityNote(
 }
 
 export function buildSuitability(
-  journeyFit: Record<JourneyId, number>,
+  useCaseFit: Record<UseCase, number>,
   ctx: { waterSources: WaterSource[]; soilType: string; distanceFromBangaloreKm: number; roadAccess: string }
 ): LandSuitability {
   const orchardScore = Math.round(
-    (journeyFit["commercial-farming"] * 0.6 + journeyFit.retirement * 0.4) * (ctx.waterSources.length > 1 ? 1.05 : 0.9)
+    (useCaseFit["commercial-farming"] * 0.6 + useCaseFit.retirement * 0.4) * (ctx.waterSources.length > 1 ? 1.05 : 0.9)
   );
   const scores = {
-    polyhouse: journeyFit.polyhouse,
-    openFarming: journeyFit["commercial-farming"],
+    polyhouse: useCaseFit.polyhouse,
+    openFarming: useCaseFit["commercial-farming"],
     orchard: Math.min(100, orchardScore),
-    residentialFarmhouse: journeyFit.retirement,
-    getaway: journeyFit.getaway,
+    residentialFarmhouse: useCaseFit.retirement,
+    getaway: useCaseFit.getaway,
   };
   return {
     polyhouse: { score: scores.polyhouse, note: suitabilityNote("polyhouse", scores.polyhouse, ctx) },
@@ -114,7 +114,7 @@ export interface PropertyInput {
   pricePerAcre: number;
   guidanceValuePerAcre: number;
   tags: string[];
-  journeyFit: Record<JourneyId, number>;
+  useCaseFit: Record<UseCase, number>;
   soilType: string;
   waterSources: WaterSource[];
   roadAccess: string;
@@ -157,7 +157,7 @@ export function buildProperty(input: PropertyInput): Property {
     pricePerAcre: input.pricePerAcre,
     totalPrice,
     tags: input.tags,
-    journeyFit: input.journeyFit,
+    useCaseFit: input.useCaseFit,
     soilType: input.soilType,
     waterSources: input.waterSources,
     roadAccess: input.roadAccess,
@@ -166,7 +166,7 @@ export function buildProperty(input: PropertyInput): Property {
     images: input.images,
     description: input.description,
     taxes,
-    suitability: buildSuitability(input.journeyFit, ctx),
+    suitability: buildSuitability(input.useCaseFit, ctx),
     legal: {
       khata: input.khata,
       dcConverted: input.dcConverted,

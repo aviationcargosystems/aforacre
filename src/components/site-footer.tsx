@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { journeys } from "@/data/journeys";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { BrandIcon } from "@/components/brand-icon";
 
@@ -47,13 +46,11 @@ export function SiteFooter() {
                     Explore land
                   </Link>
                 </li>
-                {journeys.slice(0, 3).map((journey) => (
-                  <li key={journey.id}>
-                    <Link href={`/journeys/${journey.id}`} className="text-sm text-white/78 hover:text-white">
-                      {journey.shortTitle}
-                    </Link>
-                  </li>
-                ))}
+                <li>
+                  <Link href="/match" className="text-sm text-white/78 hover:text-white">
+                    Find your match
+                  </Link>
+                </li>
                 <li>
                   <Link href="/submit-land" className="text-sm text-white/78 hover:text-white">
                     List your land

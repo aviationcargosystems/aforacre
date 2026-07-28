@@ -1,4 +1,4 @@
-import type { JourneyId, Property } from "@/lib/types";
+import type { Property, UseCase } from "@/lib/types";
 
 export type QuizQuestionId = "goals" | "involvement" | "scenery" | "budget";
 
@@ -61,11 +61,11 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
 ];
 
-// Best-effort mapping from the quiz's goal options to the site's existing
-// journey taxonomy. "long-term-investment" and "not-sure" have no single
-// natural journey — they stay neutral and blend across all four instead of
+// Best-effort mapping from the quiz's goal options to the use-case scores
+// stored on every plot. "long-term-investment" and "not-sure" have no single
+// natural use case, so they stay neutral and blend across all four rather than
 // guessing.
-const GOAL_TO_JOURNEY: Partial<Record<string, JourneyId>> = {
+const GOAL_TO_USE_CASE: Partial<Record<string, UseCase>> = {
   "weekend-farmhouse": "getaway",
   "retirement-home": "retirement",
   "commercial-farming": "commercial-farming",
@@ -96,7 +96,7 @@ const BUDGET_RANGES: Record<string, { min: number; max: number }> = {
   "5cr-plus": { min: 50_000_000, max: Infinity },
 };
 
-const ALL_JOURNEY_IDS: JourneyId[] = ["polyhouse", "commercial-farming", "retirement", "getaway"];
+const ALL_USE_CASES: UseCase[] = ["polyhouse", "commercial-farming", "retirement", "getaway"];
 
 export interface QuizMatch {
   property: Property;
@@ -104,17 +104,17 @@ export interface QuizMatch {
 }
 
 export function computeMatches(properties: Property[], answers: QuizAnswers, limit = 6): QuizMatch[] {
-  const mappedJourneys = Array.from(
-    new Set((answers.goals ?? []).map((goal) => GOAL_TO_JOURNEY[goal]).filter((id): id is JourneyId => Boolean(id)))
+  const mappedUseCases = Array.from(
+    new Set((answers.goals ?? []).map((goal) => GOAL_TO_USE_CASE[goal]).filter((id): id is UseCase => Boolean(id)))
   );
-  const journeysToScore = mappedJourneys.length > 0 ? mappedJourneys : ALL_JOURNEY_IDS;
+  const useCasesToScore = mappedUseCases.length > 0 ? mappedUseCases : ALL_USE_CASES;
 
   const sceneryKeywords = (answers.scenery ?? []).flatMap((value) => SCENERY_KEYWORDS[value] ?? []);
   const budgetRanges = (answers.budget ?? []).map((value) => BUDGET_RANGES[value]).filter(Boolean);
 
   const scored = properties.map((property) => {
     const baseScore =
-      journeysToScore.reduce((sum, id) => sum + property.journeyFit[id], 0) / journeysToScore.length;
+      useCasesToScore.reduce((sum, id) => sum + property.useCaseFit[id], 0) / useCasesToScore.length;
 
     let score = baseScore;
 

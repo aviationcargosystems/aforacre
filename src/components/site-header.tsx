@@ -8,13 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { journeys } from "@/data/journeys";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -61,28 +58,6 @@ export function SiteHeader() {
           <div className="hidden min-w-0 flex-1 justify-center lg:flex">
             <NavigationMenu viewport={false}>
             <NavigationMenuList className="gap-1">
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="rounded-full bg-transparent px-4 text-sm font-medium text-foreground hover:bg-muted/70">
-                  Journeys
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[340px] gap-1 p-2">
-                    {journeys.map((journey) => (
-                      <li key={journey.id}>
-                        <NavigationMenuLink asChild>
-                          <Link
-                            href={`/journeys/${journey.id}`}
-                            className="flex flex-col gap-0.5 rounded-2xl px-3 py-2.5 transition-colors hover:bg-secondary/70"
-                          >
-                            <span className="font-medium text-foreground">{journey.shortTitle}</span>
-                            <span className="text-xs text-muted-foreground">{journey.tagline}</span>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
               {navLinks.map((link) => (
                 <NavigationMenuItem key={link.href}>
                   <NavigationMenuLink asChild>
@@ -128,23 +103,9 @@ export function SiteHeader() {
               </SheetHeader>
               <div className="px-4 pb-8">
                 <p className="mt-2 text-sm text-muted-foreground">
-                  South Bangalore land discovery, with clearer pricing, taxes, and local help.
+                  Verified farmland in South Bangalore, matched to how you will actually use it.
                 </p>
                 <nav className="mt-6 flex flex-col gap-1">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                    Journeys
-                  </p>
-                  {journeys.map((journey) => (
-                    <Link
-                      key={journey.id}
-                      href={`/journeys/${journey.id}`}
-                      onClick={() => setOpen(false)}
-                      className="rounded-2xl px-3 py-2.5 text-sm transition-colors hover:bg-secondary/70"
-                    >
-                      {journey.shortTitle}
-                    </Link>
-                  ))}
-                  <div className="my-3 h-px bg-border/70" />
                   {navLinks.map((link) => (
                     <Link
                       key={link.href}

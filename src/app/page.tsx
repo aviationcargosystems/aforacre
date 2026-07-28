@@ -17,11 +17,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { JourneyCard } from "@/components/journey-card";
 import { FeaturedLandCarousel } from "@/components/featured-land-carousel";
 import { SectionHeading } from "@/components/section-heading";
-import { journeys } from "@/data/journeys";
-import { getAllProperties, featuredProperties } from "@/lib/store/properties";
+import { featuredProperties } from "@/lib/store/properties";
 import { HeroVideo } from "@/components/hero-video";
 
 export const dynamic = "force-dynamic";
@@ -31,18 +29,16 @@ const HOLISTIC_CRITERIA = [
   {
     icon: LayoutGrid,
     title: "Fit for everything",
-    description: "Room for a polyhouse, garden, pet house, container home, and staff quarters — all in one plot.",
+    description: "Room for a polyhouse, garden, pet house, container home, and staff quarters, all in one plot.",
   },
   { icon: Route, title: "Real road access", description: "Every plot reachable by vehicle, no guesswork." },
-  { icon: Clock, title: "1–1.5 hrs from the city", description: "Close enough for a weekend, far enough to feel like an escape." },
+  { icon: Clock, title: "1 to 1.5 hrs from the city", description: "Close enough for a weekend, far enough to feel like an escape." },
   { icon: TrendingUp, title: "Built to appreciate", description: "Selected for long-term land value, not just today's price." },
 ];
 
 export default async function Home() {
-  const [allProperties, featured] = await Promise.all([getAllProperties(), featuredProperties()]);
-
-  const totalAcres = Math.round(allProperties.reduce((sum, property) => sum + property.extentAcres, 0));
-  const closingImage = journeys[0]?.heroImage ?? featured[0]?.images[0];
+  const featured = await featuredProperties();
+  const closingImage = featured[0]?.images[0];
 
   return (
     <div className="pb-16">
@@ -113,27 +109,15 @@ export default async function Home() {
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,14,0.10)_0%,rgba(8,18,14,0.20)_40%,rgba(8,18,14,0.78)_100%)]" />
                 <div className="absolute inset-x-4 bottom-4 rounded-[1.5rem] border border-white/15 bg-white/10 p-4 text-white backdrop-blur-xl">
                   <div className="flex items-center justify-between gap-4">
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
                         A for Acre
                       </p>
-                      <p className="mt-1 font-heading text-xl font-semibold">Calm, practical, reliable.</p>
+                      <p className="mt-1 font-heading text-xl font-semibold">
+                        Verified before it reaches you.
+                      </p>
                     </div>
-                    <Badge className="bg-white/15 text-white">Live listing data</Badge>
-                  </div>
-                  <div className="mt-4 grid grid-cols-3 gap-2">
-                    <div className="rounded-2xl bg-white/10 p-3">
-                      <p className="text-[11px] uppercase tracking-[0.14em] text-white/55">Listings</p>
-                      <p className="mt-1 font-heading text-lg font-semibold">{allProperties.length}</p>
-                    </div>
-                    <div className="rounded-2xl bg-white/10 p-3">
-                      <p className="text-[11px] uppercase tracking-[0.14em] text-white/55">Acres</p>
-                      <p className="mt-1 font-heading text-lg font-semibold">{totalAcres}+</p>
-                    </div>
-                    <div className="rounded-2xl bg-white/10 p-3">
-                      <p className="text-[11px] uppercase tracking-[0.14em] text-white/55">Journeys</p>
-                      <p className="mt-1 font-heading text-lg font-semibold">{journeys.length}</p>
-                    </div>
+                    <Badge className="bg-white/15 text-white">Minimum 1 acre</Badge>
                   </div>
                 </div>
               </div>
@@ -158,21 +142,6 @@ export default async function Home() {
               <h3 className="mt-3 font-heading text-base font-semibold text-foreground">{item.title}</h3>
               <p className="mt-1.5 text-xs leading-6 text-muted-foreground">{item.description}</p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      <section id="journeys" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-        <SectionHeading
-          align="center"
-          className="mx-auto mb-12"
-          kicker="Start here"
-          title="Choose your journey"
-          subtitle="Every buyer arrives with a different intent. Tell us which one is yours and we'll surface the land and the checklists matched to it."
-        />
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {journeys.map((journey) => (
-            <JourneyCard key={journey.id} journey={journey} />
           ))}
         </div>
       </section>

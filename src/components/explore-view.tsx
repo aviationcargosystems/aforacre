@@ -2,15 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import type { JourneyId, Property, WaterSource } from "@/lib/types";
-import { journeys } from "@/data/journeys";
+import type { Property, WaterSource } from "@/lib/types";
 import { formatINR } from "@/lib/tax";
 import { PropertyCard } from "@/components/property-card";
 import { PropertyMap } from "@/components/map/property-map";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 const WATER_SOURCES: { value: WaterSource; label: string }[] = [
@@ -27,16 +25,13 @@ const MAX_DISTANCE = 110;
 export function ExploreView({
   properties,
   allTags,
-  initialJourney,
   initialQuery,
 }: {
   properties: Property[];
   allTags: string[];
-  initialJourney?: JourneyId | null;
   initialQuery?: string;
 }) {
   const [query, setQuery] = useState(initialQuery ?? "");
-  const [journeyId, setJourneyId] = useState<JourneyId | "all">(initialJourney ?? "all");
   const [maxDistance, setMaxDistance] = useState(MAX_DISTANCE);
   const [acreRange, setAcreRange] = useState<[number, number]>([0, MAX_ACRES]);
   const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
@@ -55,18 +50,15 @@ export function ExploreView({
           .toLowerCase();
         return queryWords.every((word) => haystack.includes(word));
       })
-      .filter((property) => (journeyId === "all" ? true : property.journeyFit[journeyId] >= 45))
       .filter((property) => property.distanceFromBangaloreKm <= maxDistance)
       .filter((property) => property.extentAcres >= acreRange[0] && property.extentAcres <= acreRange[1])
       .filter((property) => property.totalPrice <= maxPrice)
       .filter((property) => (selectedTags.length === 0 ? true : selectedTags.some((tag) => property.tags.includes(tag))))
-      .filter((property) => (selectedWater.length === 0 ? true : selectedWater.some((source) => property.waterSources.includes(source))))
-      .sort((a, b) => (journeyId === "all" ? 0 : b.journeyFit[journeyId] - a.journeyFit[journeyId]));
-  }, [properties, query, journeyId, maxDistance, acreRange, maxPrice, selectedTags, selectedWater]);
+      .filter((property) => (selectedWater.length === 0 ? true : selectedWater.some((source) => property.waterSources.includes(source))));
+  }, [properties, query, maxDistance, acreRange, maxPrice, selectedTags, selectedWater]);
 
   const activeFilterCount =
     (query.trim() ? 1 : 0) +
-    (journeyId !== "all" ? 1 : 0) +
     (maxDistance < MAX_DISTANCE ? 1 : 0) +
     (acreRange[0] > 0 || acreRange[1] < MAX_ACRES ? 1 : 0) +
     (maxPrice < MAX_PRICE ? 1 : 0) +
@@ -75,7 +67,6 @@ export function ExploreView({
 
   function resetFilters() {
     setQuery("");
-    setJourneyId("all");
     setMaxDistance(MAX_DISTANCE);
     setAcreRange([0, MAX_ACRES]);
     setMaxPrice(MAX_PRICE);
@@ -93,23 +84,6 @@ export function ExploreView({
 
   const filterPanel = (
     <div className="space-y-6">
-      <div>
-        <label className="text-sm font-medium text-foreground">Journey</label>
-        <Select value={journeyId} onValueChange={(value) => setJourneyId(value as JourneyId | "all")}>
-          <SelectTrigger className="mt-2 w-full rounded-full border-border/70 bg-background/80">
-            <SelectValue placeholder="All journeys" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All journeys</SelectItem>
-            {journeys.map((journey) => (
-              <SelectItem key={journey.id} value={journey.id}>
-                {journey.shortTitle}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
       <div>
         <div className="flex items-center justify-between text-sm font-medium text-foreground">
           <span>Max distance from city</span>
@@ -235,10 +209,7 @@ export function ExploreView({
                 onMouseLeave={() => setHoveredSlug(null)}
                 className={hoveredSlug === property.slug ? "rounded-[1.75rem] ring-2 ring-accent/60" : ""}
               >
-                <PropertyCard
-                  property={property}
-                  highlightJourney={journeyId !== "all" ? `${property.journeyFit[journeyId]}% match` : undefined}
-                />
+                <PropertyCard property={property} />
               </div>
             ))
           )}

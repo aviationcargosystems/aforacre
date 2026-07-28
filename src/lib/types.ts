@@ -2,7 +2,10 @@
 // Mock data in src/data/* implements these shapes. Swapping to a real DB later
 // should only require replacing the data source, not these types.
 
-export type JourneyId =
+// What a plot is good for. This is a plot ATTRIBUTE used by the matching
+// engine, never a browse path a buyer picks for themselves: the system tells
+// the user who they are, the user does not self-select a category.
+export type UseCase =
   | "polyhouse"
   | "commercial-farming"
   | "retirement"
@@ -11,24 +14,6 @@ export type JourneyId =
 export type WaterSource = "borewell" | "open-well" | "rain-fed" | "canal" | "none";
 
 export type KhataType = "A" | "B" | "none";
-
-export interface Journey {
-  id: JourneyId;
-  title: string;
-  shortTitle: string;
-  tagline: string;
-  description: string;
-  heroImage: string;
-  whatToLookFor: string[];
-  recommendedFilters: {
-    minAcres?: number;
-    maxAcres?: number;
-    maxDistanceKm?: number;
-    tags?: string[];
-  };
-  faqs: { question: string; answer: string }[];
-  accentTag: string;
-}
 
 export interface LandSuitability {
   polyhouse: { score: number; note: string };
@@ -91,7 +76,7 @@ export interface Property {
   pricePerAcre: number;
   totalPrice: number;
   tags: string[];
-  journeyFit: Record<JourneyId, number>; // 0-100
+  useCaseFit: Record<UseCase, number>; // 0-100
   soilType: string;
   waterSources: WaterSource[];
   roadAccess: string;

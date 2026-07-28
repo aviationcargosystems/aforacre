@@ -1,6 +1,4 @@
-import type { JourneyId } from "@/lib/types";
 import { getAllProperties, allTags } from "@/lib/store/properties";
-import { journeys } from "@/data/journeys";
 import { ExploreView } from "@/components/explore-view";
 
 export const dynamic = "force-dynamic";
@@ -13,11 +11,10 @@ export const metadata = {
 export default async function ExplorePage({
   searchParams,
 }: {
-  searchParams: Promise<{ journey?: string; q?: string }>;
+  searchParams: Promise<{ q?: string }>;
 }) {
-  const { journey, q } = await searchParams;
-  const initialJourney = journeys.some((journeyItem) => journeyItem.id === journey) ? (journey as JourneyId) : null;
+  const { q } = await searchParams;
   const [properties, tags] = await Promise.all([getAllProperties(), allTags()]);
 
-  return <ExploreView properties={properties} allTags={tags} initialJourney={initialJourney} initialQuery={q ?? ""} />;
+  return <ExploreView properties={properties} allTags={tags} initialQuery={q ?? ""} />;
 }

@@ -103,7 +103,7 @@ export async function rejectLandSubmission(id: string): Promise<void> {
 /**
  * Approves a submission: builds a draft Property with a freshly-assigned FID
  * and saves it, then links the submission to that property. The draft is
- * intentionally bare (neutral journey-fit scores, unverified checklist,
+ * intentionally bare (neutral use-case scores, unverified checklist,
  * placeholder legal/soil fields) — admin fleshes it out via the normal
  * property edit form afterward, per the spec's "ADMIN CAN EDIT" step.
  */
@@ -131,7 +131,7 @@ export async function approveLandSubmission(id: string): Promise<string> {
     pricePerAcre,
     guidanceValuePerAcre: pricePerAcre, // placeholder — admin must confirm the real guidance value before tax figures are trustworthy
     tags: submission.tags,
-    journeyFit: { polyhouse: 50, "commercial-farming": 50, retirement: 50, getaway: 50 },
+    useCaseFit: { polyhouse: 50, "commercial-farming": 50, retirement: 50, getaway: 50 },
     soilType: "Not yet assessed",
     waterSources: [],
     roadAccess: "Not yet assessed",

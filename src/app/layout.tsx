@@ -17,7 +17,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "A for Acre | South Bangalore",
   description:
-    "Explore farmland, farmhouse plots, and weekend getaway land across South Bangalore - matched to your journey, with taxes, land suitability, and verified ownership up front.",
+    "Verified farmland in South Bangalore, matched to how you will actually use it. Taxes, land suitability, and ownership checks up front.",
 };
 
 export default function RootLayout({

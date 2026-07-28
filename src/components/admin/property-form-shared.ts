@@ -1,11 +1,6 @@
-import type { JourneyId, VerifiedChecklist, WaterSource } from "@/lib/types";
+import type { UseCase, VerifiedChecklist, WaterSource } from "@/lib/types";
 
-export const JOURNEY_FIELDS: { id: JourneyId; label: string }[] = [
-  { id: "polyhouse", label: "Polyhouse Farming" },
-  { id: "commercial-farming", label: "Commercial Farming" },
-  { id: "retirement", label: "Retirement" },
-  { id: "getaway", label: "Weekend Getaway" },
-];
+export { USE_CASES as USE_CASE_FIELDS } from "@/data/use-cases";
 
 export const WATER_SOURCE_OPTIONS: { value: WaterSource; label: string }[] = [
   { value: "borewell", label: "Borewell" },
@@ -21,8 +16,10 @@ export const KHATA_OPTIONS = [
   { value: "none", label: "Not applicable" },
 ] as const;
 
-export function journeyFieldName(id: JourneyId) {
-  return `journeyFit_${id}`;
+// Deliberately not named useCaseFieldName: any identifier starting with "use"
+// followed by a capital reads as a React Hook to the hooks lint rule.
+export function fieldNameForUseCase(id: UseCase) {
+  return `useCaseFit_${id}`;
 }
 
 export const VERIFIED_FIELDS: { key: keyof VerifiedChecklist; label: string }[] = [

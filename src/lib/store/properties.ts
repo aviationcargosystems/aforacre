@@ -1,4 +1,4 @@
-import type { JourneyId, Property, VerifiedChecklist } from "@/lib/types";
+import type { Property, UseCase, VerifiedChecklist } from "@/lib/types";
 import { getSupabaseAdmin, isMissingSchemaError } from "@/lib/supabase/server";
 
 const DEFAULT_VERIFIED: VerifiedChecklist = {
@@ -21,7 +21,10 @@ interface PropertyRow {
   price_per_acre: number;
   total_price: number;
   tags: string[];
-  journey_fit: Record<JourneyId, number>;
+  // Column name still reads journey_fit. The domain concept is now useCaseFit;
+  // the column gets renamed with the Phase 2 schema rebuild rather than in a
+  // one-off migration here.
+  journey_fit: Record<UseCase, number>;
   soil_type: string;
   water_sources: Property["waterSources"];
   road_access: string;
@@ -48,7 +51,7 @@ function rowToProperty(row: PropertyRow): Property {
     pricePerAcre: row.price_per_acre,
     totalPrice: row.total_price,
     tags: row.tags ?? [],
-    journeyFit: row.journey_fit,
+    useCaseFit: row.journey_fit,
     soilType: row.soil_type,
     waterSources: row.water_sources ?? [],
     roadAccess: row.road_access,
@@ -79,7 +82,7 @@ function propertyToRow(p: Property): Omit<PropertyRow, "created_at" | "updated_a
     price_per_acre: p.pricePerAcre,
     total_price: p.totalPrice,
     tags: p.tags,
-    journey_fit: p.journeyFit,
+    journey_fit: p.useCaseFit,
     soil_type: p.soilType,
     water_sources: p.waterSources,
     road_access: p.roadAccess,
@@ -114,12 +117,6 @@ export async function featuredProperties(): Promise<Property[]> {
   const { data, error } = await getSupabaseAdmin().from("properties").select("*").eq("featured", true).order("title");
   if (error) throw error;
   return (data as PropertyRow[]).map(rowToProperty);
-}
-
-export async function propertiesForJourney(journeyId: JourneyId, limit?: number): Promise<Property[]> {
-  const all = await getAllProperties();
-  const sorted = [...all].sort((a, b) => b.journeyFit[journeyId] - a.journeyFit[journeyId]);
-  return limit ? sorted.slice(0, limit) : sorted;
 }
 
 export async function allTags(): Promise<string[]> {

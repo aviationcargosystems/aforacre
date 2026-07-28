@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-07-28 15:20 IST · Phase 1: delete the journeys layer
+
+Journeys let a buyer self-select a category, which pre-empts the match quiz and
+undercuts the core thesis: the system tells the user who they are, the user does
+not pick a bucket.
+
+**Removed**
+- `/journeys` and `/journeys/[slug]` routes, `journey-card.tsx`, and the journey
+  seed module. `/journeys` and `/journeys/*` now 301 to `/explore`.
+- Journeys dropdown from the desktop navbar and the mobile sheet, journey links
+  from the footer, and the "Choose your journey" homepage section.
+- The hero stat counters (Listings 26 / Acres 69+ / Journeys 4). Thin inventory
+  should not be advertised, so the card now reads "Verified before it reaches
+  you" with a "Minimum 1 acre" badge.
+- The journey filter and `?journey=` param on `/explore`.
+
+**Kept, deliberately.** The per-use-case scores were the actual matching signal,
+not decoration: they drive the quiz and `buildSuitability()` derives all five
+suitability ratings from them. Deleting the data would have silently gutted
+matching, so the type layer was renamed instead of removed. `JourneyId` is now
+`UseCase`, `Property.journeyFit` is now `Property.useCaseFit`, and the labels
+live in a new `src/data/use-cases.ts`. These are plot attributes used by the
+engine, never a browse path. The Postgres column is still `journey_fit`, mapped
+in the store layer, and gets renamed with the Phase 2 schema rebuild rather than
+in a one-off migration.
+
+**Dead code removed on the way through:** `src/data/properties.ts` (800+ lines of
+seed data superseded by `supabase/seed.sql`), `stat-counter.tsx`, and
+`scroll-to-section-button.tsx`.
+
+**Verified:** `/journeys` and `/journeys/polyhouse` both return 301 to
+`/explore`; zero occurrences of "journey" in the rendered DOM of `/`, `/explore`,
+`/match` and a property page; tsc, eslint and `next build` all clean.
+
+- `(pending)`
+
 ## 2026-07-28 14:05 IST · Admin dashboard redesign + remove professionals directory
 
 **Admin shell + dashboard, rebuilt**

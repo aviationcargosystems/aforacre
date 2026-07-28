@@ -6,7 +6,7 @@ import { formatINR } from "@/lib/tax";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
-export function PropertyCard({ property, highlightJourney }: { property: Property; highlightJourney?: string }) {
+export function PropertyCard({ property, highlightLabel }: { property: Property; highlightLabel?: string }) {
   const metaItems = [`${property.extentAcres} acres`, ...property.tags.slice(0, 2), property.roadAccess];
 
   return (
@@ -27,7 +27,7 @@ export function PropertyCard({ property, highlightJourney }: { property: Propert
                 Featured
               </Badge>
             )}
-            {highlightJourney && <Badge className="bg-accent text-accent-foreground">{highlightJourney}</Badge>}
+            {highlightLabel && <Badge className="bg-accent text-accent-foreground">{highlightLabel}</Badge>}
           </div>
           <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-4 text-white">
             <div className="min-w-0">

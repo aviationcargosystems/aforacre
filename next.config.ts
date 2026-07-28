@@ -10,6 +10,17 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  async redirects() {
+    return [
+      // Journeys let a buyer self-select a category, which pre-empts the match
+      // quiz. The routes are gone; anything still pointing at them lands on
+      // explore.
+      // statusCode 301 rather than `permanent: true`, which emits 308. Both are
+      // permanent; the spec and its test call for 301 specifically.
+      { source: "/journeys", destination: "/explore", statusCode: 301 },
+      { source: "/journeys/:path*", destination: "/explore", statusCode: 301 },
+    ];
+  },
   images: {
     remotePatterns: [
       {

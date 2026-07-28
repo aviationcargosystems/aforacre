@@ -4,11 +4,11 @@ import { useState } from "react";
 import Image from "next/image";
 import type { Property } from "@/lib/types";
 import {
-  JOURNEY_FIELDS,
   KHATA_OPTIONS,
+  USE_CASE_FIELDS,
   VERIFIED_FIELDS,
   WATER_SOURCE_OPTIONS,
-  journeyFieldName,
+  fieldNameForUseCase,
 } from "@/components/admin/property-form-shared";
 import { Button } from "@/components/ui/button";
 
@@ -201,18 +201,18 @@ export function PropertyForm({
       </section>
 
       <section className="space-y-4">
-        <h2 className="font-heading text-lg font-semibold text-foreground">Journey fit (0–100)</h2>
+        <h2 className="font-heading text-lg font-semibold text-foreground">Use-case fit (0 to 100)</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-          {JOURNEY_FIELDS.map((j) => (
-            <Field key={j.id} label={j.label} htmlFor={journeyFieldName(j.id)}>
+          {USE_CASE_FIELDS.map((useCase) => (
+            <Field key={useCase.id} label={useCase.label} htmlFor={fieldNameForUseCase(useCase.id)}>
               <input
-                id={journeyFieldName(j.id)}
-                name={journeyFieldName(j.id)}
+                id={fieldNameForUseCase(useCase.id)}
+                name={fieldNameForUseCase(useCase.id)}
                 type="number"
                 min={0}
                 max={100}
                 required
-                defaultValue={property?.journeyFit[j.id] ?? 50}
+                defaultValue={property?.useCaseFit[useCase.id] ?? 50}
                 className={inputClass}
               />
             </Field>
