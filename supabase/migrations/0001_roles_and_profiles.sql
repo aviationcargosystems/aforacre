@@ -51,6 +51,16 @@ as $$
   select role from profiles where id = auth.uid();
 $$;
 
+create or replace function current_kyc_of_user()
+returns kyc_status
+language sql
+stable
+security definer
+set search_path = public, pg_temp
+as $$
+  select kyc_status from profiles where id = auth.uid();
+$$;
+
 create or replace function is_super_admin()
 returns boolean
 language sql

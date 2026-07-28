@@ -25,10 +25,14 @@ create policy profiles_update_own on profiles
   for update using (id = auth.uid())
   -- Without this, a buyer could promote themselves to super_admin by updating
   -- their own row. Role and kyc_status are super_admin territory.
+  --
+  -- These read through the security definer helpers rather than a subquery on
+  -- profiles. A policy on profiles that selects from profiles recurses, and
+  -- Postgres aborts the query with "infinite recursion detected in policy".
   with check (
     id = auth.uid()
-    and role = (select role from profiles p where p.id = auth.uid())
-    and kyc_status = (select kyc_status from profiles p where p.id = auth.uid())
+    and role = current_role_of_user()
+    and kyc_status = current_kyc_of_user()
   );
 
 create policy profiles_read_all_admin on profiles
@@ -48,8 +52,7 @@ create policy submissions_insert_own on submissions
     and current_role_of_user() = 'partner'
     -- KYC gate, enforced in the database rather than only in the form: a
     -- partner cannot submit until their mobile is verified.
-    and (select kyc_status from profiles where id = auth.uid())
-        in ('otp_verified', 'docs_submitted', 'verified')
+    and current_kyc_of_user() in ('otp_verified', 'docs_submitted', 'verified')
   );
 
 create policy submissions_read_own on submissions
