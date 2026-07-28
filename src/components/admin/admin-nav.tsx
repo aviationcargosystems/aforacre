@@ -2,7 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Camera, IdCard, LayoutDashboard, MapPinned, MessageCircle, Route, Tag, Upload } from "lucide-react";
+import {
+  Camera,
+  ClipboardCheck,
+  IdCard,
+  LayoutDashboard,
+  MapPinned,
+  MessageCircle,
+  Route,
+  Tag,
+  Upload,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AdminAttentionCounts } from "@/lib/admin-counts";
@@ -27,6 +37,7 @@ export const ADMIN_NAV: NavGroup[] = [
   {
     label: "Incoming",
     items: [
+      { href: "/admin/queue", label: "QC queue", short: "Queue", icon: ClipboardCheck },
       { href: "/admin/recces", label: "Recces", short: "Recces", icon: Route },
       { href: "/admin/land-submissions", label: "Land submissions", short: "Submissions", icon: Upload },
       { href: "/admin/enquiries", label: "Enquiries", short: "Enquiries", icon: MessageCircle },

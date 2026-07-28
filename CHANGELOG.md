@@ -1,5 +1,73 @@
 # Changelog
 
+## 2026-07-28 18:15 IST · Phase 3: partner capture and QC queue
+
+**`/partner/capture`, built for a broker standing in a field on 4G.**
+Single column, thumb reachable, one required step and one optional one. Step 1
+is mobile, relationship to the land, a pin (map tap or current location), area,
+asking price and 3 to 10 photos. Everything else is behind an "Add more detail"
+disclosure that a partner or an agent can finish later.
+
+- **Losing signal must not lose work.** The draft autosaves every 10 seconds, on
+  every field blur, and when the page is hidden. A "Saved" indicator says which
+  of those three states it is actually in, including "Not saved".
+- **Photos are compressed in the browser first.** A phone camera produces 4 to
+  8MB a shot, so ten of them is a 60MB upload that never finishes on 4G. Long
+  edge is capped at 1600px and quality steps down a ladder until the file fits
+  roughly 200KB, which turns that into about 2MB total.
+- **Real upload progress.** supabase-js gives no progress events, and a stalled
+  upload with no feedback looks the same as a frozen page, so uploads go over
+  XHR to the storage REST endpoint. Each photo shows its own bar and a retry
+  button if it fails.
+
+**`/partner` dashboard** lists only that partner's own submissions with a status
+pill and, when rejected, the reason. Nothing else: no other listings, no buyers.
+
+**`/admin/queue`** is the QC queue. Pending submissions newest first with photo
+thumbnails, then a detail view with every submitted field side by side with a
+map. Approve opens an enrichment form that requires corridor, road access,
+water, soil quality, a point of contact and suitability scores for all seven use
+cases before it will go through.
+
+**Approval is one Postgres transaction.** `approve_submission()` mints the FID,
+creates the plot, writes the suitability rows, copies media across and closes
+the submission. Supabase's client cannot run a multi-statement transaction, so
+doing this from application code would leave a window where an FID exists with
+no plot, or a plot exists with no photos. **An FID is never generated on
+submission, only on approval.**
+
+**The KYC gate is enforced in three places, not one.** A partner cannot submit
+until their mobile is verified (the submissions insert policy checks it, and so
+does `open_or_create_draft`). Their first plot cannot go live until documents
+are checked and they are marked verified (`approve_submission` raises if not).
+The UI shows exactly which of those is blocking them, in their words.
+
+**Partner onboarding is self-serve.** Confirming a mobile number promotes the
+profile from buyer to partner and sets kyc_status to otp_verified in one step,
+so a new broker is not stuck waiting for an admin before they can even start.
+The promotion happens in a trigger, and the profiles self-update policy still
+pins role and kyc_status, so it cannot be self-granted.
+
+**Storage:** two private buckets. `submissions` holds unvetted partner content
+and `kyc` holds identity documents, so neither is public and both are read
+through short-lived signed URLs. Partners write only into a folder named for
+their own submission id, checked by joining back to `submissions` rather than
+trusting the path.
+
+`lib/schema/capture.ts` holds the field schema as plain data with no React and
+no Supabase imports, so a WhatsApp flow can reuse it verbatim instead of drifting
+into a second set of questions.
+
+**Verified:** `/partner` and `/partner/capture` redirect to `/login`;
+`/admin/queue` redirects to the admin login; tsc, eslint and `next build` all
+clean. Every file added in this phase is free of em dashes.
+
+**Not verified end to end**, and it cannot be until the migrations are run and a
+partner account exists: the full capture, submit, review, approve loop. See the
+notes in `.claude/state/todo.md`.
+
+- `(pending)`
+
 ## 2026-07-28 16:40 IST · Phase 2: schema and auth
 
 **Migrations, not a hand-pasted file.** `supabase/migrations/` now holds six
