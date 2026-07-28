@@ -3,35 +3,33 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/admin/require-admin";
-import { LegacyTableMissingError, createAgent, resetAgentPassword, setAgentActive } from "@/lib/store/agents";
+import { StaffError, createStaff, setStaffDisabled, setStaffPassword, setStaffRole } from "@/lib/store/staff";
+import type { UserRole } from "@/lib/auth/roles";
 
 const MIN_PASSWORD_LENGTH = 8;
+
+/** Surfaces the real reason rather than an opaque code the admin cannot act on. */
+function fail(message: string): never {
+  redirect(`/admin/agents?error=${encodeURIComponent(message)}`);
+}
 
 export async function createAgentAction(formData: FormData) {
   await requireAdmin();
 
-  const username = String(formData.get("username") || "").trim();
+  const fullName = String(formData.get("fullName") || "").trim();
+  const email = String(formData.get("email") || "").trim();
+  const mobile = String(formData.get("mobile") || "").trim();
   const password = String(formData.get("password") || "");
+  const role = String(formData.get("role") || "agent") as "agent" | "super_admin";
 
-  if (!username) redirect("/admin/agents?error=username");
-  if (password.length < MIN_PASSWORD_LENGTH) redirect("/admin/agents?error=password");
+  if (!fullName) fail("Add a name.");
+  if (!email.includes("@")) fail("A work email is required. It is the recovery path if a phone is lost.");
+  if (password.length < MIN_PASSWORD_LENGTH) fail(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
 
   try {
-    await createAgent({
-      name: String(formData.get("name") || "").trim(),
-      phone: String(formData.get("phone") || "").trim(),
-      username,
-      password,
-    });
+    await createStaff({ fullName, email, mobile, password, role });
   } catch (error) {
-    // 23505 = unique_violation on agents.username
-    if ((error as { code?: string })?.code === "23505") {
-      redirect("/admin/agents?error=duplicate");
-    }
-    if (error instanceof LegacyTableMissingError) {
-      redirect("/admin/agents?error=legacy");
-    }
-    throw error;
+    fail(error instanceof StaffError ? error.message : "Could not create that account.");
   }
 
   revalidatePath("/admin/agents");
@@ -41,9 +39,31 @@ export async function createAgentAction(formData: FormData) {
 export async function setAgentActiveAction(formData: FormData) {
   await requireAdmin();
   const id = String(formData.get("id") || "");
-  const active = String(formData.get("active") || "") === "true";
-  if (id) await setAgentActive(id, active);
+  const disabled = String(formData.get("disabled") || "") === "true";
+
+  try {
+    await setStaffDisabled(id, disabled);
+  } catch (error) {
+    fail(error instanceof StaffError ? error.message : "Could not update that account.");
+  }
+
   revalidatePath("/admin/agents");
+  redirect("/admin/agents");
+}
+
+export async function setAgentRoleAction(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("id") || "");
+  const role = String(formData.get("role") || "agent") as UserRole;
+
+  try {
+    await setStaffRole(id, role);
+  } catch (error) {
+    fail(error instanceof StaffError ? error.message : "Could not change that role.");
+  }
+
+  revalidatePath("/admin/agents");
+  redirect("/admin/agents");
 }
 
 export async function resetAgentPasswordAction(formData: FormData) {
@@ -51,10 +71,14 @@ export async function resetAgentPasswordAction(formData: FormData) {
   const id = String(formData.get("id") || "");
   const password = String(formData.get("password") || "");
 
-  if (!id) return;
-  if (password.length < MIN_PASSWORD_LENGTH) redirect("/admin/agents?error=password");
+  if (password.length < MIN_PASSWORD_LENGTH) fail(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
 
-  await resetAgentPassword(id, password);
+  try {
+    await setStaffPassword(id, password);
+  } catch (error) {
+    fail(error instanceof StaffError ? error.message : "Could not reset that password.");
+  }
+
   revalidatePath("/admin/agents");
   redirect("/admin/agents?reset=1");
 }
