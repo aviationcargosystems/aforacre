@@ -39,11 +39,15 @@ export default async function Home() {
 
   return (
     <div className="pb-16">
-      <section className="relative isolate overflow-hidden pt-8 sm:pt-10">
-        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      {/* Hero and video share one backdrop. They used to be two sections, each
+          with its own background, so the gradient stopped dead at the boundary
+          and drew a visible line across the page. The blobs are anchored to
+          this wrapper instead, so the colour runs through both. */}
+      <div className="relative isolate overflow-hidden pt-8 sm:pt-10">
+        <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="animate-drift-slow absolute left-[-10%] top-[-6%] h-[560px] w-[560px] rounded-full bg-accent/30 blur-2xl" />
-          <div className="animate-drift-slower absolute right-[-8%] top-10 h-[500px] w-[500px] rounded-full bg-primary/26 blur-2xl" />
-          <div className="animate-drift-slow absolute left-[38%] top-[42%] h-[320px] w-[320px] rounded-full bg-[#e0bd7c]/26 blur-2xl [animation-delay:-7s]" />
+          <div className="animate-drift-slower absolute right-[-8%] top-24 h-[620px] w-[620px] rounded-full bg-primary/26 blur-2xl" />
+          <div className="animate-drift-slow absolute left-[34%] top-[52%] h-[420px] w-[420px] rounded-full bg-[#e0bd7c]/26 blur-2xl [animation-delay:-7s]" />
         </div>
 
         {/* Centered hero. The old two-column split fought the display type for
@@ -73,24 +77,23 @@ export default async function Home() {
 
         </div>
 
-      </section>
-
-      {/* Second section. No separate background: it sits inside the same
+        {/* Second block. No separate background: it sits inside the same
           gradient wrapper as the hero so the colour runs straight through
           instead of stopping at a section edge. Narrower than before and
           dimmed, because it is atmosphere behind the page, not a banner
           asking to be read. */}
-      <section className="relative px-4 pb-6 pt-4 sm:px-6 lg:px-8">
-        <div className="relative mx-auto max-w-[52rem]">
-          <div className="absolute inset-x-12 -bottom-8 h-24 rounded-[3rem] bg-deep-green/25 blur-3xl" />
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-white/60 shadow-[0_34px_90px_rgba(15,23,42,0.24)] sm:rounded-[2rem]">
-            <div className="relative aspect-video">
-              <HeroVideo poster="/videos/hero-poster.jpg" />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(8,18,14,0.52)_0%,rgba(8,18,14,0.34)_55%,rgba(8,18,14,0.20)_100%)]" />
+        <div className="relative px-4 pb-10 pt-4 sm:px-6 lg:px-8">
+          <div className="relative mx-auto max-w-[52rem]">
+            <div className="absolute inset-x-12 -bottom-8 h-24 rounded-[3rem] bg-deep-green/25 blur-3xl" />
+            <div className="relative overflow-hidden rounded-[1.75rem] border border-white/60 shadow-[0_34px_90px_rgba(15,23,42,0.24)] sm:rounded-[2rem]">
+              <div className="relative aspect-video">
+                <HeroVideo poster="/videos/hero-poster.jpg" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(8,18,14,0.52)_0%,rgba(8,18,14,0.34)_55%,rgba(8,18,14,0.20)_100%)]" />
+              </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
       <section className="relative pb-20 pt-10 lg:pt-14">
         <div className="absolute inset-x-0 top-1/2 -z-10 h-[420px] -translate-y-1/2 bg-[radial-gradient(circle_at_center,rgba(87,168,132,0.12),transparent_60%)]" />
