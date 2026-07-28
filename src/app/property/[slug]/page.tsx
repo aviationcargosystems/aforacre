@@ -13,14 +13,12 @@ import {
   Zap,
 } from "lucide-react";
 import { getProperty } from "@/lib/store/properties";
-import { getAllProfessionals } from "@/lib/store/professionals";
 import { journeys } from "@/data/journeys";
 import { karnatakaLegalTerms } from "@/data/legal";
 import { formatINR, formatINRFull } from "@/lib/tax";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ProfessionalCard } from "@/components/professional-card";
 import { PropertyLocationMap } from "@/components/map/property-location-map";
 import { SectionHeading } from "@/components/section-heading";
 import { VERIFIED_FIELDS } from "@/components/admin/property-form-shared";
@@ -60,11 +58,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
     (best, journey) => (property.journeyFit[journey.id] > property.journeyFit[best.id] ? journey : best),
     journeys[0]
   );
-
-  const professionals = await getAllProfessionals();
-  const matchedProfessionals = professionals
-    .filter((professional) => topJourney.relevantProfessionalCategories.includes(professional.category))
-    .slice(0, 3);
 
   return (
     <div className="pb-16">
@@ -278,21 +271,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
               <EnquiryForm context="property" propertySlug={property.slug} ctaLabel="Request a call back" />
             </CardContent>
           </Card>
-
-          {matchedProfessionals.length > 0 && (
-            <div>
-              <SectionHeading
-                kicker="Support"
-                title="Set this land up"
-                subtitle={`Matched for ${topJourney.shortTitle.toLowerCase()}.`}
-              />
-              <div className="mt-5 space-y-4">
-                {matchedProfessionals.map((professional) => (
-                  <ProfessionalCard key={professional.slug} professional={professional} />
-                ))}
-              </div>
-            </div>
-          )}
 
           <Card className="p-6">
             <CardContent className="space-y-4 p-0">

@@ -17,7 +17,6 @@ export const journeys: Journey[] = [
       "DC-converted or convertible land if any packhouse structure is planned",
     ],
     recommendedFilters: { maxDistanceKm: 55, tags: ["Ready for Polyhouse", "Borewell Tested"] },
-    relevantProfessionalCategories: ["polyhouse-construction", "irrigation", "soil-testing", "solar"],
     faqs: [
       {
         question: "Are there government subsidies for polyhouse construction in Karnataka?",
@@ -53,7 +52,6 @@ export const journeys: Journey[] = [
       "Soil test data — red loamy vs black cotton soil changes what you can grow",
     ],
     recommendedFilters: { minAcres: 3, tags: ["Open Farmland", "Multi-Crop Suitable"] },
-    relevantProfessionalCategories: ["farm-management", "irrigation", "soil-testing", "fencing"],
     faqs: [
       {
         question: "What crops work best in South Bangalore's soil and climate?",
@@ -63,7 +61,7 @@ export const journeys: Journey[] = [
       {
         question: "Can I lease out farming operations instead of managing it myself?",
         answer:
-          "Yes — several farm-management professionals on this platform offer end-to-end contract farming: they handle sowing, irrigation, labour, and harvest for a share of output or a fixed annual fee, letting absentee owners hold farmland as an asset.",
+          "Yes — contract farming is common in this belt: a local operator handles sowing, irrigation, labour, and harvest for a share of output or a fixed annual fee, letting absentee owners hold farmland as an asset.",
       },
       {
         question: "Is commercial agricultural land eligible for crop loans?",
@@ -89,7 +87,6 @@ export const journeys: Journey[] = [
       "Reliable electricity and mobile network coverage",
     ],
     recommendedFilters: { maxAcres: 3, maxDistanceKm: 45, tags: ["Gated Farm Community", "Farmhouse Ready"] },
-    relevantProfessionalCategories: ["landscaping", "legal-verification", "fencing", "farm-management"],
     faqs: [
       {
         question: "Do I need DC conversion to build a farmhouse?",
@@ -125,17 +122,16 @@ export const journeys: Journey[] = [
       "Potential for a small guest cottage or farm-stay rental income",
     ],
     recommendedFilters: { maxAcres: 2, tags: ["Weekend Escape", "Scenic Views"] },
-    relevantProfessionalCategories: ["landscaping", "fencing", "solar", "farm-management"],
     faqs: [
       {
         question: "Can I legally rent out a farm-stay cottage on agricultural land?",
         answer:
-          "Karnataka permits small-scale agri-tourism/farm-stay structures on agricultural land under specific area limits without full DC conversion, but rules vary by taluk — verify with a local legal-verification professional before building.",
+          "Karnataka permits small-scale agri-tourism/farm-stay structures on agricultural land under specific area limits without full DC conversion, but rules vary by taluk — verify with the local taluk office before building.",
       },
       {
         question: "What upkeep does a weekend property need when I'm away?",
         answer:
-          "Most owners hire a local caretaker (often arranged through a farm-management professional) for watering, security checks, and basic landscaping — typically ₹4,000–8,000/month depending on plot size and scope.",
+          "Most owners hire a local caretaker for watering, security checks, and basic landscaping — typically ₹4,000–8,000/month depending on plot size and scope.",
       },
       {
         question: "Which corridors are best for a scenic weekend plot near Bangalore?",

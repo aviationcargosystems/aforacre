@@ -20,7 +20,6 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { href: "/explore", label: "Explore" },
   { href: "/match", label: "Match Quiz" },
-  { href: "/professionals", label: "Professionals" },
 ];
 
 export function SiteHeader() {
@@ -105,7 +104,7 @@ export function SiteHeader() {
 
           <div className="hidden items-center gap-2 lg:flex">
             <Button asChild variant="ghost" size="sm" className="rounded-full px-4">
-              <Link href="/professionals">For Professionals</Link>
+              <Link href="/submit-land">List your land</Link>
             </Button>
             <Button asChild variant="pill" size="sm">
               <Link href="/explore">Explore land</Link>
@@ -164,8 +163,8 @@ export function SiteHeader() {
                     </Link>
                   </Button>
                   <Button asChild variant="pill-outline" size="sm" className="w-full">
-                    <Link href="/professionals" onClick={() => setOpen(false)}>
-                      For professionals
+                    <Link href="/submit-land" onClick={() => setOpen(false)}>
+                      List your land
                     </Link>
                   </Button>
                 </div>

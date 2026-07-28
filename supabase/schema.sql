@@ -51,27 +51,11 @@ create index if not exists properties_corridor_idx on properties (corridor);
 create index if not exists properties_tags_idx on properties using gin (tags);
 create index if not exists properties_fid_idx on properties (fid);
 
--- ── professionals ─────────────────────────────────────────────────────────
-create table if not exists professionals (
-  slug                text primary key,
-  name                text not null,
-  category            text not null,
-  tagline             text not null default '',
-  services            text[] not null default '{}',
-  starting_price      text not null default '',
-  experience_years    integer not null default 0,
-  projects_completed  integer not null default 0,
-  service_areas       text[] not null default '{}',
-  rating              numeric not null default 0,
-  review_count        integer not null default 0,
-  image               text not null default '',
-  bio                 text not null default '',
-  phone               text not null default '',
-  created_at          timestamptz not null default now(),
-  updated_at          timestamptz not null default now()
-);
-
-create index if not exists professionals_category_idx on professionals (category);
+-- ── removed features ──────────────────────────────────────────────────────
+-- The professionals/services directory was cut from the product. Dropping the
+-- table here so re-running this file leaves no orphaned data behind. Safe to
+-- delete this line once it has been run against every environment.
+drop table if exists professionals;
 
 -- ── tags ──────────────────────────────────────────────────────────────────
 -- Canonical pickable tag list shown on the property form — separate from the
@@ -211,9 +195,14 @@ create trigger properties_set_updated_at
   before update on properties
   for each row execute function set_updated_at();
 
-drop trigger if exists professionals_set_updated_at on professionals;
-create trigger professionals_set_updated_at
-  before update on professionals
+drop trigger if exists agents_set_updated_at on agents;
+create trigger agents_set_updated_at
+  before update on agents
+  for each row execute function set_updated_at();
+
+drop trigger if exists recces_set_updated_at on recces;
+create trigger recces_set_updated_at
+  before update on recces
   for each row execute function set_updated_at();
 
 -- ── Row Level Security ───────────────────────────────────────────────────
@@ -226,11 +215,14 @@ create trigger professionals_set_updated_at
 -- key — even if it ever leaked — grants no access at all; defense in depth,
 -- not required for the app to work.
 alter table properties enable row level security;
-alter table professionals enable row level security;
 alter table tags enable row level security;
 alter table captures enable row level security;
 alter table enquiries enable row level security;
 alter table land_submissions enable row level security;
+-- agents holds password hashes and recces holds field work — these two matter
+-- most of all here, so never let them fall out of this list.
+alter table agents enable row level security;
+alter table recces enable row level security;
 
 -- ── Grants ────────────────────────────────────────────────────────────────
 grant usage on schema public to service_role;

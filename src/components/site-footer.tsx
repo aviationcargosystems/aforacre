@@ -55,8 +55,8 @@ export function SiteFooter() {
                   </li>
                 ))}
                 <li>
-                  <Link href="/professionals" className="text-sm text-white/78 hover:text-white">
-                    Professionals
+                  <Link href="/submit-land" className="text-sm text-white/78 hover:text-white">
+                    List your land
                   </Link>
                 </li>
               </ul>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ArrowRight,
+  BadgeCheck,
   Clock,
   LayoutGrid,
   Map as MapIcon,
@@ -18,11 +19,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { JourneyCard } from "@/components/journey-card";
 import { FeaturedLandCarousel } from "@/components/featured-land-carousel";
-import { ProfessionalCard } from "@/components/professional-card";
 import { SectionHeading } from "@/components/section-heading";
 import { journeys } from "@/data/journeys";
 import { getAllProperties, featuredProperties } from "@/lib/store/properties";
-import { getAllProfessionals } from "@/lib/store/professionals";
 import { HeroVideo } from "@/components/hero-video";
 
 export const dynamic = "force-dynamic";
@@ -40,13 +39,8 @@ const HOLISTIC_CRITERIA = [
 ];
 
 export default async function Home() {
-  const [allProperties, featured, professionals] = await Promise.all([
-    getAllProperties(),
-    featuredProperties(),
-    getAllProfessionals(),
-  ]);
+  const [allProperties, featured] = await Promise.all([getAllProperties(), featuredProperties()]);
 
-  const spotlightProfessionals = professionals.filter((p) => p.category !== "broker").slice(0, 4);
   const totalAcres = Math.round(allProperties.reduce((sum, property) => sum + property.extentAcres, 0));
   const closingImage = journeys[0]?.heroImage ?? featured[0]?.images[0];
 
@@ -174,7 +168,7 @@ export default async function Home() {
           className="mx-auto mb-12"
           kicker="Start here"
           title="Choose your journey"
-          subtitle="Every buyer arrives with a different intent. Tell us which one is yours and we'll surface land, checklists, and professionals matched to it."
+          subtitle="Every buyer arrives with a different intent. Tell us which one is yours and we'll surface the land and the checklists matched to it."
         />
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {journeys.map((journey) => (
@@ -240,37 +234,15 @@ export default async function Home() {
           <Card className="p-6">
             <CardContent className="space-y-4 p-0">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <Wrench className="h-6 w-6" />
+                <BadgeCheck className="h-6 w-6" />
               </div>
-              <h3 className="font-heading text-2xl font-semibold">Setup help, on tap</h3>
+              <h3 className="font-heading text-2xl font-semibold">Verified before it&apos;s listed</h3>
               <p className="text-sm leading-7 text-muted-foreground">
-                Solar, irrigation, borewell, and construction professionals matched to your plot and journey.
+                Ownership, survey, GPS, road access, documents, and a physical site visit - checked by our team before
+                a plot gets its Farm ID.
               </p>
             </CardContent>
           </Card>
-        </div>
-      </section>
-
-      <section className="relative py-20">
-        <div className="absolute inset-x-0 bottom-0 -z-10 h-[380px] bg-[radial-gradient(circle_at_center,rgba(201,110,69,0.10),transparent_60%)]" />
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
-            <SectionHeading
-              kicker="Trusted network"
-              title="Professionals ready to help"
-              subtitle="Vetted specialists who set up land across South Bangalore, every day."
-            />
-            <Button asChild variant="pill-outline" size="pill">
-              <Link href="/professionals">
-                Browse all professionals <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {spotlightProfessionals.map((professional) => (
-              <ProfessionalCard key={professional.slug} professional={professional} />
-            ))}
-          </div>
         </div>
       </section>
 

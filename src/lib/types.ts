@@ -8,18 +8,6 @@ export type JourneyId =
   | "retirement"
   | "getaway";
 
-export type ProfessionalCategory =
-  | "broker"
-  | "solar"
-  | "irrigation"
-  | "borewell"
-  | "polyhouse-construction"
-  | "soil-testing"
-  | "fencing"
-  | "farm-management"
-  | "landscaping"
-  | "legal-verification";
-
 export type WaterSource = "borewell" | "open-well" | "rain-fed" | "canal" | "none";
 
 export type KhataType = "A" | "B" | "none";
@@ -38,7 +26,6 @@ export interface Journey {
     maxDistanceKm?: number;
     tags?: string[];
   };
-  relevantProfessionalCategories: ProfessionalCategory[];
   faqs: { question: string; answer: string }[];
   accentTag: string;
 }
@@ -123,40 +110,6 @@ export interface Property {
   verified: VerifiedChecklist;
 }
 
-export interface Professional {
-  slug: string;
-  name: string;
-  category: ProfessionalCategory;
-  tagline: string;
-  services: string[];
-  startingPrice: string;
-  experienceYears: number;
-  projectsCompleted: number;
-  serviceAreas: string[];
-  rating: number;
-  reviewCount: number;
-  image: string;
-  bio: string;
-  phone: string;
-}
-
-export interface Vendor {
-  slug: string;
-  name: string;
-  category: string;
-  description: string;
-  serviceAreas: string[];
-}
-
-export interface Broker {
-  slug: string;
-  name: string;
-  agency: string;
-  serviceAreas: string[];
-  listingsCount: number;
-  phone: string;
-}
-
 export type CaptureStatus = "new" | "reviewed" | "archived";
 
 export interface Capture {
@@ -180,7 +133,7 @@ export interface Enquiry {
   createdAt: string;
   name: string;
   phone: string;
-  context: string; // e.g. "quiz", "schedule-visit", "property", "professional"
+  context: string; // e.g. "quiz", "schedule-visit", "property"
   propertySlug: string | null;
   message: string;
   status: EnquiryStatus;

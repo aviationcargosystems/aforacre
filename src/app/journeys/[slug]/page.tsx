@@ -4,9 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { journeys, getJourney } from "@/data/journeys";
 import { propertiesForJourney } from "@/lib/store/properties";
-import { getAllProfessionals } from "@/lib/store/professionals";
 import { PropertyCard } from "@/components/property-card";
-import { ProfessionalCard } from "@/components/professional-card";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,10 +22,7 @@ export default async function JourneyPage({ params }: { params: Promise<{ slug: 
   const journey = getJourney(slug);
   if (!journey) notFound();
 
-  const [matches, professionals] = await Promise.all([propertiesForJourney(journey.id, 6), getAllProfessionals()]);
-  const matchedProfessionals = professionals
-    .filter((professional) => journey.relevantProfessionalCategories.includes(professional.category))
-    .slice(0, 4);
+  const matches = await propertiesForJourney(journey.id, 6);
 
   return (
     <div className="pb-16">
@@ -52,7 +47,7 @@ export default async function JourneyPage({ params }: { params: Promise<{ slug: 
                 </Link>
               </Button>
               <Button asChild variant="pill-outline" size="pill" className="border-white/20 text-white hover:text-white">
-                <Link href="/professionals">Find specialists</Link>
+                <Link href="/match">Take the match quiz</Link>
               </Button>
             </div>
           </div>
@@ -136,21 +131,6 @@ export default async function JourneyPage({ params }: { params: Promise<{ slug: 
         </div>
       </section>
 
-      {matchedProfessionals.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-          <SectionHeading
-            kicker="Support network"
-            title="Professionals for this journey"
-            subtitle={`Once you have land, these specialists help you set it up for ${journey.shortTitle.toLowerCase()}.`}
-            className="mb-10"
-          />
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {matchedProfessionals.map((professional) => (
-              <ProfessionalCard key={professional.slug} professional={professional} />
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 }

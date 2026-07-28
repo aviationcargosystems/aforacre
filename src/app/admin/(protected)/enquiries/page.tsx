@@ -31,7 +31,7 @@ export default async function AdminEnquiriesPage({
     <div>
       <h1 className="font-heading text-2xl font-semibold text-foreground">Enquiries</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Leads from property/professional pages, the match quiz, and &quot;Schedule a visit&quot;.
+        Leads from property pages, the match quiz, and &quot;Schedule a visit&quot;.
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">

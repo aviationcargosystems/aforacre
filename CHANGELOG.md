@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-07-28 14:05 IST · Admin dashboard redesign + remove professionals directory
+
+**Admin shell + dashboard, rebuilt**
+- The dashboard was seven identical count cards, five of them reading `0`. It is now organised around what an admin actually opens it to do: a "Needs attention" band listing only the queues with real work (or a single calm "all caught up" strip when there is none), a merged recent-activity feed across recces, submissions, enquiries and captures with relative timestamps, a Portfolio panel of numbers computed from live listings (acres, corridors, average price/acre, FID coverage, verification pass rate), and catalogue counts demoted to a compact strip at the bottom.
+- Dropped the "Storage" card. It was rendering the literal string `{SUPABASE_STORAGE_BUCKET}` as if it were a value.
+- Sidebar is now a deep-green rail with the nav grouped Incoming / Catalogue / Team, **active-route highlighting** (previously nothing indicated which page you were on), and count badges on queues with work waiting. Mobile nav gets the same badges plus a fade on the right edge so it is visible that more items scroll off.
+- Sidebar badges and the dashboard band read from one shared `getAdminAttentionCounts()`, so they cannot drift apart.
+
+**Professionals / services directory removed**
+- Removed entirely at the user's request: public `/professionals` routes, the admin CRUD, the card + directory components, the store layer, seed data, the `Professional`/`ProfessionalCategory` types, and the `professionals` table (`schema.sql` now drops it; the seed block is gone).
+- Also removed the unused `Vendor`/`Broker` seed types and data files, dead weight from the original marketplace sketch, never rendered anywhere.
+- Journeys keep working: `relevantProfessionalCategories` is gone from the journey type and data, and the property/journey pages no longer render matched specialists. Header, footer, and homepage links now point at "List your land" instead.
+- Copy that promised something we no longer offer was rewritten rather than left dangling. The homepage's third value card is now the six-point verification story, and two journey FAQs no longer refer buyers to platform professionals.
+
+**Security fix found while editing the schema:** `agents` and `recces` were missing from the RLS block, so the migration would have created them with row-level security disabled, meaning the anon key could have read `agents.password_hash`. Both are now in the list, with a comment explaining why they must stay. They were also missing their `updated_at` triggers; added.
+
+**User-facing:** no more professionals directory anywhere on the site; admin is legible.
+
+- `(pending)`
+
 ## 2026-07-23 23:10 IST · Agent login + recce, AFORACRE doc alignment, zoom prototype
 
 Three batches of work that had been sitting local, now shipped together.
