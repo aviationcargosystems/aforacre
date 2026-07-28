@@ -1,37 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
-import {
-  ArrowRight,
-  BadgeCheck,
-  Clock,
-  LayoutGrid,
-  MapPin,
-  Route,
-  ShieldCheck,
-  Sprout,
-  TrendingUp,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { FeaturedLandCarousel } from "@/components/featured-land-carousel";
 import { SectionHeading } from "@/components/section-heading";
+import { WhyThisCorridor } from "@/components/home/why-this-corridor";
 import { featuredProperties } from "@/lib/store/properties";
 import { HeroVideo } from "@/components/hero-video";
 
 export const dynamic = "force-dynamic";
 
-const HOLISTIC_CRITERIA = [
-  { icon: Sprout, title: "Rich soil", description: "Fertile land, ready to grow." },
-  {
-    icon: LayoutGrid,
-    title: "Fit for everything",
-    description: "Room for a polyhouse, garden, pet house, container home, and staff quarters, all in one plot.",
-  },
-  { icon: Route, title: "Real road access", description: "Every plot reachable by vehicle, no guesswork." },
-  { icon: Clock, title: "1 to 1.5 hrs from the city", description: "Close enough for a weekend, far enough to feel like an escape." },
-  { icon: TrendingUp, title: "Built to appreciate", description: "Selected for long-term land value, not just today's price." },
-];
 
 export default async function Home() {
   const featured = await featuredProperties();
@@ -96,6 +75,8 @@ export default async function Home() {
         </div>
       </div>
 
+      <WhyThisCorridor />
+
       <section className="relative pb-24 pt-4 lg:pb-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
@@ -113,76 +94,6 @@ export default async function Home() {
           <FeaturedLandCarousel properties={featured} />
         </div>
       </section>
-      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-28">
-        <SectionHeading
-          align="center"
-          className="mx-auto mb-10"
-          kicker="What makes land holistic"
-          title="Every plot we list, checked against five things."
-        />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {HOLISTIC_CRITERIA.map((item) => (
-            <div key={item.title} className="rounded-2xl border border-border/70 bg-white/70 p-5 text-center backdrop-blur-sm">
-              <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <item.icon className="h-5 w-5" />
-              </div>
-              <h3 className="mt-3 font-heading text-base font-semibold text-foreground">{item.title}</h3>
-              <p className="mt-1.5 text-xs leading-6 text-muted-foreground">{item.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-28">
-        <SectionHeading
-          align="center"
-          className="mx-auto mb-14"
-          kicker="Why A for Acre"
-          title="Buying land should not feel like guesswork."
-          subtitle="We surface the details that actually decide whether a plot works for you."
-        />
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-          <Card className="p-6">
-            <CardContent className="space-y-4 p-0">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <MapPin className="h-6 w-6" />
-              </div>
-              <h3 className="font-heading text-2xl font-semibold">Real land suitability</h3>
-              <p className="text-sm leading-7 text-muted-foreground">
-                Every plot is scored for polyhouse, farming, farmhouse living, and getaway use - not just listed with
-                a price.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="p-6">
-            <CardContent className="space-y-4 p-0">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <ShieldCheck className="h-6 w-6" />
-              </div>
-              <h3 className="font-heading text-2xl font-semibold">Karnataka tax, upfront</h3>
-              <p className="text-sm leading-7 text-muted-foreground">
-                Stamp duty, registration, and DC conversion charges calculated per property - no surprises at the
-                registrar&apos;s office.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="p-6">
-            <CardContent className="space-y-4 p-0">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <BadgeCheck className="h-6 w-6" />
-              </div>
-              <h3 className="font-heading text-2xl font-semibold">Verified before it&apos;s listed</h3>
-              <p className="text-sm leading-7 text-muted-foreground">
-                Ownership, survey, GPS, road access, documents, and a physical site visit - checked by our team before
-                a plot gets its Farm ID.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
       {closingImage && (
         <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-[2.25rem] border border-white/70 shadow-[0_30px_90px_rgba(15,23,42,0.18)]">

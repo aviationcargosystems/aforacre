@@ -3,6 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   CheckCircle2,
+  Clock,
+  LayoutGrid,
+  Sprout,
+  TrendingUp,
   Droplets,
   Fence,
   MapPin,
@@ -17,6 +21,7 @@ import { USE_CASES } from "@/data/use-cases";
 import { karnatakaLegalTerms } from "@/data/legal";
 import { formatINR } from "@/lib/tax";
 import { Badge } from "@/components/ui/badge";
+import { GrowthAnchors } from "@/components/property/growth-anchors";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { PropertyLocationMap } from "@/components/map/property-location-map";
@@ -25,6 +30,20 @@ import { VERIFIED_FIELDS } from "@/components/admin/property-form-shared";
 import { EnquiryForm } from "@/components/enquiry-form";
 
 export const dynamic = "force-dynamic";
+
+/**
+ * The five checks every plot we list has to pass. These used to be a homepage
+ * section; they belong against an actual plot, where they are a claim about
+ * this land rather than a marketing promise.
+ */
+const HOLISTIC_CHECKS = [
+  { icon: Sprout, label: "Rich soil" },
+  { icon: LayoutGrid, label: "Fit for everything" },
+  { icon: Route, label: "Real road access" },
+  { icon: Clock, label: "1 to 1.5 hrs from the city" },
+  { icon: TrendingUp, label: "Built to appreciate" },
+];
+
 
 const suitabilityLabels: Record<string, string> = {
   polyhouse: "Polyhouse Farming",
@@ -134,6 +153,18 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                 <Badge key={tag} variant="secondary" className="px-3 py-1.5">
                   {tag}
                 </Badge>
+              ))}
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {HOLISTIC_CHECKS.map((check) => (
+                <span
+                  key={check.label}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-white/70 px-3 py-1.5 text-xs font-medium text-foreground/80"
+                >
+                  <check.icon className="h-4 w-4 text-primary" />
+                  {check.label}
+                </span>
               ))}
             </div>
             <SectionHeading
@@ -265,6 +296,23 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                 Leave your number and our team will call you back to arrange a site visit.
               </p>
               <EnquiryForm context="property" propertySlug={property.slug} ctaLabel="Request a call back" />
+            </CardContent>
+          </Card>
+
+          <GrowthAnchors lat={property.location.lat} lng={property.location.lng} />
+
+          <Card className="p-6">
+            <CardContent className="space-y-4 p-0">
+              <h3 className="font-heading text-base font-semibold text-foreground">Verified before it is listed</h3>
+              <p className="text-sm leading-7 text-muted-foreground">
+                Ownership, survey, GPS, road access, documents and a physical site visit, all checked by our team
+                before a plot gets its Farm ID.
+              </p>
+              <h3 className="pt-1 font-heading text-base font-semibold text-foreground">Karnataka tax, upfront</h3>
+              <p className="text-sm leading-7 text-muted-foreground">
+                Stamp duty, registration and DC conversion charges are worked out per property, so there are no
+                surprises at the registrar&apos;s office.
+              </p>
             </CardContent>
           </Card>
 
