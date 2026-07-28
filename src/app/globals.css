@@ -134,10 +134,11 @@
   }
   body {
     @apply min-h-full bg-background text-foreground antialiased;
-    background:
-      radial-gradient(circle at top left, rgba(201, 110, 69, 0.18), transparent 30%),
-      radial-gradient(circle at top right, rgba(31, 58, 46, 0.16), transparent 26%),
-      linear-gradient(180deg, #fbf7f0 0%, #f3ede4 52%, #efe6d8 100%);
+    /* Just the base wash. The two corner radials used to sit here as well, and
+       stacked with the drifting blob layer they made the whole page feel
+       washed in colour. The blobs carry the tint now; this only sets the
+       paper. Fixed, so it never shifts or bands as the page scrolls. */
+    background: linear-gradient(180deg, #fbf8f2 0%, #f5efe6 55%, #f1e9dc 100%);
     background-attachment: fixed;
     /* ss01/cv01/cv02 are Inter-family stylistic sets. Applying them globally
        also hit Playfair, which swapped in alternate glyphs: digits rendered as
