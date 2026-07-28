@@ -55,7 +55,7 @@ Three batches of work that had been sitting local, now shipped together.
 - This was invisible in my own checks because a page-wide `overflow-x: clip` guard (added earlier) hides the resulting horizontal scrollbar — it masks the symptom but not the cause, so the oversized content was being silently clipped off-screen instead of visibly overflowing. Confirmed live via element-level bounding-box checks, not just scrollWidth.
 - Fixed on: homepage hero, journey-page hero, property-page gallery/header grids, professional-detail page grid, and the shared footer (present on every page)
 - User-facing: mobile layout was genuinely broken (hero text/buttons cut off, not just cosmetically loose) — now renders correctly at narrow widths
-- `(6268e5c)`
+- `(a646354)`
 
 ## 2026-07-21 15:55 IST · Editorial Earth polish pass
 
