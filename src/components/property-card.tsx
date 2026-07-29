@@ -20,7 +20,8 @@ export function PropertyCard({ property, highlightLabel }: { property: Property;
             src={property.images[0]}
             alt={property.title}
             fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 390px"
+            quality={72}
             className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
           )}

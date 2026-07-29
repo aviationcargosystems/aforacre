@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-29 21:45 IST · Coordinate precision fix, image weight, map text
+
+- Fixed: latitude and longitude inputs had step="0.0001", so the six decimals a dropped pin writes were rejected as invalid and the form refused to submit. Coordinates are continuous, so there is no step to enforce.
+- Listing photos are compressed in the browser before upload (about 200 KB at 1600px), using the same helper the partner capture form already used. Full-size phone photos were being stored and served as-is.
+- Card images asked for a full-viewport image to fill a 390px card, so each one downloaded roughly three times the pixels it displayed. Sizes corrected and quality set.
+- Corridor map: place names lightened again and the frame pulled back further.
+
 ## 2026-07-29 21:10 IST · RTC values become appliable, scan is kept
 
 - Reading an RTC now stores the scan itself against the listing, not just what was read off it — the extraction is a proposal about a legal document and a reviewer needs the document to check it against. A link to the stored scan appears in the Legal step.

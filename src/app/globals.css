@@ -198,8 +198,8 @@
   /* Enough to lift the names off a warm background, and no more. Pushed
      harder, every minor hamlet turns solid black and the label layer starts
      competing with the blooms it is supposed to sit behind. */
-  filter: brightness(0.78) contrast(1.08);
-  opacity: 0.88;
+  filter: brightness(0.92) contrast(1.02);
+  opacity: 0.62;
 }
 
 /* Corridor-map heat blooms. A very shallow opacity cycle, offset per ring so

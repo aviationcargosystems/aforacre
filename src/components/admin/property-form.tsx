@@ -13,6 +13,7 @@ import {
 } from "@/components/admin/property-form-shared";
 import { AreaInput } from "@/components/admin/area-input";
 import { AiAssist } from "@/components/admin/ai-assist";
+import { compressImage } from "@/lib/images/compress";
 import { Button } from "@/components/ui/button";
 
 const inputClass =
@@ -50,6 +51,40 @@ export function PropertyForm({
   const [selectedTags, setSelectedTags] = useState<string[]>(property?.tags ?? []);
   const [titleValue, setTitleValue] = useState(property?.title ?? "");
   const [step, setStep] = useState(0);
+  const [compressing, setCompressing] = useState(false);
+
+  /**
+   * Re-encode photos in the browser before they are uploaded.
+   *
+   * A phone camera produces 4 to 8 MB a shot, and those were being stored and
+   * then served at full size — which is why listing pages were slow. The same
+   * helper the partner capture form uses brings each one to roughly 200 KB at
+   * 1600px, which is more than a card or a gallery ever displays.
+   */
+  async function compressPickedImages(e: React.ChangeEvent<HTMLInputElement>) {
+    const input = e.target;
+    const picked = Array.from(input.files ?? []);
+    if (picked.length === 0) return;
+
+    setCompressing(true);
+    try {
+      const transfer = new DataTransfer();
+      for (const file of picked) {
+        try {
+          const { blob } = await compressImage(file);
+          const name = file.name.replace(/\.[^.]+$/, "") + ".jpg";
+          transfer.items.add(new File([blob], name, { type: blob.type || "image/jpeg" }));
+        } catch {
+          // A file the canvas cannot decode (HEIC on some browsers) still gets
+          // uploaded as-is rather than being silently dropped.
+          transfer.items.add(file);
+        }
+      }
+      input.files = transfer.files;
+    } finally {
+      setCompressing(false);
+    }
+  }
 
   function toggleTag(tag: string) {
     setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
@@ -147,7 +182,7 @@ export function PropertyForm({
                           id="lat"
                           name="lat"
                           type="number"
-                          step="0.0001"
+                          step="any"
                           defaultValue={property?.location.lat ?? prefill?.lat}
                           className={inputClass}
                         />
@@ -157,7 +192,7 @@ export function PropertyForm({
                           id="lng"
                           name="lng"
                           type="number"
-                          step="0.0001"
+                          step="any"
                           defaultValue={property?.location.lng ?? prefill?.lng}
                           className={inputClass}
                         />
@@ -305,8 +340,16 @@ export function PropertyForm({
                         </div>
                       </div>
                     )}
-                    <Field label="Upload photos" htmlFor="imageFiles">
-                      <input id="imageFiles" name="imageFiles" type="file" accept="image/*" multiple className={inputClass} />
+                    <Field label={compressing ? "Compressing photos…" : "Upload photos"} htmlFor="imageFiles">
+                      <input
+                        id="imageFiles"
+                        name="imageFiles"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={compressPickedImages}
+                        className={inputClass}
+                      />
                     </Field>
                   </section>
             <section className="space-y-4">
