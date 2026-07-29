@@ -34,14 +34,14 @@ export function PropertyCard({ property, highlightLabel }: { property: Property;
             )}
             {highlightLabel && <Badge className="bg-accent text-accent-foreground">{highlightLabel}</Badge>}
           </div>
-          <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-4 text-white">
+          <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-2 text-white sm:flex-row sm:items-end sm:justify-between sm:gap-4">
             <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">
                 South Bangalore{property.fid && ` · FID ${property.fid}`}
               </p>
-              <p className="mt-1 line-clamp-2 font-heading text-xl font-semibold leading-tight">{property.title}</p>
+              <p className="mt-1 font-heading text-lg font-semibold leading-tight sm:line-clamp-2 sm:text-xl">{property.title}</p>
             </div>
-            <div className="min-w-[108px] shrink-0 rounded-2xl border border-white/15 bg-white/10 px-3 py-2 text-right backdrop-blur">
+            <div className="shrink-0 self-start rounded-2xl border border-white/15 bg-white/10 px-3 py-2 backdrop-blur sm:min-w-[108px] sm:self-auto sm:text-right">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/68">Total price</p>
               <p className="mt-1 whitespace-nowrap font-heading text-lg font-semibold leading-none">
                 {formatINR(property.totalPrice)}

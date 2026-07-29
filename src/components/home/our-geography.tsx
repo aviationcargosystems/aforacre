@@ -72,11 +72,6 @@ export function OurGeography() {
           ))}
         </ul>
       )}
-
-      <p className="mt-8 max-w-2xl text-sm leading-7 text-muted-foreground">
-        We do not list outside this belt. If a plot is further out than a weekend drive, it is somebody else&apos;s
-        listing.
-      </p>
     </section>
   );
 }

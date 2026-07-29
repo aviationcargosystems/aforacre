@@ -91,13 +91,13 @@ export function PropertyForm({
   }
 
   return (
-    <form id="property-form" action={action} className="flex h-[calc(100dvh-7rem)] min-h-[34rem] flex-col overflow-hidden rounded-[1.5rem] border border-border bg-background">
+    <form id="property-form" action={action} className="flex flex-col rounded-[1.5rem] border border-border bg-background lg:h-[calc(100dvh-7rem)] lg:min-h-[34rem] lg:overflow-hidden">
       {/* A panel, not a page. The old form was one continuous column of nine
           sections, which meant the only way to find out what it still wanted
           was to scroll the whole thing. Steps make the shape of the work
           visible, and Save sits in the bar rather than at the bottom so a
           part-filled listing can be put down at any point and picked up later. */}
-      <div className="shrink-0 border-b border-border px-4 py-3 sm:px-6">
+      <div className="border-b border-border px-4 py-3 sm:px-6 lg:shrink-0">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="font-heading text-lg font-semibold text-foreground">
             {isEdit ? "Edit property" : "Add property"}
@@ -133,7 +133,7 @@ export function PropertyForm({
       {/* Steps are hidden, never unmounted: an unmounted step's inputs leave
           the form, so anything typed on step four would be dropped the moment
           someone stepped back to check the pin. */}
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+      <div className="px-4 py-6 sm:px-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
         <div className="mx-auto max-w-6xl">
           {errorMessage && (
             <div className="mb-6 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
@@ -515,7 +515,7 @@ export function PropertyForm({
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-2 border-t border-border px-4 py-3 sm:px-6">
+      <div className="flex items-center gap-2 border-t border-border px-4 py-3 sm:px-6 lg:shrink-0">
         {step > 0 && (
           <Button type="button" variant="outline" size="sm" onClick={() => setStep((n) => n - 1)}>
             Back

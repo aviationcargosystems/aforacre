@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-07-30 00:30 IST · Mobile scroll, card overlay, two more region pins
+
+- Both fixed-height shells (Add Property, Explore) are desktop-only now. On mobile they flowed inside the page's own scroller, giving two scrollbars and neither reaching the end.
+- Property card: on narrow screens the price pill and the title fought for one row, truncating the title. They stack below sm.
+- Found pins for Maralavadi and Kalanakuppe — they only resolve under their OSM spellings (Maralawadi, Kallanakuppe), which is why earlier searches came back empty. Sheetalwadi and Bannerghatta still return nothing and stay as chips.
+- Extent takes the full width on capture so its three unit fields sit inline instead of stacking.
+- Removed the "we do not list outside this belt" paragraph.
+- Added supabase/clear-seed-data.sql for wiping the demo catalogue. Not run — it is destructive and yours to execute.
+
 ## 2026-07-29 23:55 IST · Quick capture down to two steps
 
 - Quick capture is Site and Documents. Site carries photos, video, the pin, area, extent, price and tags; Documents is the RTC upload, survey number and khata.

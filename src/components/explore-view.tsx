@@ -156,10 +156,10 @@ export function ExploreView({
      * viewport as their chrome collapses, and `vh` would leave the last card
      * permanently under the address bar.
      */
-    <div className="flex h-[100dvh] flex-col overflow-hidden">
+    <div className="flex flex-col lg:h-[100dvh] lg:overflow-hidden">
       {/* Only the search bar and the count survive at rest. The title is
           reference, not navigation, so it is allowed to leave. */}
-      <div className="shrink-0 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+      <div className="sticky top-0 z-10 border-b border-border/60 bg-background/80 backdrop-blur-xl lg:static lg:shrink-0">
         <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <div className="relative min-w-0 flex-1">
@@ -200,9 +200,9 @@ export function ExploreView({
       {/* min-h-0 on both the row and the scrolling column: without it a flex
           child refuses to shrink below its content and the overflow lands on
           the page instead of inside the list. */}
-      <div className="mx-auto flex w-full min-h-0 max-w-7xl flex-1 gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:max-w-[46%]">
-          <div className="min-h-0 flex-1 overflow-y-auto pr-1 [scrollbar-width:thin]">
+      <div className="mx-auto flex w-full max-w-7xl gap-4 px-4 py-4 sm:px-6 lg:min-h-0 lg:flex-1 lg:px-8">
+        <div className="flex min-w-0 flex-1 flex-col lg:min-h-0 lg:max-w-[46%]">
+          <div className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 [scrollbar-width:thin]">
             <div className="grid grid-cols-1 gap-4 pb-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
               {filtered.length === 0 ? (
                 <div className="rounded-[1.75rem] border border-dashed border-border/70 bg-white/65 p-10 text-center text-muted-foreground backdrop-blur-sm sm:col-span-2 lg:col-span-1 xl:col-span-2">

@@ -10,10 +10,15 @@
  * change, and a geocoding call in the request path would be a dependency for no
  * benefit.
  *
- * `lat`/`lng` are deliberately optional. Four of these villages return nothing
- * from OpenStreetMap, and a pin guessed from a name is worse than no pin: it
- * would put a confident dot on a map in the wrong field. Those regions render
- * as plain chips until someone who knows the ground supplies the coordinate.
+ * `lat`/`lng` are deliberately optional. Sheetalwadi and Bannerghatta return
+ * nothing usable from OpenStreetMap under any spelling tried, and a pin guessed
+ * from a name is worse than no pin: it would put a confident dot on a map in the
+ * wrong field. Those two render as plain chips until someone who knows the
+ * ground supplies the coordinate.
+ *
+ * Maralavadi and Kalanakuppe resolve only under their OSM spellings
+ * (Maralawadi, Kallanakuppe), which is why the search for them kept coming back
+ * empty.
  */
 
 export interface CoreRegion {
@@ -24,11 +29,11 @@ export interface CoreRegion {
 
 export const CORE_REGIONS: CoreRegion[] = [
   { name: "Harohalli", lat: 12.6801, lng: 77.4697 },
-  { name: "Maralavadi" },
+  { name: "Maralavadi", lat: 12.6121, lng: 77.5252 },
   { name: "Dodda Maralavadi", lat: 12.6156, lng: 77.522 },
   { name: "Thattekere", lat: 12.6729, lng: 77.5738 },
   { name: "Kaggalipura", lat: 12.809, lng: 77.5097 },
-  { name: "Kalanakuppe" },
+  { name: "Kalanakuppe", lat: 12.6232, lng: 77.5635 },
   { name: "Sheetalwadi" },
   { name: "Anekal interiors", lat: 12.7103, lng: 77.6886 },
   { name: "Bannerghatta surroundings" },
