@@ -1,7 +1,7 @@
-import type { KhataType, UseCase, WaterSource } from "@/lib/types";
+import type { KhataType, UseCase } from "@/lib/types";
 import type { PropertyInput } from "@/lib/property-builder";
 import { slugify } from "@/lib/property-builder";
-import { fieldNameForUseCase } from "@/components/admin/property-form-shared";
+import { fieldNameForUseCase, waterSourcesFromTags } from "@/components/admin/property-form-shared";
 import { saveUploadedFiles } from "@/lib/store/uploads";
 
 function num(formData: FormData, key: string, fallback = 0): number {
@@ -79,7 +79,7 @@ export async function parsePropertyForm(
     useCaseFit,
     soilType: str(formData, "soilType"),
     landObservation: str(formData, "landObservation"),
-    waterSources: checkboxList<WaterSource>(formData, "waterSources"),
+    waterSources: waterSourcesFromTags(tags),
     roadAccess: str(formData, "roadAccess"),
     fencing: formData.get("fencing") === "on",
     electricity: formData.get("electricity") === "on",

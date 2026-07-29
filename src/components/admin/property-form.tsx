@@ -8,7 +8,6 @@ import {
   LAND_OBSERVATIONS,
   USE_CASE_FIELDS,
   VERIFIED_FIELDS,
-  WATER_SOURCE_OPTIONS,
   fieldNameForUseCase,
 } from "@/components/admin/property-form-shared";
 import { AreaInput } from "@/components/admin/area-input";
@@ -259,23 +258,7 @@ export function PropertyForm({
                         ))}
                       </datalist>
                     </Field>
-                    <div>
-                      <p className={labelClass}>Water sources</p>
-                      <div className="mt-2 flex flex-wrap gap-3">
-                        {WATER_SOURCE_OPTIONS.map((w) => (
-                          <label key={w.value} className="flex items-center gap-1.5 text-sm text-foreground">
-                            <input
-                              type="checkbox"
-                              name="waterSources"
-                              value={w.value}
-                              defaultChecked={property?.waterSources.includes(w.value)}
-                              className="h-4 w-4"
-                            />
-                            {w.label}
-                          </label>
-                        ))}
-                      </div>
-                    </div>
+                    
                     <div className="flex flex-wrap gap-6">
                       <label className="flex items-center gap-1.5 text-sm text-foreground">
                         <input type="checkbox" name="fencing" defaultChecked={property?.fencing} className="h-4 w-4" />

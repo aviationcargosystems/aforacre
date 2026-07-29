@@ -10,6 +10,28 @@ export const WATER_SOURCE_OPTIONS: { value: WaterSource; label: string }[] = [
   { value: "none", label: "None" },
 ];
 
+/**
+ * Water source is entered as a tag rather than its own checkbox set — it is one
+ * of the things a buyer browses by, and having it in two places meant keeping
+ * them in step. The structured value is derived from the tags on save, since
+ * suitability scoring, the explore filter and the property page all read it.
+ */
+export const WATER_SOURCE_TAGS: Record<string, WaterSource> = {
+  borewell: "borewell",
+  "open well": "open-well",
+  "open-well": "open-well",
+  "rain-fed": "rain-fed",
+  "rain fed": "rain-fed",
+  canal: "canal",
+};
+
+export function waterSourcesFromTags(tags: string[]): WaterSource[] {
+  const found = tags
+    .map((tag) => WATER_SOURCE_TAGS[tag.trim().toLowerCase()])
+    .filter((value): value is WaterSource => Boolean(value));
+  return Array.from(new Set(found));
+}
+
 export const KHATA_OPTIONS = [
   { value: "A", label: "Khata A" },
   { value: "B", label: "Khata B" },

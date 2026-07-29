@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-07-29 23:10 IST · Water source becomes a tag
+
+- Water source is no longer its own checkbox set on the property form. Tag a listing Borewell, Open well, Rain-fed or Canal and the structured value is derived from the tags on save.
+- Nothing downstream changed: suitability scoring, the explore filter and the property page's Water source fact all still read the same field.
+
 ## 2026-07-29 22:55 IST · Leaner quick capture
 
 - Quick capture is three steps instead of four: Site, Details, Documents. Extent and tags moved onto Site, so photos, video, the pin, the size and the tags are all captured in one pass.
