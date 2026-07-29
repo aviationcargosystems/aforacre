@@ -169,6 +169,26 @@
   }
 }
 
+/* Coverage-map tooltips. Leaflet renders these outside the React tree, so the
+   brand treatment cannot come from a className on the component. */
+.leaflet-tooltip {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-family: var(--font-montserrat), sans-serif;
+  font-size: 11px;
+  color: var(--foreground);
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.1);
+}
+.leaflet-tooltip::before {
+  display: none;
+}
+.aa-map-label {
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+
 /* Leaflet popup content is a plain DOM node outside Tailwind's reach — override
    its default padding/rounding so the property-card popup image can go full-bleed. */
 .property-popup .leaflet-popup-content-wrapper {

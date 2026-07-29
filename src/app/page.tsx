@@ -6,14 +6,36 @@ import { Badge } from "@/components/ui/badge";
 import { FeaturedLandCarousel } from "@/components/featured-land-carousel";
 import { SectionHeading } from "@/components/section-heading";
 import { WhyThisCorridor } from "@/components/home/why-this-corridor";
-import { featuredProperties } from "@/lib/store/properties";
-import { HeroVideo } from "@/components/hero-video";
+import { SouthBangaloreMapView } from "@/components/home/south-bangalore-map-view";
+import { featuredProperties, getAllProperties } from "@/lib/store/properties";
 
 export const dynamic = "force-dynamic";
 
 
 export default async function Home() {
-  const featured = await featuredProperties();
+  const [featured, allProperties] = await Promise.all([featuredProperties(), getAllProperties()]);
+
+  // One marker per area, not per plot. Several listings in the same village
+  // should read as depth there rather than as clutter.
+  const coverage = Array.from(
+    allProperties.reduce((byArea, property) => {
+      const key = property.location.area;
+      const existing = byArea.get(key);
+      if (existing) {
+        existing.count += 1;
+      } else {
+        byArea.set(key, {
+          area: key,
+          corridor: property.location.corridor,
+          lat: property.location.lat,
+          lng: property.location.lng,
+          count: 1,
+        });
+      }
+      return byArea;
+    }, new Map<string, { area: string; corridor: string; lat: number; lng: number; count: number }>())
+      .values()
+  );
   const closingImage = featured[0]?.images[0];
 
   return (
@@ -37,43 +59,52 @@ export default async function Home() {
           <h1 className="font-heading text-5xl font-semibold leading-[1.02] tracking-tight text-balance text-foreground sm:text-6xl lg:text-7xl">
             Buy holistic lands in south Bengaluru!
           </h1>
-          <p className="mt-8 max-w-2xl text-pretty text-lg leading-8 text-muted-foreground sm:text-xl">
-            Farmland, farmhouse plots and weekend escapes, matched to how you&apos;ll actually use them.
+          <p className="mt-7 max-w-3xl text-pretty text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-9">
+            Within a comfortable 90 minute drive from the city lies an extraordinary landscape of forests, lakes,
+            hills and fertile farmland that many Bengaluru residents have never explored.
           </p>
 
-          {/* No search box. With this few listings a search returns either
-              everything or nothing, and it hands the buyer a job the match flow
-              is meant to do for them. */}
-          <div className="mt-11 grid w-full max-w-md grid-cols-1 gap-3 sm:grid-cols-2">
-            <Button asChild variant="pill" size="pill" className="w-full">
+          {/* One CTA. A second button beside it splits attention at the exact
+              moment we want a single decision, and everything on this page
+              already leads somewhere. */}
+          <div className="mt-11 w-full sm:w-auto">
+            <Button asChild variant="pill" size="pill" className="h-14 w-full px-10 text-base sm:w-auto">
               <Link href="/match">
-                Find land <ArrowRight className="ml-1 h-4 w-4" />
+                Find myself <ArrowRight className="ml-1.5 h-5 w-5" />
               </Link>
-            </Button>
-            <Button asChild variant="pill-outline" size="pill" className="w-full">
-              <Link href="/explore">See every plot</Link>
             </Button>
           </div>
 
         </div>
 
-        <WhyThisCorridor />
-
-        {/* Second block. No separate background: it sits inside the same
-          gradient wrapper as the hero so the colour runs straight through
-          instead of stopping at a section edge. Narrower than before and
-          dimmed, because it is atmosphere behind the page, not a banner
-          asking to be read. */}
-        <div className="relative px-4 pb-20 pt-14 sm:px-6 lg:px-8 lg:pb-28 lg:pt-20">
-          <div className="relative mx-auto max-w-[52rem]">
-            <div className="relative overflow-hidden rounded-[1.75rem] border border-white/60 shadow-[0_24px_60px_rgba(15,23,42,0.16)] sm:rounded-[2rem]">
-              <div className="relative aspect-video">
-                <HeroVideo poster="/videos/hero-poster.jpg" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(8,18,14,0.52)_0%,rgba(8,18,14,0.34)_55%,rgba(8,18,14,0.20)_100%)]" />
+        {/* Coverage map, in the floating slot the video used to hold. Where we
+            operate is a better second beat than atmosphere: it answers "is this
+            near me" before anyone has to scroll. */}
+        <div className="relative px-4 pb-20 pt-10 sm:px-6 lg:px-8 lg:pb-28 lg:pt-14">
+          <div className="relative mx-auto max-w-5xl">
+            <div className="absolute inset-x-12 -bottom-8 h-24 rounded-[3rem] bg-deep-green/20 blur-3xl" />
+            <div className="relative overflow-hidden rounded-[1.75rem] border border-white/70 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.20)] sm:rounded-[2rem]">
+              <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border/60 px-5 py-4 sm:px-7">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Where we operate</p>
+                  <h2 className="mt-1 font-heading text-xl font-semibold text-foreground sm:text-2xl">
+                    Every plot, south of the city
+                  </h2>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {coverage.length} {coverage.length === 1 ? "area" : "areas"} across Kanakapura, Bannerghatta, Sarjapur
+                  and Anekal
+                </p>
+              </div>
+              <div className="h-[22rem] sm:h-[30rem]">
+                <SouthBangaloreMapView areas={coverage} />
               </div>
             </div>
           </div>
         </div>
+
+        <WhyThisCorridor />
+
       </div>
 
       <section className="relative pb-24 pt-4 lg:pb-28">
