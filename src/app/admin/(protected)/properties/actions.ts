@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { buildProperty } from "@/lib/property-builder";
 import { getProperty, saveProperty, deleteProperty, nextFid } from "@/lib/store/properties";
 import { addTag } from "@/lib/store/tags";
+import { setCaptureStatus } from "@/lib/store/captures";
 import { parsePropertyForm } from "@/lib/store/property-form-parser";
 import { requireAdmin } from "@/lib/admin/require-admin";
 
@@ -40,6 +41,15 @@ export async function createPropertyAction(formData: FormData) {
 
   try {
     await Promise.all(newTags.map((t) => addTag(t)));
+
+    // The capture has become a listing, so it stops being an open item in the
+    // field-capture queue.
+    const captureId = String(formData.get("captureId") || "").trim();
+    if (captureId) {
+      await setCaptureStatus(captureId, "reviewed");
+      revalidatePath("/admin/captures");
+    }
+
     revalidatePublicPaths(property.slug);
     revalidatePath("/admin/properties");
   } catch {

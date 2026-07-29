@@ -38,5 +38,11 @@ export default async function NewPropertyPage({
       }
     : undefined;
 
-  return <PropertyForm action={createPropertyAction} existingTags={existingTags} errorMessage={error} prefill={prefill} />;
+  return <PropertyForm
+      action={createPropertyAction}
+      existingTags={existingTags}
+      errorMessage={error}
+      captureId={capture?.id}
+      prefill={prefill}
+    />;
 }

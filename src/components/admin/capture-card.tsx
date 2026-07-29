@@ -86,7 +86,7 @@ export function CaptureCard({ capture, linkedPropertyTitle }: { capture: Capture
               href={`/admin/properties/new?captureId=${capture.id}`}
               className="text-xs font-medium text-accent hover:underline"
             >
-              Use in new property
+              Push to properties
             </Link>
             <form
               action={deleteCaptureAction}

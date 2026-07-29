@@ -41,6 +41,7 @@ export function PropertyForm({
   property,
   existingTags,
   errorMessage,
+  captureId,
   prefill,
 }: {
   action: (formData: FormData) => void;
@@ -48,6 +49,7 @@ export function PropertyForm({
   existingTags: string[];
   errorMessage?: string;
   /** Carried over when a field capture is promoted into a listing. */
+  captureId?: string;
   prefill?: {
     images?: string[];
     videos?: string[];
@@ -198,7 +200,10 @@ export function PropertyForm({
 
           <div className={step === 0 ? "grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start" : "hidden"}>
             <div className="lg:order-2 lg:sticky lg:top-0">
-              {(prefill?.images ?? []).map((url) => (
+              {/* Lets the action retire the capture once this listing is saved. */}
+      {captureId && <input type="hidden" name="captureId" value={captureId} />}
+
+      {(prefill?.images ?? []).map((url) => (
         <input key={url} type="hidden" name="imageUrls" value={url} />
       ))}
       {(prefill?.videos ?? []).map((url) => (
