@@ -14,8 +14,9 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 
-// Nothing in the middle. The two actions on the right are the whole nav: one
-// for sellers, one for buyers, and the quiz is what "Explore land" opens.
+// Nothing in the middle. One action on the right is the whole nav, and it opens
+// the listings rather than the quiz — someone reaching for "Explore land" is
+// asking to see what exists, not to answer four questions first.
 const navLinks: { href: string; label: string }[] = [];
 
 export function SiteHeader() {
@@ -77,11 +78,8 @@ export function SiteHeader() {
           </div>
 
           <div className="hidden items-center gap-2 lg:flex">
-            <Button asChild variant="ghost" size="sm" className="rounded-full px-4">
-              <Link href="/submit-land">List your land</Link>
-            </Button>
             <Button asChild variant="pill" size="sm">
-              <Link href="/match">Explore land</Link>
+              <Link href="/explore">Explore land</Link>
             </Button>
           </div>
 
@@ -118,13 +116,8 @@ export function SiteHeader() {
                 </nav>
                 <div className="mt-6 grid gap-2">
                   <Button asChild variant="pill" size="sm" className="w-full">
-                    <Link href="/match" onClick={() => setOpen(false)}>
+                    <Link href="/explore" onClick={() => setOpen(false)}>
                       Explore land
-                    </Link>
-                  </Button>
-                  <Button asChild variant="pill-outline" size="sm" className="w-full">
-                    <Link href="/submit-land" onClick={() => setOpen(false)}>
-                      List your land
                     </Link>
                   </Button>
                 </div>

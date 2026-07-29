@@ -23,7 +23,7 @@ export function GrowthAnchors({ lat, lng }: { lat: number | null; lng: number | 
   if (distances.length === 0) return null;
 
   return (
-    <div className="rounded-[1.5rem] border border-border/70 bg-white/70 p-5">
+    <section className="border-t border-border/70 pt-8">
       <h3 className="font-heading text-base font-semibold text-foreground">Growth anchors</h3>
       <p className="mt-1 text-xs text-muted-foreground">Straight-line distance from this plot.</p>
 
@@ -49,6 +49,6 @@ export function GrowthAnchors({ lat, lng }: { lat: number | null; lng: number | 
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 }

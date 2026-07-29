@@ -42,31 +42,69 @@ export interface TaxBreakdown {
   lineItems: TaxLineItem[];
 }
 
-export interface LegalStatus {
-  khata: KhataType;
-  /** Revenue hierarchy as printed on the RTC. */
+/**
+ * One RTC, which in practice means one survey number.
+ *
+ * A plot assembled from adjoining parcels carries a separate RTC per survey
+ * number, each with its own owner, mutation history and land revenue — so these
+ * fields repeat per record rather than sitting once on the property. Holding
+ * them flat forced every multi-survey plot to be entered as whichever RTC the
+ * person happened to type first, silently discarding the rest.
+ */
+export interface RtcRecord {
+  surveyNumber: string;
+  /** Stored scan of this RTC, so a reviewer can check the reading against it. */
+  document: string;
+  /** Revenue hierarchy as printed on this RTC. */
   hobli: string;
   taluk: string;
   district: string;
   /** Mutation reference, e.g. "MR H41/2025-2026". */
   mutationReference: string;
-  /** The RTC's "valid from" date, as printed. */
+  /** This RTC's "valid from" date, as printed. */
   rtcValidFrom: string;
   /** Land revenue in rupees, as printed. */
   landRevenueRupees: string;
   /**
-   * Owner as named on the RTC. Admin-only: vendor identity is never rendered on
+   * Owner as named on this RTC. Admin-only: vendor identity is never rendered on
    * a buyer-facing surface, so this must not reach a public page.
    */
   ownerOnRecord: string;
-  /** Stored scan of the RTC itself, so a reviewer can check the reading against it. */
-  rtcDocument: string;
+}
+
+export interface LegalStatus {
+  khata: KhataType;
+  /** One entry per survey number. Read it through `rtcRecordsOf`, never raw. */
+  rtcRecords: RtcRecord[];
   dcConverted: boolean;
   dcConversionNote: string;
   rtcAvailable: boolean;
   encumbranceClear: boolean;
-  surveyNumber: string;
   notes: string[];
+
+  // ── Legacy single-RTC fields ────────────────────────────────────────────
+  // Rows written before rtcRecords existed still carry these, and `legal` is a
+  // jsonb blob rather than columns, so there is no migration that backfills
+  // them. `rtcRecordsOf` folds them into a single record on read; nothing new
+  // should write them except the compatibility shim in the builder.
+  /** @deprecated use rtcRecords[].surveyNumber */
+  surveyNumber?: string;
+  /** @deprecated use rtcRecords[].document */
+  rtcDocument?: string;
+  /** @deprecated use rtcRecords[].hobli */
+  hobli?: string;
+  /** @deprecated use rtcRecords[].taluk */
+  taluk?: string;
+  /** @deprecated use rtcRecords[].district */
+  district?: string;
+  /** @deprecated use rtcRecords[].mutationReference */
+  mutationReference?: string;
+  /** @deprecated use rtcRecords[].rtcValidFrom */
+  rtcValidFrom?: string;
+  /** @deprecated use rtcRecords[].landRevenueRupees */
+  landRevenueRupees?: string;
+  /** @deprecated use rtcRecords[].ownerOnRecord */
+  ownerOnRecord?: string;
 }
 
 export interface PropertyLocation {

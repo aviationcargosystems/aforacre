@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarClock, ChevronRight, MapPin } from "lucide-react";
+import { CalendarClock, Camera, ChevronRight, MapPin } from "lucide-react";
 import type { Recce, RecceStatus } from "@/lib/types";
 import { requireAgent } from "@/lib/agent/require-agent";
 import { getReccesForAgent } from "@/lib/store/recces";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "My Recces — A for Acre",
+  title: "Agent — A for Acre",
 };
 
 const TYPE_LABELS: Record<Recce["type"], string> = {
@@ -75,6 +75,29 @@ export default async function AgentHomePage() {
 
   return (
     <div className="space-y-8">
+      {/*
+        Capture leads, not recces. Most sites an agent stands in front of have no
+        recce raised against them, so making assigned work the first thing on the
+        page put the rarer job above the everyday one.
+      */}
+      <Link
+        href="/agent/capture"
+        className="flex items-center gap-4 rounded-2xl border border-accent/30 bg-accent/[0.07] p-5 transition-colors hover:bg-accent/[0.12]"
+      >
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
+          <Camera className="h-6 w-6" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-heading text-lg font-semibold leading-tight text-foreground">
+            Quick capture
+          </span>
+          <span className="mt-0.5 block text-sm text-muted-foreground">
+            Photos and a pin from where you are standing.
+          </span>
+        </span>
+        <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
+      </Link>
+
       <div>
         <h1 className="font-heading text-2xl font-semibold text-foreground">My recces</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -104,7 +127,7 @@ export default async function AgentHomePage() {
 
       {recces.length === 0 && (
         <div className="rounded-2xl border border-dashed border-border bg-background p-10 text-center text-sm text-muted-foreground">
-          No recces assigned to you yet.
+          No recces assigned to you yet — capture away in the meantime.
         </div>
       )}
     </div>

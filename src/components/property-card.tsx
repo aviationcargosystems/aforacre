@@ -36,8 +36,9 @@ export function PropertyCard({ property, highlightLabel }: { property: Property;
           </div>
           <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-2 text-white sm:flex-row sm:items-end sm:justify-between sm:gap-4">
             <div className="min-w-0">
+              {/* FID is an internal reference — it means nothing to a buyer. */}
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">
-                South Bangalore{property.fid && ` · FID ${property.fid}`}
+                South Bangalore
               </p>
               <p className="mt-1 font-heading text-lg font-semibold leading-tight sm:line-clamp-2 sm:text-xl">{property.title}</p>
             </div>
@@ -52,8 +53,10 @@ export function PropertyCard({ property, highlightLabel }: { property: Property;
         <CardContent className="space-y-4 p-5">
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <MapPin className="h-3.5 w-3.5 shrink-0" />
+            {/* Joined, not interpolated: a plot with no corridor recorded was
+                rendering as "Attikuppe, " with a dangling separator. */}
             <span className="truncate">
-              {property.location.area}, {property.location.corridor}
+              {[property.location.area, property.location.corridor].filter(Boolean).join(", ")}
             </span>
           </div>
           <div className="flex flex-wrap gap-1.5">
