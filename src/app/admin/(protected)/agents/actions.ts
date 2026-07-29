@@ -24,10 +24,23 @@ export async function createAgentAction(formData: FormData) {
 
   if (!fullName) fail("Add a name.");
   if (!email.includes("@")) fail("A work email is required. It is the recovery path if a phone is lost.");
-  if (password.length < MIN_PASSWORD_LENGTH) fail(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
+
+  // Left blank, the phone number becomes the password. It is something the
+  // person already knows, so nobody has to invent one and read it out.
+  //
+  // It is also, plainly, a weak credential: a phone number is semi-public and
+  // guessable. That is an acceptable trade for a handful of field accounts that
+  // only reach the capture tool, and a poor one for anything with admin rights
+  // — so change it for those, and treat this as a first password rather than a
+  // permanent one.
+  const initial = password || mobile.replace(/\D/g, "");
+
+  if (initial.length < MIN_PASSWORD_LENGTH) {
+    fail(`Set a password of at least ${MIN_PASSWORD_LENGTH} characters, or enter a mobile number to use as the first one.`);
+  }
 
   try {
-    await createStaff({ fullName, email, mobile, password, role });
+    await createStaff({ fullName, email, mobile, password: initial, role });
   } catch (error) {
     fail(error instanceof StaffError ? error.message : "Could not create that account.");
   }

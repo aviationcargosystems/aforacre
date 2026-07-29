@@ -67,7 +67,7 @@ export default async function AdminAgentsPage({
           </label>
           <label className="space-y-1.5">
             <span className="text-sm font-medium text-foreground">Temporary password</span>
-            <PasswordField required className={inputClass} />
+            <PasswordField className={inputClass} placeholder="Leave blank to use their mobile" />
           </label>
           <label className="space-y-1.5">
             <span className="text-sm font-medium text-foreground">Role</span>
