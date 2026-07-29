@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   BadgeCheck,
-  Check,
   Droplets,
   Fence,
   MapPin,
@@ -10,7 +9,6 @@ import {
   Route,
   Ruler,
   ScrollText,
-  ShieldCheck,
   Zap,
 } from "lucide-react";
 import { getProperty } from "@/lib/store/properties";
@@ -117,48 +115,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
           </Section>
 
 
-          <Section id="due-diligence" eyebrow="Due diligence" title="Legal and verification">
-            <div className="grid gap-10 md:grid-cols-2">
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Legal status</h3>
-                <dl className="mt-4 divide-y divide-border/70 border-y border-border/70">
-                  <LegalRow label="Khata" value={property.legal.khata === "none" ? "Not applicable" : `Khata ${property.legal.khata}`} />
-                  <LegalRow label="DC conversion" value={property.legal.dcConverted ? "Converted" : "Not converted"} />
-                  <LegalRow label="RTC available" value={property.legal.rtcAvailable ? "Yes" : "No"} />
-                  <LegalRow label="Encumbrance" value={property.legal.encumbranceClear ? "Clear" : "Needs verification"} />
-                  <LegalRow label="Survey number" value={property.legal.surveyNumber || "Not provided"} />
-                </dl>
-              </div>
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Verified by our team</h3>
-                {verified.length > 0 ? (
-                  <ul className="mt-4 grid gap-x-4 gap-y-3 sm:grid-cols-2 md:grid-cols-1">
-                    {verified.map((field) => (
-                      <li key={field.key} className="flex items-center gap-2 text-sm text-foreground">
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <Check className="h-3 w-3" />
-                        </span>
-                        {field.label}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                    <ShieldCheck className="h-4 w-4" /> Verification is in progress.
-                  </p>
-                )}
-              </div>
-            </div>
-            {property.legal.notes.length > 0 && (
-              <div className="mt-8 border-l-2 border-accent/45 pl-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Notes</p>
-                <ul className="mt-2 space-y-2 text-sm leading-6 text-muted-foreground">
-                  {property.legal.notes.map((note) => <li key={note}>{note}</li>)}
-                </ul>
-              </div>
-            )}
-          </Section>
-
+          
           <Section id="location" eyebrow="Location" title="See the land in context">
             <div className="grid gap-6 xl:grid-cols-2">
               <figure>
@@ -265,14 +222,6 @@ function Fact({
   );
 }
 
-function LegalRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4 py-3">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="text-right text-sm font-medium text-foreground">{value}</dd>
-    </div>
-  );
-}
 
 function formatUnit(value: number): string {
   return Number(value.toFixed(2)).toLocaleString("en-IN");

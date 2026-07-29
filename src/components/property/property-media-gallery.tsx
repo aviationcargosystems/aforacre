@@ -67,7 +67,12 @@ export function PropertyMediaGallery({
         {media.map((item, index) => (
           <div
             key={`${item.kind}-${item.src}`}
-            className="relative aspect-[4/5] min-h-[28rem] min-w-full snap-center sm:aspect-[16/8.2] lg:aspect-[16/7]"
+            // Photos get the tall editorial frame; a landscape clip in that
+            // frame is mostly black bars, so video slides take a 16/9 shape on
+            // a phone and match the photos again once the frame is wide.
+            className={`relative min-w-full snap-center sm:aspect-[16/8.2] lg:aspect-[16/7] ${
+              item.kind === "video" ? "aspect-video" : "aspect-[4/5] min-h-[28rem]"
+            }`}
           >
             {item.kind === "image" ? (
               <Image

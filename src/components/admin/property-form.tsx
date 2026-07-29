@@ -6,9 +6,7 @@ import type { Property } from "@/lib/types";
 import {
   KHATA_OPTIONS,
   LAND_OBSERVATIONS,
-  USE_CASE_FIELDS,
   VERIFIED_FIELDS,
-  fieldNameForUseCase,
 } from "@/components/admin/property-form-shared";
 import { AreaInput } from "@/components/admin/area-input";
 import { PriceInput } from "@/components/admin/price-input";
@@ -556,24 +554,7 @@ export function PropertyForm({
                     </div>
                   </section>
             
-            <section className="space-y-4">
-                    <h2 className="font-heading text-lg font-semibold text-foreground">Use-case fit (0 to 100)</h2>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-                      {USE_CASE_FIELDS.map((useCase) => (
-                        <Field key={useCase.id} label={useCase.label} htmlFor={fieldNameForUseCase(useCase.id)}>
-                          <input
-                            id={fieldNameForUseCase(useCase.id)}
-                            name={fieldNameForUseCase(useCase.id)}
-                            type="number"
-                            min={0}
-                            max={100}
-                            defaultValue={property?.useCaseFit[useCase.id] ?? 50}
-                            className={inputClass}
-                          />
-                        </Field>
-                      ))}
-                    </div>
-                  </section>
+            
           </div>
         </div>
       </div>
