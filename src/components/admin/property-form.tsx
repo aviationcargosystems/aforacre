@@ -15,6 +15,7 @@ import { PriceInput } from "@/components/admin/price-input";
 import { AiAssist } from "@/components/admin/ai-assist";
 import { TagPicker } from "@/components/admin/tag-picker";
 import { compressImage } from "@/lib/images/compress";
+import { uploadDirect } from "@/lib/direct-upload";
 import { Button } from "@/components/ui/button";
 
 const inputClass =
@@ -52,38 +53,47 @@ export function PropertyForm({
   const [selectedTags, setSelectedTags] = useState<string[]>(property?.tags ?? []);
   const [titleValue, setTitleValue] = useState(property?.title ?? "");
   const [step, setStep] = useState(0);
-  const [compressing, setCompressing] = useState(false);
+  const [uploaded, setUploaded] = useState<{ images: string[]; videos: string[] }>({ images: [], videos: [] });
+  const [uploading, setUploading] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   /**
-   * Re-encode photos in the browser before they are uploaded.
+   * Photos and clips go browser-to-Storage, never through the server action.
    *
-   * A phone camera produces 4 to 8 MB a shot, and those were being stored and
-   * then served at full size — which is why listing pages were slow. The same
-   * helper the partner capture form uses brings each one to roughly 200 KB at
-   * 1600px, which is more than a card or a gallery ever displays.
+   * On Vercel the action is a serverless function, and those reject any request
+   * body over 4.5MB before our code runs — which is what was killing the save.
+   * Only the resulting URLs travel with the form. Photos are re-encoded first
+   * since a phone shot is 4-8MB and nothing here ever displays it at that size.
    */
-  async function compressPickedImages(e: React.ChangeEvent<HTMLInputElement>) {
-    const input = e.target;
-    const picked = Array.from(input.files ?? []);
+  async function uploadPicked(e: React.ChangeEvent<HTMLInputElement>, kind: "images" | "videos") {
+    const picked = Array.from(e.target.files ?? []);
     if (picked.length === 0) return;
 
-    setCompressing(true);
+    setUploadError(null);
+    const urls: string[] = [];
     try {
-      const transfer = new DataTransfer();
-      for (const file of picked) {
-        try {
-          const { blob } = await compressImage(file);
-          const name = file.name.replace(/\.[^.]+$/, "") + ".jpg";
-          transfer.items.add(new File([blob], name, { type: blob.type || "image/jpeg" }));
-        } catch {
-          // A file the canvas cannot decode (HEIC on some browsers) still gets
-          // uploaded as-is rather than being silently dropped.
-          transfer.items.add(file);
+      for (const [i, file] of picked.entries()) {
+        const label = `${kind === "images" ? "Photo" : "Video"} ${i + 1} of ${picked.length}`;
+        setUploading(label);
+
+        let toSend = file;
+        if (kind === "images") {
+          const { blob } = await compressImage(file).catch(() => ({ blob: file as Blob }));
+          toSend = new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", {
+            type: blob.type || "image/jpeg",
+          });
         }
+
+        const { publicUrl } = await uploadDirect(toSend, "properties", (f) =>
+          setUploading(`${label} — ${Math.round(f * 100)}%`)
+        );
+        urls.push(publicUrl);
       }
-      input.files = transfer.files;
+      setUploaded((prev) => ({ ...prev, [kind]: [...prev[kind], ...urls] }));
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed.");
     } finally {
-      setCompressing(false);
+      setUploading(null);
     }
   }
 
@@ -103,7 +113,25 @@ export function PropertyForm({
             <span className="hidden text-xs text-muted-foreground sm:inline">
               Only a title is required — save and keep adding.
             </span>
-            <Button type="submit" size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
+            <Button
+              type="submit"
+              size="sm"
+              onClick={(e) => {
+                // The title lives on step one. If Save is pressed from another
+                // step while it is empty, the browser refuses to submit and
+                // cannot show a message on a hidden field, so nothing happens
+                // at all. Jump to it and say so instead.
+                const form = e.currentTarget.form;
+                const title = form?.elements.namedItem("title");
+                if (title instanceof HTMLInputElement && !title.value.trim()) {
+                  e.preventDefault();
+                  setStep(0);
+                  setUploadError("A title is needed before this can be saved.");
+                  requestAnimationFrame(() => title.focus());
+                }
+              }}
+              className="bg-accent text-accent-foreground hover:bg-accent/90"
+            >
               {isEdit ? "Save changes" : "Save property"}
             </Button>
           </div>
@@ -132,6 +160,18 @@ export function PropertyForm({
           someone stepped back to check the pin. */}
       <div className="px-4 py-6 sm:px-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
         <div className="mx-auto max-w-6xl">
+          {uploading && (
+            <p className="mb-4 flex items-center gap-2 rounded-md border border-border bg-background px-4 py-2.5 text-sm text-muted-foreground">
+              <span className="h-3 w-3 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+              Uploading {uploading}
+            </p>
+          )}
+          {uploadError && (
+            <p className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+              {uploadError}
+            </p>
+          )}
+
           {errorMessage && (
             <div className="mb-6 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {errorMessage}
@@ -140,7 +180,14 @@ export function PropertyForm({
 
           <div className={step === 0 ? "grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start" : "hidden"}>
             <div className="lg:order-2 lg:sticky lg:top-0">
-              <AiAssist
+              {uploaded.images.map((url) => (
+        <input key={url} type="hidden" name="imageUrls" value={url} />
+      ))}
+      {uploaded.videos.map((url) => (
+        <input key={url} type="hidden" name="videoUrls" value={url} />
+      ))}
+
+      <AiAssist
                 formId="property-form"
                 availableTags={existingTags}
                 onApplyTags={(tags) =>
@@ -306,14 +353,13 @@ export function PropertyForm({
                         </div>
                       </div>
                     )}
-                    <Field label={compressing ? "Compressing photos…" : "Upload photos"} htmlFor="imageFiles">
+                    <Field label="Upload photos" htmlFor="imageFiles">
                       <input
                         id="imageFiles"
-                        name="imageFiles"
                         type="file"
                         accept="image/*"
                         multiple
-                        onChange={compressPickedImages}
+                        onChange={(e) => uploadPicked(e, "images")}
                         className={inputClass}
                       />
                     </Field>

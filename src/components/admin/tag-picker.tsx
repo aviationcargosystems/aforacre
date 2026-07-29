@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Plus, Search, X } from "lucide-react";
+import { Plus, Search, X } from "lucide-react";
 
 /**
  * Tag selection that stays usable as the vocabulary grows.
@@ -128,7 +128,6 @@ export function TagPicker({
               onClick={() => toggle(tag)}
               className="inline-flex items-center gap-1.5 rounded-full border border-input bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-primary/40 hover:text-primary"
             >
-              <Check className="h-3 w-3 opacity-0" />
               {tag}
             </button>
           ))}

@@ -2,7 +2,6 @@ import type { KhataType, UseCase } from "@/lib/types";
 import type { PropertyInput } from "@/lib/property-builder";
 import { slugify } from "@/lib/property-builder";
 import { fieldNameForUseCase, waterSourcesFromTags } from "@/components/admin/property-form-shared";
-import { saveUploadedFiles } from "@/lib/store/uploads";
 
 function num(formData: FormData, key: string, fallback = 0): number {
   const raw = formData.get(key);
@@ -48,16 +47,15 @@ export async function parsePropertyForm(
     .filter(Boolean);
   const tags = Array.from(new Set([...checkedTags, ...newTags]));
 
-  const uploadedFiles = formData.getAll("imageFiles").filter((f): f is File => f instanceof File && f.size > 0);
-  const uploadedPaths = await saveUploadedFiles(uploadedFiles, "properties");
+  // Uploaded straight to Storage from the browser; only URLs reach here.
+  const uploadedPaths = formData.getAll("imageUrls").map(String).filter(Boolean);
   const removedImages = new Set(checkboxList<string>(formData, "removeImage"));
   const keptExisting = opts.existingImages.filter((img) => !removedImages.has(img));
   const images = Array.from(new Set([...keptExisting, ...uploadedPaths]));
 
   // Uploaded now, plus whatever the listing already had minus anything ticked
   // for removal.
-  const uploadedVideoFiles = formData.getAll("videoFiles").filter((f): f is File => f instanceof File && f.size > 0);
-  const uploadedVideoPaths = await saveUploadedFiles(uploadedVideoFiles, "properties");
+  const uploadedVideoPaths = formData.getAll("videoUrls").map(String).filter(Boolean);
   const removedVideos = new Set(checkboxList<string>(formData, "removeVideo"));
   const keptVideos = (opts.existingVideos ?? []).filter((v) => !removedVideos.has(v));
   const videos = Array.from(new Set([...keptVideos, ...uploadedVideoPaths]));
