@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-30 01:10 IST · Drafts on the device, inline tag creation
+
+- Quick capture keeps a draft on the device as you type — pin, area, extent, tags and label. A locked phone, an evicted tab or a failed save no longer means starting over. Restoring says plainly that photos and clips need re-picking, since files are not in the draft.
+- The draft clears on a successful save, and can be discarded with "Start fresh".
+- Tag picker can create a tag inline when nothing matches, matched case-insensitively so near-duplicates cannot split a filter. New tags persist from both forms.
+- Saving a capture no longer takes the page down when a column is missing; it returns a readable message and keeps what was entered.
+
 ## 2026-07-30 00:30 IST · Mobile scroll, card overlay, two more region pins
 
 - Both fixed-height shells (Add Property, Explore) are desktop-only now. On mobile they flowed inside the page's own scroller, giving two scrollbars and neither reaching the end.

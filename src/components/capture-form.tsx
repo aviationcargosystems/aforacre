@@ -12,6 +12,7 @@ import { TagPicker } from "@/components/admin/tag-picker";
 import { AiAssist } from "@/components/admin/ai-assist";
 import { KHATA_OPTIONS } from "@/components/admin/property-form-shared";
 import { buildSiteLabel } from "@/lib/site-label";
+import { useDraft } from "@/lib/use-draft";
 
 /**
  * Capture, in two passes: the site, then its documents.
@@ -66,6 +67,35 @@ export function CaptureForm({
   const [label, setLabel] = useState("");
   const [capturedBy, setCapturedBy] = useState("");
   const [submitCount, setSubmitCount] = useState(0);
+
+  const draftKey = `aa_capture_draft_${variant}`;
+  const { draft, restored, save: saveDraft, discard: discardDraft } = useDraft<Record<string, unknown>>(
+    draftKey,
+    (v) => !v.lat && !v.area && !v.label && !(v.tags as string[])?.length
+  );
+
+  useEffect(() => {
+    // One-shot restore. Files are not in the draft, so photos and clips still
+    // have to be re-picked — the notice below says so.
+    if (!draft) return;
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (typeof draft.lat === "string") setLat(draft.lat);
+    if (typeof draft.lng === "string") setLng(draft.lng);
+    if (typeof draft.area === "string") setArea(draft.area);
+    if (typeof draft.acres === "number") setAcres(draft.acres);
+    if (Array.isArray(draft.tags)) setSelectedTags(draft.tags as string[]);
+    if (typeof draft.label === "string" && draft.label) {
+      setLabel(draft.label);
+      setLabelTouched(true);
+    }
+    if (typeof draft.lat === "string" && draft.lat) setGeoStatus("success");
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [draft]);
+
+  useEffect(() => {
+    saveDraft({ lat, lng, area, acres, tags: selectedTags, label: labelTouched ? label : "" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lat, lng, area, acres, selectedTags, label, labelTouched]);
 
   function locate() {
     if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
@@ -124,6 +154,7 @@ export function CaptureForm({
       setLabelTouched(false);
       setStep(0);
       /* eslint-enable react-hooks/set-state-in-effect */
+      discardDraft();
       setSubmitCount((n) => n + 1);
       locate();
     }
@@ -170,6 +201,20 @@ export function CaptureForm({
         <div className="flex items-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-primary">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           {state.message}
+        </div>
+      )}
+
+      {restored && (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-accent/30 bg-accent/[0.07] px-4 py-3 text-sm">
+          <span className="text-foreground">Picked up where you left off.</span>
+          <span className="text-xs text-muted-foreground">Photos and clips need choosing again.</span>
+          <button
+            type="button"
+            onClick={discardDraft}
+            className="ml-auto text-xs font-medium text-accent hover:underline"
+          >
+            Start fresh
+          </button>
         </div>
       )}
 
