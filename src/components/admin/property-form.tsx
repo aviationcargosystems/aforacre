@@ -131,7 +131,7 @@ export function PropertyForm({
           </h1>
           <div className="ml-auto flex items-center gap-2">
             <span className="hidden text-xs text-muted-foreground sm:inline">
-              Only a title is required — save and keep adding.
+              Only a title is required. Publishing makes it live; you can keep editing after.
             </span>
             <Button
               type="submit"
@@ -152,7 +152,7 @@ export function PropertyForm({
               }}
               className="bg-accent text-accent-foreground hover:bg-accent/90"
             >
-              {isEdit ? "Save changes" : "Save property"}
+              {isEdit ? "Save changes" : "Publish property"}
             </Button>
           </div>
         </div>
