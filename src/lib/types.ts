@@ -160,9 +160,6 @@ export interface CaptureDetails {
   soilType?: string;
   landObservation?: string;
   roadAccess?: string;
-  waterSources?: WaterSource[];
-  fencing?: boolean;
-  electricity?: boolean;
   surveyNumber?: string;
   khata?: KhataType;
   /** Raw RTC reading, kept whole so a reviewer can audit it against the scan. */

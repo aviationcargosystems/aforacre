@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PinLocationPicker } from "@/components/map/pin-location-picker";
 import { AreaInput } from "@/components/admin/area-input";
 import { AiAssist } from "@/components/admin/ai-assist";
-import { KHATA_OPTIONS, LAND_OBSERVATIONS, WATER_SOURCE_OPTIONS } from "@/components/admin/property-form-shared";
+import { KHATA_OPTIONS, LAND_OBSERVATIONS } from "@/components/admin/property-form-shared";
 
 /**
  * Capture, with as much or as little detail as the person on site has.
@@ -30,7 +30,7 @@ const initialState: CaptureActionState = { ok: false };
 
 type GeoStatus = "idle" | "locating" | "success" | "error" | "unsupported";
 
-const STEPS = ["Site", "Tags", "Details", "Documents"] as const;
+const STEPS = ["Site", "Details", "Documents"] as const;
 
 export function CaptureForm({
   properties,
@@ -346,10 +346,12 @@ export function CaptureForm({
             />
           </div>
         )}
-      </div>
 
-      {/* Step 2 — tags */}
-      <div className={step === 1 ? "space-y-3" : "hidden"}>
+        <div className="space-y-1.5">
+          <span className={labelClass}>Extent</span>
+          <AreaInput />
+        </div>
+
         <p className={labelClass}>Tags</p>
         {existingTags.length === 0 ? (
           <p className="text-sm text-muted-foreground">No tags set up yet.</p>
@@ -379,8 +381,8 @@ export function CaptureForm({
         )}
       </div>
 
-      {/* Step 3 — anything already known about the plot itself */}
-      <div className={step === 2 ? "space-y-4" : "hidden"}>
+      {/* Step 2 — anything already known about the plot itself */}
+      <div className={step === 1 ? "space-y-4" : "hidden"}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Labelled label="Area / village" htmlFor="area">
             <input id="area" name="area" className={inputClass} />
@@ -390,10 +392,7 @@ export function CaptureForm({
           </Labelled>
         </div>
 
-        <div className="space-y-1.5">
-          <span className={labelClass}>Extent</span>
-          <AreaInput />
-        </div>
+
 
         <Labelled label="Price per acre (₹)" htmlFor="pricePerAcre">
           <input id="pricePerAcre" name="pricePerAcre" type="number" step="1000" className={inputClass} />
@@ -423,30 +422,11 @@ export function CaptureForm({
           </datalist>
         </Labelled>
 
-        <div>
-          <p className={labelClass}>Water sources</p>
-          <div className="mt-2 flex flex-wrap gap-3">
-            {WATER_SOURCE_OPTIONS.map((option) => (
-              <label key={option.value} className="flex items-center gap-1.5 text-sm text-foreground">
-                <input type="checkbox" name="waterSources" value={option.value} className="h-4 w-4" />
-                {option.label}
-              </label>
-            ))}
-          </div>
-        </div>
 
-        <div className="flex flex-wrap gap-5">
-          <label className="flex items-center gap-2 text-sm text-foreground">
-            <input type="checkbox" name="fencing" className="h-4 w-4" /> Fenced
-          </label>
-          <label className="flex items-center gap-2 text-sm text-foreground">
-            <input type="checkbox" name="electricity" className="h-4 w-4" /> Electricity
-          </label>
-        </div>
       </div>
 
-      {/* Step 4 — documents */}
-      <div className={step === 3 ? "space-y-4" : "hidden"}>
+      {/* Step 3 — documents */}
+      <div className={step === 2 ? "space-y-4" : "hidden"}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Labelled label="Survey number" htmlFor="surveyNumber">
             <input id="surveyNumber" name="surveyNumber" className={inputClass} />

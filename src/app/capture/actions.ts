@@ -2,7 +2,7 @@
 
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
-import type { Capture, CaptureDetails, KhataType, WaterSource } from "@/lib/types";
+import type { Capture, CaptureDetails, KhataType } from "@/lib/types";
 import { createCapture } from "@/lib/store/captures";
 import { saveUploadedFiles } from "@/lib/store/uploads";
 
@@ -45,13 +45,6 @@ function buildDetails(formData: FormData): CaptureDetails {
     const n = Number(raw);
     if (Number.isFinite(n)) details[key] = n;
   }
-
-  const waterSources = formData.getAll("waterSources").map(String) as WaterSource[];
-  if (waterSources.length) details.waterSources = waterSources;
-
-  // Unchecked boxes are absent from FormData, so only record a true.
-  if (formData.get("fencing") === "on") details.fencing = true;
-  if (formData.get("electricity") === "on") details.electricity = true;
 
   const khata = text(formData, "khata");
   if (khata) details.khata = khata as KhataType;

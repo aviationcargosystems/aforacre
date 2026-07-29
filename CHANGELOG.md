@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-07-29 22:55 IST · Leaner quick capture
+
+- Quick capture is three steps instead of four: Site, Details, Documents. Extent and tags moved onto Site, so photos, video, the pin, the size and the tags are all captured in one pass.
+- Removed water sources, fenced and electricity from capture — they belong on the listing, not on a field visit.
+- Removed the explainer paragraph above the form.
+
 ## 2026-07-29 22:35 IST · Video on quick capture
 
 - Quick capture takes video alongside photos, on the Site step. Optional, and placed below the photos so nobody is waiting on a clip to upload before they can save.
