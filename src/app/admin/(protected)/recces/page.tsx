@@ -6,13 +6,10 @@ import { getAllRecces } from "@/lib/store/recces";
 import { getStaff } from "@/lib/store/staff";
 import { getAllProperties } from "@/lib/store/properties";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { RecceAssignForm } from "@/components/admin/recce-assign-form";
 import { assignRecceAction, reviewRecceAction } from "./actions";
 
 export const dynamic = "force-dynamic";
-
-const inputClass =
-  "w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring";
 
 const STATUS_STYLES: Record<RecceStatus, string> = {
   assigned: "bg-accent text-accent-foreground",
@@ -89,84 +86,17 @@ export default async function AdminReccesPage({
           .
         </p>
       ) : (
-        <form action={assignRecceAction} className="mt-6 rounded-xl border border-border bg-background p-5">
-          <h2 className="font-heading text-base font-semibold text-foreground">Assign a recce</h2>
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="space-y-1.5">
-              <label htmlFor="agentId" className="text-sm font-medium text-foreground">
-                Agent
-              </label>
-              <select id="agentId" name="agentId" required className={inputClass}>
-                {activeAgents.map((agent) => (
-                  <option key={agent.id} value={agent.id}>
-                    {agent.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="type" className="text-sm font-medium text-foreground">
-                Type
-              </label>
-              <select id="type" name="type" defaultValue="scout" className={inputClass}>
-                <option value="scout">Scout new land</option>
-                <option value="pre_visit">Pre-visit check</option>
-                <option value="client_visit">Client visit</option>
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="propertySlug" className="text-sm font-medium text-foreground">
-                Linked property (optional)
-              </label>
-              <select id="propertySlug" name="propertySlug" defaultValue="" className={inputClass}>
-                <option value="">Not linked</option>
-                {properties.map((property) => (
-                  <option key={property.slug} value={property.slug}>
-                    {property.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="area" className="text-sm font-medium text-foreground">
-                Area
-              </label>
-              <input id="area" name="area" placeholder="e.g. Kallanakuppe" className={inputClass} />
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="lat" className="text-sm font-medium text-foreground">
-                Latitude
-              </label>
-              <input id="lat" name="lat" inputMode="decimal" placeholder="12.643456" className={inputClass} />
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="lng" className="text-sm font-medium text-foreground">
-                Longitude
-              </label>
-              <input id="lng" name="lng" inputMode="decimal" placeholder="77.595406" className={inputClass} />
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor="scheduledFor" className="text-sm font-medium text-foreground">
-                Scheduled for (optional)
-              </label>
-              <input id="scheduledFor" name="scheduledFor" type="datetime-local" className={inputClass} />
-            </div>
-            <div className="space-y-1.5 sm:col-span-2">
-              <label htmlFor="instructions" className="text-sm font-medium text-foreground">
-                Instructions
-              </label>
-              <input
-                id="instructions"
-                name="instructions"
-                placeholder="What should they check or photograph?"
-                className={inputClass}
-              />
-            </div>
-          </div>
-          <Button type="submit" variant="pill" size="pill" className="mt-4">
-            Assign recce
-          </Button>
-        </form>
+        <RecceAssignForm
+          action={assignRecceAction}
+          agents={activeAgents.map((agent) => ({ id: agent.id, name: agent.name }))}
+          properties={properties.map((property) => ({
+            slug: property.slug,
+            title: property.title,
+            area: property.location.area,
+            lat: property.location.lat,
+            lng: property.location.lng,
+          }))}
+        />
       )}
 
       <div className="mt-8 flex flex-wrap gap-2">
