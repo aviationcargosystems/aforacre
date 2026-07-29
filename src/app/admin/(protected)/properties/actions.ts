@@ -11,7 +11,9 @@ import { requireAdmin } from "@/lib/admin/require-admin";
 function revalidatePublicPaths(slug?: string) {
   revalidatePath("/");
   revalidatePath("/explore");
-  revalidatePath("/journeys/[slug]", "page");
+  // /journeys was revalidated here until the rebuild removed those pages. The
+  // call outlived the route and threw after a successful save, so the property
+  // was written and the request still failed — which read as "not saving".
   if (slug) revalidatePath(`/property/${slug}`);
 }
 
@@ -36,9 +38,15 @@ export async function createPropertyAction(formData: FormData) {
     redirect(`/admin/properties/new?error=${encodeURIComponent((err as Error).message)}`);
   }
 
-  await Promise.all(newTags.map((t) => addTag(t)));
-  revalidatePublicPaths(property.slug);
-  revalidatePath("/admin/properties");
+  try {
+    await Promise.all(newTags.map((t) => addTag(t)));
+    revalidatePublicPaths(property.slug);
+    revalidatePath("/admin/properties");
+  } catch {
+    // The listing is already saved; a failed tag upsert or revalidate is not
+    // worth losing it over.
+  }
+
   redirect("/admin/properties");
 }
 
@@ -61,8 +69,12 @@ export async function updatePropertyAction(originalSlug: string, formData: FormD
     redirect(`/admin/properties/${originalSlug}/edit?error=${encodeURIComponent((err as Error).message)}`);
   }
 
-  await Promise.all(newTags.map((t) => addTag(t)));
-  revalidatePublicPaths(property.slug);
+  try {
+    await Promise.all(newTags.map((t) => addTag(t)));
+    revalidatePublicPaths(property.slug);
+  } catch {
+    // As above: the save already happened.
+  }
   revalidatePath("/admin/properties");
   redirect("/admin/properties");
 }

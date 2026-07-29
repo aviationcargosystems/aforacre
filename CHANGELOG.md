@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-07-30 02:15 IST · Fix property saving
+
+- Property saving failed after the write, not during it. revalidatePublicPaths still revalidated /journeys/[slug], a route the rebuild deleted; the call outlived the route and threw once the save had already succeeded, so the request errored and never redirected.
+- Tag upserts and revalidation after a successful save are now guarded. Housekeeping failing should never look like a failed save.
+- Verified directly against Supabase that the properties schema accepts the exact row the app writes, so the migrations are correctly applied.
+
 ## 2026-07-30 01:10 IST · Drafts on the device, inline tag creation
 
 - Quick capture keeps a draft on the device as you type — pin, area, extent, tags and label. A locked phone, an evicted tab or a failed save no longer means starting over. Restoring says plainly that photos and clips need re-picking, since files are not in the draft.
