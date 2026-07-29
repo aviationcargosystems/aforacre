@@ -360,7 +360,10 @@ export function PropertyForm({
                         className={inputClass}
                       />
                     </Field>
-                  </section>
+                  
+                    <h2 className="font-heading text-lg font-semibold text-foreground">Tags</h2>
+                    <TagPicker available={existingTags} selected={selectedTags} onChange={setSelectedTags} />
+</section>
           </div>
 
           <div className={step === 3 ? "space-y-8" : "hidden"}>
@@ -552,10 +555,7 @@ export function PropertyForm({
                       </div>
                     </div>
                   </section>
-            <section className="space-y-4">
-                    <h2 className="font-heading text-lg font-semibold text-foreground">Tags</h2>
-                    <TagPicker available={existingTags} selected={selectedTags} onChange={setSelectedTags} />
-                  </section>
+            
             <section className="space-y-4">
                     <h2 className="font-heading text-lg font-semibold text-foreground">Use-case fit (0 to 100)</h2>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">

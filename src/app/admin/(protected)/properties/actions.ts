@@ -42,11 +42,13 @@ export async function createPropertyAction(formData: FormData) {
   try {
     await Promise.all(newTags.map((t) => addTag(t)));
 
-    // The capture has become a listing, so it stops being an open item in the
-    // field-capture queue.
+    // The capture has become a listing, so it leaves the capture queue
+    // entirely rather than sitting there as a reviewed item — the property is
+    // the record now, and two copies of the same plot in two places is how one
+    // of them goes stale.
     const captureId = String(formData.get("captureId") || "").trim();
     if (captureId) {
-      await setCaptureStatus(captureId, "reviewed");
+      await setCaptureStatus(captureId, "archived");
       revalidatePath("/admin/captures");
     }
 
