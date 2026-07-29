@@ -12,6 +12,20 @@ import { featuredProperties, getAllProperties } from "@/lib/store/properties";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * What is driving the corridor. `mapped` marks the three with confirmed sites,
+ * which are the ones drawn on the map; the rest are real but not yet placeable,
+ * so they are listed rather than plotted.
+ */
+const INFRASTRUCTURE = [
+  { label: "New IIM Bengaluru campus", mapped: true },
+  { label: "Upcoming international cricket stadium", mapped: true },
+  { label: "Proposed Bengaluru international airport (south)", mapped: true },
+  { label: "Satellite Town Ring Road (STRR)", mapped: false },
+  { label: "Metro expansion", mapped: false },
+  { label: "Future connectivity improvements", mapped: false },
+];
+
 
 export default async function Home() {
   const [featured, allProperties] = await Promise.all([featuredProperties(), getAllProperties()]);
@@ -60,15 +74,12 @@ export default async function Home() {
           <h1 className="font-heading text-5xl font-semibold leading-[1.02] tracking-tight text-balance text-foreground sm:text-6xl lg:text-7xl">
             Buy holistic lands in south Bengaluru!
           </h1>
-          {/* The four words carry the promise; the paragraph gives it a place.
-              Kept as two lines because collapsing them would either lose the
-              rhythm or bury it inside prose. */}
-          <p className="mt-6 text-lg font-medium tracking-tight text-foreground sm:text-xl">
-            Discover. Own. Build. Grow.
+          <p className="mt-6 max-w-3xl text-pretty text-lg leading-8 text-foreground/85 sm:text-xl sm:leading-9">
+            South Bengaluru is quietly becoming one of India&apos;s most exciting growth corridors.
           </p>
           <p className="mt-4 max-w-3xl text-pretty text-base leading-8 text-muted-foreground sm:text-lg sm:leading-9">
-            Within a comfortable 90 minute drive from the city lies an extraordinary landscape of forests, lakes,
-            hills and fertile farmland that many Bengaluru residents have never explored.
+            Within a comfortable one to one-and-a-half-hour drive from the city lies an extraordinary landscape of
+            forests, lakes, hills and fertile farmland that many Bengaluru residents have never explored.
           </p>
 
           {/* One CTA. A second button beside it splits attention at the exact
@@ -84,26 +95,35 @@ export default async function Home() {
 
         </div>
 
-        {/* Coverage map, in the floating slot the video used to hold. Where we
-            operate is a better second beat than atmosphere: it answers "is this
-            near me" before anyone has to scroll. */}
-        <div className="relative px-4 pb-20 pt-10 sm:px-6 lg:px-8 lg:pb-28 lg:pt-14">
-          <div className="relative mx-auto max-w-5xl">
-            <div className="absolute inset-x-12 -bottom-8 h-24 rounded-[3rem] bg-deep-green/20 blur-3xl" />
-            <div className="relative overflow-hidden rounded-[1.75rem] border border-white/70 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.20)] sm:rounded-[2rem]">
-              <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border/60 px-5 py-4 sm:px-7">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">Where we operate</p>
-                  <h2 className="mt-1 font-heading text-xl font-semibold text-foreground sm:text-2xl">
-                    Every plot, south of the city
-                  </h2>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {coverage.length} {coverage.length === 1 ? "area" : "areas"} across Kanakapura, Bannerghatta, Sarjapur
-                  and Anekal
+        {/* No card, no border. The map is the section, not something sitting
+            inside one. Infrastructure carries it; our listings are context. */}
+        <div className="relative mt-14 lg:mt-20">
+          <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Why south Bengaluru</p>
+                <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
+                  The region is expected to benefit from major infrastructure.
+                </h2>
+                <ul className="mt-7 space-y-3">
+                  {INFRASTRUCTURE.map((item) => (
+                    <li key={item.label} className="flex items-baseline gap-3">
+                      <span
+                        className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${
+                          item.mapped ? "bg-accent" : "bg-muted-foreground/40"
+                        }`}
+                      />
+                      <span className="text-sm leading-7 text-muted-foreground sm:text-base">{item.label}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-6 max-w-md text-xs leading-6 text-muted-foreground/80">
+                  Highlighted areas mark the three projects with confirmed sites. The ring road, metro extension and
+                  wider connectivity work are named here but not drawn, because their alignments are not settled.
                 </p>
               </div>
-              <div className="h-[22rem] sm:h-[30rem]">
+
+              <div className="h-[24rem] sm:h-[30rem] lg:h-[34rem]">
                 <SouthBangaloreMapView areas={coverage} />
               </div>
             </div>
