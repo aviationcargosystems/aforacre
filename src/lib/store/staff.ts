@@ -7,6 +7,10 @@ import type { UserRole } from "@/lib/auth/roles";
  * There is no separate agents table any more. An agent is a Supabase auth user
  * whose profile carries role='agent', which means one identity system instead
  * of two and one place where "is this person still allowed in" is answered.
+ *
+ * Partners are issued the same way. They used to promote themselves by
+ * confirming a phone over OTP; with OTP gone there is no self-serve path, so a
+ * broker gets an account the same way an agent does.
  */
 
 export interface StaffMember {
@@ -30,14 +34,14 @@ interface ProfileRow {
   last_active_at: string;
 }
 
-/** Everyone who is staff. Buyers and partners are not listed here. */
+/** Everyone with an account we issued. Buyers, who self-register, are not. */
 export async function getStaff(): Promise<StaffMember[]> {
   const supabase = getSupabaseAdmin();
 
   const { data, error } = await supabase
     .from("profiles")
     .select("id, full_name, mobile, role, created_at, last_active_at")
-    .in("role", ["agent", "super_admin"])
+    .in("role", ["agent", "super_admin", "partner"])
     .order("created_at", { ascending: false });
   if (error) return [];
 
@@ -79,7 +83,9 @@ export async function createStaff(input: {
   email: string;
   mobile: string;
   password: string;
-  role: Extract<UserRole, "agent" | "super_admin">;
+  role: Extract<UserRole, "agent" | "super_admin" | "partner">;
+  /** Required when role is partner: the profiles check constraint enforces it. */
+  partnerType?: "broker" | "reseller" | "owner";
 }): Promise<void> {
   const supabase = getSupabaseAdmin();
 
@@ -98,7 +104,16 @@ export async function createStaff(input: {
 
   const { error: profileError } = await supabase
     .from("profiles")
-    .update({ role: input.role, full_name: input.fullName.trim(), mobile: input.mobile.trim() })
+    .update({
+      role: input.role,
+      full_name: input.fullName.trim(),
+      mobile: input.mobile.trim(),
+      partner_type: input.role === "partner" ? (input.partnerType ?? "broker") : null,
+      // An admin created this account deliberately, so the contact is already
+      // confirmed as far as the submission gate is concerned. Document checks
+      // are still a separate step before anything of theirs goes live.
+      kyc_status: input.role === "partner" ? "otp_verified" : "none",
+    })
     .eq("id", data.user.id);
 
   if (profileError) {

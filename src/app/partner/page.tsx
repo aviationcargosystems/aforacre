@@ -88,8 +88,8 @@ function KycNotice({ status }: { status: string }) {
   const copy: Record<string, { icon: React.ReactNode; title: string; body: string }> = {
     none: {
       icon: <AlertCircle className="h-4 w-4" />,
-      title: "Verify your mobile number",
-      body: "Sign in with the OTP sent to your phone. You cannot add land until that is done.",
+      title: "Your account is not set up to submit yet",
+      body: "Call us and we will finish setting up your partner account. You cannot add land until that is done.",
     },
     otp_verified: {
       icon: <Clock className="h-4 w-4" />,

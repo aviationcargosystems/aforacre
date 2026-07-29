@@ -26,7 +26,7 @@ export default async function LoginPage({
       <Image src="/brand/icon.png" alt="" width={48} height={48} className="h-12 w-12" />
       <h1 className="mt-5 font-heading text-3xl font-semibold text-foreground">Sign in</h1>
       <p className="mt-2 mb-8 text-center text-sm text-muted-foreground">
-        Partners sign in with their mobile number. Staff use their work email.
+        Use the email and password your admin set up for you.
       </p>
       <LoginForm next={next} />
     </div>

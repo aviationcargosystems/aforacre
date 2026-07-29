@@ -20,7 +20,7 @@ export async function createAgentAction(formData: FormData) {
   const email = String(formData.get("email") || "").trim();
   const mobile = String(formData.get("mobile") || "").trim();
   const password = String(formData.get("password") || "");
-  const role = String(formData.get("role") || "agent") as "agent" | "super_admin";
+  const role = String(formData.get("role") || "agent") as "agent" | "super_admin" | "partner";
 
   if (!fullName) fail("Add a name.");
   if (!email.includes("@")) fail("A work email is required. It is the recovery path if a phone is lost.");

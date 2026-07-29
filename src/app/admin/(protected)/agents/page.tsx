@@ -27,8 +27,9 @@ export default async function AdminAgentsPage({
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Team</p>
         <h1 className="mt-1 font-heading text-3xl font-semibold text-foreground">Staff</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Agents and admins sign in at <code className="rounded bg-muted px-1 py-0.5 text-xs">/login</code> with their
-          work email. An agent is a profile carrying the agent role, so there is one identity system rather than two.
+          Everyone signs in at <code className="rounded bg-muted px-1 py-0.5 text-xs">/login</code> with their email and
+          password. Roles are just a field on the profile, so one account can be promoted or stood down without
+          touching a second system.
         </p>
       </div>
 
@@ -71,6 +72,7 @@ export default async function AdminAgentsPage({
             <span className="text-sm font-medium text-foreground">Role</span>
             <select name="role" defaultValue="agent" className={inputClass}>
               <option value="agent">Agent</option>
+              <option value="partner">Partner (broker or owner)</option>
               <option value="super_admin">Super admin</option>
             </select>
           </label>
@@ -112,6 +114,7 @@ export default async function AdminAgentsPage({
                       className="rounded-lg border border-input bg-background px-2 py-1 text-xs"
                     >
                       <option value="agent">Agent</option>
+                      <option value="partner">Partner</option>
                       <option value="super_admin">Super admin</option>
                       <option value="buyer">Buyer</option>
                     </select>
