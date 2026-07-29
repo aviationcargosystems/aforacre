@@ -176,9 +176,20 @@ export async function nextFid(): Promise<string> {
     if (isMissingSchemaError(error)) return "0001"; // migration not run yet
     throw error;
   }
-  const highest = (data as { fid: string | null }[]).reduce((max, row) => {
-    const n = row.fid ? parseInt(row.fid, 10) : 0;
-    return Number.isFinite(n) && n > max ? n : max;
-  }, 0);
-  return String(highest + 1).padStart(4, "0");
+
+  // Lowest unused number rather than highest-plus-one, so deleting a farm
+  // frees its FID for the next one created.
+  //
+  // Worth knowing: FID is the only public identifier a plot has, so a reissued
+  // number means an old link or forwarded screenshot for FID-0042 now points at
+  // different land. That is the tradeoff this behaviour accepts.
+  const taken = new Set(
+    (data as { fid: string | null }[])
+      .map((row) => (row.fid ? parseInt(row.fid, 10) : NaN))
+      .filter((n) => Number.isFinite(n) && n > 0)
+  );
+
+  let candidate = 1;
+  while (taken.has(candidate)) candidate += 1;
+  return String(candidate).padStart(4, "0");
 }

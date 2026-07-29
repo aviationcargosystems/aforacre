@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { buildProperty } from "@/lib/property-builder";
-import { getProperty, saveProperty, deleteProperty } from "@/lib/store/properties";
+import { getProperty, saveProperty, deleteProperty, nextFid } from "@/lib/store/properties";
 import { addTag } from "@/lib/store/tags";
 import { parsePropertyForm } from "@/lib/store/property-form-parser";
 import { requireAdmin } from "@/lib/admin/require-admin";
@@ -22,6 +22,11 @@ export async function createPropertyAction(formData: FormData) {
   if (!input.title || !input.slug) {
     redirect(`/admin/properties/new?error=${encodeURIComponent("Title is required.")}`);
   }
+
+  // Every listing gets a Farm ID at creation. It is the only public identifier
+  // a plot has, so leaving it to be filled in by hand later means listings can
+  // go live without one.
+  input.fid = input.fid || (await nextFid());
 
   const property = buildProperty(input);
 

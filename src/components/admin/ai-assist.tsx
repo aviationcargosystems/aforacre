@@ -36,6 +36,8 @@ interface LocationPayload {
   taluk: string;
   hobli: string;
   distanceFromBangaloreKm: number;
+  driveMinutes: number | null;
+  distanceMethod: "road" | "straight-line";
   nearbyLandmarks: string[];
   soilType: string;
   description: string;
@@ -204,7 +206,13 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
           { label: "Hobli", field: null, value: p.hobli },
           { label: "District", field: null, value: p.district },
           {
-            label: "Distance from Bengaluru (km)",
+            // Measured from the pin, not researched — routed via OSRM where
+            // possible, straight-line where not, and never one labelled as the
+            // other.
+            label:
+              p.distanceMethod === "road"
+                ? `Distance from Bengaluru by road${p.driveMinutes ? ` (~${p.driveMinutes} min)` : ""}`
+                : "Distance from Bengaluru (straight line — no route found)",
             field: "distanceFromBangaloreKm",
             value: p.distanceFromBangaloreKm ? String(p.distanceFromBangaloreKm) : "",
           },

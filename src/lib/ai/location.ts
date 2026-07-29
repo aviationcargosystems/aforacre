@@ -1,5 +1,6 @@
 import { AI_MODEL, anthropic, textOf } from "./client";
 import { anchorDistancesFor } from "@/lib/anchors";
+import { distanceFromBengaluru } from "@/lib/distance";
 
 /**
  * Turning a dropped pin into a draft listing.
@@ -24,6 +25,10 @@ export interface LocationSuggestion {
   taluk: string;
   hobli: string;
   distanceFromBangaloreKm: number;
+  /** Minutes by road, when the route could be measured. */
+  driveMinutes: number | null;
+  /** Whether the distance was routed or is a straight line. */
+  distanceMethod: "road" | "straight-line";
   nearbyLandmarks: string[];
   soilType: string;
   description: string;
@@ -74,7 +79,6 @@ const SUGGESTION_SCHEMA = {
     district: STRING,
     taluk: STRING,
     hobli: STRING,
-    distanceFromBangaloreKm: { type: "number" },
     nearbyLandmarks: { type: "array", items: STRING },
     soilType: STRING,
     description: STRING,
@@ -87,7 +91,6 @@ const SUGGESTION_SCHEMA = {
     "district",
     "taluk",
     "hobli",
-    "distanceFromBangaloreKm",
     "nearbyLandmarks",
     "soilType",
     "description",
@@ -97,7 +100,8 @@ const SUGGESTION_SCHEMA = {
 } as const;
 
 export async function suggestFromPin(lat: number, lng: number): Promise<LocationSuggestion> {
-  const place = await reverseGeocode(lat, lng);
+  // Both are measurements, so both are computed rather than researched.
+  const [place, distance] = await Promise.all([reverseGeocode(lat, lng), distanceFromBengaluru(lat, lng)]);
   const anchors = anchorDistancesFor({ lat, lng });
 
   const anchorContext = anchors.length
@@ -129,15 +133,17 @@ OpenStreetMap reverse geocode for that point:
 - Full: ${place?.displayName || "unavailable"}
 
 Straight-line distance to the infrastructure projects we track: ${anchorContext}.
+Distance from central Bengaluru: ${distance.km} km${
+          distance.driveMinutes ? ` (about ${distance.driveMinutes} minutes by road)` : ""
+        }. This is already measured — use it as context, do not restate or re-estimate it.
 
 Research and report:
 1. The hobli this settlement falls under, if you can establish it.
 2. Which road corridor it is approached by (for example Kanakapura Road, Bannerghatta Road, Anekal Road).
-3. Approximate road distance from central Bengaluru in km.
-4. Real, named nearby landmarks within about 10 km — lakes, reservoirs, hills, forests, temples, towns. Give each as "Name — approximate distance".
-5. The predominant soil type of the area, only if a credible source states it.
-6. Three or four sentences describing the setting, in plain prose, for someone who has never been there.
-7. A listing title for a plot here, following the house style: a defining feature, the word Plot or Farm or Farmland, then the place. For example "Lakeview Plot, Anekal" or "Hillside Plot Near Chunchi Falls". Do not invent an acreage or a price into the title — the extent is entered separately and gets prefixed to the title later.
+3. Real, named nearby landmarks within about 10 km — lakes, reservoirs, hills, forests, temples, towns. Give each as "Name — approximate distance".
+4. The predominant soil type of the area, only if a credible source states it.
+5. Three or four sentences describing the setting, in plain prose, for someone who has never been there.
+6. A listing title for a plot here, following the house style: a defining feature, the word Plot or Farm or Farmland, then the place. For example "Lakeview Plot, Anekal" or "Hillside Plot Near Chunchi Falls". Do not invent an acreage or a price into the title — the extent is entered separately and gets prefixed to the title later.
 
 Note anything you could not establish.`,
       },
@@ -168,10 +174,16 @@ Note anything you could not establish.`,
   const text = structured.content.find((block) => block.type === "text");
   if (!text || text.type !== "text") throw new Error("The model returned no usable suggestions for this pin.");
 
-  const parsed = JSON.parse(text.text) as Omit<LocationSuggestion, "sources">;
+  const parsed = JSON.parse(text.text) as Omit<
+    LocationSuggestion,
+    "sources" | "distanceFromBangaloreKm" | "driveMinutes" | "distanceMethod"
+  >;
 
   return {
     ...parsed,
+    distanceFromBangaloreKm: distance.km,
+    driveMinutes: distance.driveMinutes,
+    distanceMethod: distance.method,
     // Prefer the geocoder over the model for the administrative names it knows.
     area: place?.settlement || parsed.area,
     district: place?.district || parsed.district,

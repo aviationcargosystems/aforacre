@@ -50,19 +50,17 @@ export async function parsePropertyForm(
 
   const uploadedFiles = formData.getAll("imageFiles").filter((f): f is File => f instanceof File && f.size > 0);
   const uploadedPaths = await saveUploadedFiles(uploadedFiles, "properties");
-  const pastedUrls = lines(formData, "imageUrls");
   const removedImages = new Set(checkboxList<string>(formData, "removeImage"));
   const keptExisting = opts.existingImages.filter((img) => !removedImages.has(img));
-  const images = Array.from(new Set([...keptExisting, ...pastedUrls, ...uploadedPaths]));
+  const images = Array.from(new Set([...keptExisting, ...uploadedPaths]));
 
-  // Same three sources as images: files uploaded now, URLs pasted in, and
-  // whatever the listing already had minus anything ticked for removal.
+  // Uploaded now, plus whatever the listing already had minus anything ticked
+  // for removal.
   const uploadedVideoFiles = formData.getAll("videoFiles").filter((f): f is File => f instanceof File && f.size > 0);
   const uploadedVideoPaths = await saveUploadedFiles(uploadedVideoFiles, "properties");
-  const pastedVideoUrls = lines(formData, "videoUrls");
   const removedVideos = new Set(checkboxList<string>(formData, "removeVideo"));
   const keptVideos = (opts.existingVideos ?? []).filter((v) => !removedVideos.has(v));
-  const videos = Array.from(new Set([...keptVideos, ...pastedVideoUrls, ...uploadedVideoPaths]));
+  const videos = Array.from(new Set([...keptVideos, ...uploadedVideoPaths]));
 
   const input: PropertyInput = {
     slug,

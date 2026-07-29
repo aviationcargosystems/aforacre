@@ -306,17 +306,7 @@ export function PropertyForm({
             </div>
           </div>
         )}
-        <Field label="Add image URLs" htmlFor="imageUrls" hint="One URL per line — paste from Unsplash, a capture, or elsewhere.">
-          <textarea
-            id="imageUrls"
-            name="imageUrls"
-            rows={3}
-            defaultValue={prefill?.images?.join("\n")}
-            className={inputClass}
-            placeholder="https://..."
-          />
-        </Field>
-        <Field label="Or upload photos" htmlFor="imageFiles">
+        <Field label="Upload photos" htmlFor="imageFiles">
           <input id="imageFiles" name="imageFiles" type="file" accept="image/*" multiple className={inputClass} />
         </Field>
       </section>
@@ -341,11 +331,8 @@ export function PropertyForm({
           </div>
         )}
 
-        <Field label="Add video URLs" htmlFor="videoUrls" hint="One URL per line.">
-          <textarea id="videoUrls" name="videoUrls" rows={2} className={inputClass} />
-        </Field>
         <Field
-          label="Or upload clips"
+          label="Upload clips"
           htmlFor="videoFiles"
           hint="MP4, MOV or WebM. Keep each under about 50 MB — these are uploaded as-is, with no transcoding step, so a long 4K clip will be slow for buyers on mobile data."
         >
@@ -397,8 +384,22 @@ export function PropertyForm({
 
       <section className="space-y-4">
         <h2 className="font-heading text-lg font-semibold text-foreground">Verification</h2>
-        <Field label="FID (Farm ID)" htmlFor="fid" hint="e.g. 0042 — shown publicly as 'FID 0042'. Leave blank if not yet assigned.">
-          <input id="fid" name="fid" defaultValue={property?.fid ?? ""} placeholder="0042" className={inputClass} />
+        <Field
+          label="FID (Farm ID)"
+          htmlFor="fid"
+          hint={
+            isEdit
+              ? "Shown publicly as 'FID 0042'. Change it only if you know why."
+              : "Assigned automatically when you save — the lowest number not already in use."
+          }
+        >
+          <input
+            id="fid"
+            name="fid"
+            defaultValue={property?.fid ?? ""}
+            placeholder={isEdit ? "0042" : "Assigned on save"}
+            className={inputClass}
+          />
         </Field>
         <div>
           <p className={labelClass}>Verified checklist</p>
