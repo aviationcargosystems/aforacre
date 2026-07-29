@@ -75,7 +75,7 @@ export function AreaInput({
 
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         <UnitField
           id="extentGunta"
           label="Guntas"
@@ -126,7 +126,7 @@ function UnitField({
 }) {
   return (
     <div className="space-y-1">
-      <label htmlFor={id} className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+      <label htmlFor={id} className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
         {label}
       </label>
       <input
@@ -137,7 +137,7 @@ function UnitField({
         inputMode="decimal"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`${inputClass} ${active ? "" : "text-muted-foreground"}`}
+        className={`${inputClass} px-2 sm:px-3 ${active ? "" : "text-muted-foreground"}`}
       />
     </div>
   );
