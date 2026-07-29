@@ -30,6 +30,8 @@ export interface LocationSuggestion {
   /** Whether the distance was routed or is a straight line. */
   distanceMethod: "road" | "straight-line";
   nearbyLandmarks: string[];
+  /** Chosen from the catalogue's existing tags, never invented. */
+  tags: string[];
   soilType: string;
   description: string;
   /** Anything the research could not establish, so the admin knows where to look themselves. */
@@ -80,6 +82,7 @@ const SUGGESTION_SCHEMA = {
     taluk: STRING,
     hobli: STRING,
     nearbyLandmarks: { type: "array", items: STRING },
+    tags: { type: "array", items: STRING },
     soilType: STRING,
     description: STRING,
     uncertain: { type: "array", items: STRING },
@@ -92,6 +95,7 @@ const SUGGESTION_SCHEMA = {
     "taluk",
     "hobli",
     "nearbyLandmarks",
+    "tags",
     "soilType",
     "description",
     "uncertain",
@@ -99,7 +103,11 @@ const SUGGESTION_SCHEMA = {
   additionalProperties: false,
 } as const;
 
-export async function suggestFromPin(lat: number, lng: number): Promise<LocationSuggestion> {
+export async function suggestFromPin(
+  lat: number,
+  lng: number,
+  availableTags: string[] = []
+): Promise<LocationSuggestion> {
   // Both are measurements, so both are computed rather than researched.
   const [place, distance] = await Promise.all([reverseGeocode(lat, lng), distanceFromBengaluru(lat, lng)]);
   const anchors = anchorDistancesFor({ lat, lng });
@@ -143,7 +151,10 @@ Research and report:
 3. Real, named nearby landmarks within about 10 km — lakes, reservoirs, hills, forests, temples, towns. Give each as "Name — approximate distance".
 4. The predominant soil type of the area, only if a credible source states it.
 5. Three or four sentences describing the setting, in plain prose, for someone who has never been there.
-6. A listing title for a plot here, following the house style: a defining feature, the word Plot or Farm or Farmland, then the place. For example "Lakeview Plot, Anekal" or "Hillside Plot Near Chunchi Falls". Do not invent an acreage or a price into the title — the extent is entered separately and gets prefixed to the title later.
+6. Which of these existing catalogue tags plausibly apply to land at this location, based only on what you established above: ${
+          availableTags.length ? availableTags.join(", ") : "(none configured)"
+        }. Choose only from that list, never invent one, and leave it empty rather than guessing — a tag is a filter a buyer relies on.
+7. A listing title for a plot here, following the house style: a defining feature, the word Plot or Farm or Farmland, then the place. For example "Lakeview Plot, Anekal" or "Hillside Plot Near Chunchi Falls". Do not invent an acreage or a price into the title — the extent is entered separately and gets prefixed to the title later.
 
 Note anything you could not establish.`,
       },
@@ -166,7 +177,7 @@ Note anything you could not establish.`,
     model: AI_MODEL,
     max_tokens: 2000,
     system:
-      "Convert the research notes into the given schema. Use empty strings and empty arrays for anything the notes did not establish, and list those field names in `uncertain`. Do not add facts that are not in the notes.",
+      "Convert the research notes into the given schema. Use empty strings and empty arrays for anything the notes did not establish, and list those field names in `uncertain`. Do not add facts that are not in the notes. `tags` must contain only tags the notes explicitly named.",
     output_config: { format: { type: "json_schema", schema: SUGGESTION_SCHEMA } },
     messages: [{ role: "user", content: findings }],
   });
@@ -188,6 +199,9 @@ Note anything you could not establish.`,
     area: place?.settlement || parsed.area,
     district: place?.district || parsed.district,
     taluk: place?.taluk || parsed.taluk,
+    // Belt and braces: the model was told to pick from the list, and anything
+    // that still came back off-list is dropped rather than created.
+    tags: parsed.tags.filter((tag) => availableTags.includes(tag)),
     sources: Array.from(new Set(sources)),
   };
 }

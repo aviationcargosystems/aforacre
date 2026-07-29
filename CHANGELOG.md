@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-07-29 23:55 IST · Quick capture down to two steps
+
+- Quick capture is Site and Documents. Site carries photos, video, the pin, area, extent, price and tags; Documents is the RTC upload, survey number and khata.
+- Price takes a per-acre / per-gunta toggle rather than two fields — only one of them is ever the number someone was actually quoted.
+- Site label auto-generates from extent, area and a distinguishing tag, and stops regenerating the moment it is edited. Duplicates get numbered rather than colliding.
+- Tags are a searchable picker instead of a wall of chips.
+- Location: added a paste-a-map-link box, and geolocation failures now say whether permission was denied, no fix was available, or it timed out.
+- Pin research suggests tags, constrained to the existing vocabulary and filtered again server-side so an invented tag cannot reach the form.
+- Removed from capture: notes, listing link, soil type, road access, land observation, water sources, and the explainer subtexts.
+
 ## 2026-07-29 23:10 IST · Water source becomes a tag
 
 - Water source is no longer its own checkbox set on the property form. Tag a listing Borewell, Open well, Rain-fed or Canal and the structured value is derived from the tags on save.

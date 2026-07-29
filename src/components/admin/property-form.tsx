@@ -143,7 +143,13 @@ export function PropertyForm({
 
           <div className={step === 0 ? "grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start" : "hidden"}>
             <div className="lg:order-2 lg:sticky lg:top-0">
-              <AiAssist formId="property-form" />
+              <AiAssist
+                formId="property-form"
+                availableTags={existingTags}
+                onApplyTags={(tags) =>
+                  setSelectedTags((prev) => Array.from(new Set([...prev, ...tags])))
+                }
+              />
             </div>
             <section className="space-y-4 lg:order-1">
                     <h2 className="font-heading text-lg font-semibold text-foreground">Basics</h2>

@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { getAllProperties } from "@/lib/store/properties";
 import { getAllTags } from "@/lib/store/tags";
 import { CaptureForm } from "@/components/capture-form";
 
@@ -11,8 +10,7 @@ export const metadata = {
 };
 
 export default async function CapturePage() {
-  const [properties, tags] = await Promise.all([getAllProperties(), getAllTags()]);
-  const propertyOptions = properties.map((p) => ({ slug: p.slug, title: p.title }));
+  const tags = await getAllTags();
 
   return (
     <div className="mx-auto max-w-xl px-4 py-8 sm:py-12">
@@ -25,7 +23,7 @@ export default async function CapturePage() {
         Take photos and confirm your location — this goes straight to the team for review.
       </p>
       <div className="mt-6">
-        <CaptureForm properties={propertyOptions} existingTags={tags} />
+        <CaptureForm existingTags={tags} />
       </div>
     </div>
   );

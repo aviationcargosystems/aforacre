@@ -1,25 +1,29 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { Camera, CheckCircle2, ExternalLink, Loader2, MapPin, RefreshCw } from "lucide-react";
 import { submitCaptureAction, type CaptureActionState } from "@/app/capture/actions";
 import { Button } from "@/components/ui/button";
 import { PinLocationPicker } from "@/components/map/pin-location-picker";
+import { MapLinkInput } from "@/components/map-link-input";
 import { AreaInput } from "@/components/admin/area-input";
+import { PriceInput } from "@/components/admin/price-input";
+import { TagPicker } from "@/components/admin/tag-picker";
 import { AiAssist } from "@/components/admin/ai-assist";
-import { KHATA_OPTIONS, LAND_OBSERVATIONS } from "@/components/admin/property-form-shared";
+import { KHATA_OPTIONS } from "@/components/admin/property-form-shared";
+import { buildSiteLabel } from "@/lib/site-label";
 
 /**
- * Capture, with as much or as little detail as the person on site has.
+ * Capture, in two passes: the site, then its documents.
  *
- * The original twenty-second path is the one that must not regress: photos, a
- * pin, save. Everything past step one is optional and the save button sits
- * outside the stepper, so a broker standing in a field on 4G never has to walk
- * through screens they have nothing to put in.
+ * Photos, a pin and save is still the whole requirement, and the save button
+ * sits outside the stepper so nobody standing in a field has to reach the
+ * second step to finish. Everything on Site is what somebody physically there
+ * can answer; Documents is the paperwork, which usually arrives separately.
  *
- * Steps are hidden rather than unmounted. An unmounted step's inputs leave the
- * form, so anything typed on step three would vanish the moment someone stepped
- * back to check a photo.
+ * Steps are hidden rather than unmounted — unmounting takes the inputs out of
+ * the form, so anything typed on Documents would be dropped by stepping back to
+ * check a photo.
  */
 
 const inputClass =
@@ -30,39 +34,36 @@ const initialState: CaptureActionState = { ok: false };
 
 type GeoStatus = "idle" | "locating" | "success" | "error" | "unsupported";
 
-const STEPS = ["Site", "Details", "Documents"] as const;
+const STEPS = ["Site", "Documents"] as const;
 
 export function CaptureForm({
-  properties,
   existingTags = [],
   variant = "public",
 }: {
-  properties: { slug: string; title: string }[];
   existingTags?: string[];
-  /** "admin" is for staff already logged into /admin — adds a map pin, skips the "who are you" field. */
+  /** "admin" is for staff already signed in — unlocks RTC reading and link resolution. */
   variant?: "public" | "admin";
 }) {
-  // The map is for everyone. Two decimal boxes are a fine way to *store* a
-  // location and a poor way to check one: somebody in a field has no way to
-  // tell 12.6801 from 12.6810 without seeing it on a map, and that is roughly a
-  // kilometre of difference.
-  const showCapturedBy = variant === "public";
-  // RTC reading and pin research go through admin-only API routes, so the
-  // panel is only useful to someone already signed in.
-  const showAssist = variant === "admin";
+  const isAdmin = variant === "admin";
 
   const [state, formAction, isPending] = useActionState(submitCaptureAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
 
   const [step, setStep] = useState(0);
   const [geoStatus, setGeoStatus] = useState<GeoStatus>("idle");
+  const [geoError, setGeoError] = useState<string | null>(null);
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
   const [accuracy, setAccuracy] = useState<number | null>(null);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [videoFiles, setVideoFiles] = useState<File[]>([]);
   const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
   const [rtcPreview, setRtcPreview] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [area, setArea] = useState("");
+  const [acres, setAcres] = useState(0);
+  const [labelTouched, setLabelTouched] = useState(false);
+  const [label, setLabel] = useState("");
   const [capturedBy, setCapturedBy] = useState("");
   const [submitCount, setSubmitCount] = useState(0);
 
@@ -72,6 +73,7 @@ export function CaptureForm({
       return;
     }
     setGeoStatus("locating");
+    setGeoError(null);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLat(pos.coords.latitude.toFixed(6));
@@ -79,15 +81,25 @@ export function CaptureForm({
         setAccuracy(pos.coords.accuracy);
         setGeoStatus("success");
       },
-      () => setGeoStatus("error"),
+      (err) => {
+        // "Couldn't get your location" gives somebody in a field nothing to act
+        // on. Denied, unavailable and timed out have different remedies.
+        setGeoError(
+          err.code === err.PERMISSION_DENIED
+            ? "Location is blocked for this site. Allow it in your browser settings, or paste a map link below."
+            : err.code === err.POSITION_UNAVAILABLE
+              ? "No fix available. Move into the open and hit Refresh, or paste a map link below."
+              : "Locating timed out. Hit Refresh, or paste a map link below."
+        );
+        setGeoStatus("error");
+      },
       { enableHighAccuracy: true, timeout: 12000 }
     );
   }
 
   useEffect(() => {
-    // Mount-time sync with two external systems (geolocation permission prompt,
-    // localStorage) — not reacting to React state, so the direct setState calls
-    // inside locate() / below are intentional here.
+    // Mount-time sync with the geolocation prompt and localStorage, not a
+    // reaction to React state.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     locate();
     const saved = window.localStorage.getItem("pa_captured_by");
@@ -95,8 +107,6 @@ export function CaptureForm({
   }, []);
 
   useEffect(() => {
-    // Resets the form once the server action reports success — reacting to
-    // useActionState's result is the documented pattern for this.
     if (state.ok) {
       formRef.current?.reset();
       previews.forEach((url) => URL.revokeObjectURL(url));
@@ -105,8 +115,13 @@ export function CaptureForm({
       /* eslint-disable react-hooks/set-state-in-effect */
       setPreviews([]);
       setVideoPreviews([]);
+      setVideoFiles([]);
       setRtcPreview(null);
       setSelectedTags([]);
+      setArea("");
+      setAcres(0);
+      setLabel("");
+      setLabelTouched(false);
       setStep(0);
       /* eslint-enable react-hooks/set-state-in-effect */
       setSubmitCount((n) => n + 1);
@@ -115,6 +130,14 @@ export function CaptureForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
+  // Suggested, not imposed: the moment somebody edits the label it stops being
+  // regenerated, because their wording is better than the template's.
+  const suggestedLabel = useMemo(
+    () => buildSiteLabel({ extentAcres: acres, area, tags: selectedTags }),
+    [acres, area, selectedTags]
+  );
+  const effectiveLabel = labelTouched ? label : suggestedLabel;
+
   function onCapturedByChange(value: string) {
     setCapturedBy(value);
     window.localStorage.setItem("pa_captured_by", value);
@@ -122,20 +145,18 @@ export function CaptureForm({
 
   function onFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
     previews.forEach((url) => URL.revokeObjectURL(url));
-    const files = Array.from(e.target.files ?? []);
-    setPreviews(files.map((f) => URL.createObjectURL(f)));
+    setPreviews(Array.from(e.target.files ?? []).map((f) => URL.createObjectURL(f)));
   }
-
-  const hasPin = Boolean(lat && lng);
 
   function onVideosChange(e: React.ChangeEvent<HTMLInputElement>) {
     videoPreviews.forEach((url) => URL.revokeObjectURL(url));
-    setVideoPreviews(Array.from(e.target.files ?? []).map((f) => URL.createObjectURL(f)));
+    const picked = Array.from(e.target.files ?? []);
+    setVideoFiles(picked);
+    setVideoPreviews(picked.map((f) => URL.createObjectURL(f)));
   }
 
-  function toggleTag(tag: string) {
-    setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
-  }
+  const hasPin = Boolean(lat && lng);
+  const videoMb = videoFiles.reduce((n, f) => n + f.size, 0) / (1024 * 1024);
 
   return (
     <form id="capture-form" ref={formRef} action={formAction} className="space-y-6" key={submitCount}>
@@ -147,9 +168,9 @@ export function CaptureForm({
       )}
 
       <nav className="flex flex-wrap gap-1.5">
-        {STEPS.map((label, i) => (
+        {STEPS.map((name, i) => (
           <button
-            key={label}
+            key={name}
             type="button"
             onClick={() => setStep(i)}
             className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
@@ -158,16 +179,11 @@ export function CaptureForm({
                 : "border border-border bg-background text-muted-foreground hover:text-foreground"
             }`}
           >
-            {i + 1}. {label}
+            {i + 1}. {name}
           </button>
         ))}
       </nav>
 
-      {step > 0 && (
-        <p className="text-xs text-muted-foreground">Everything from here on is optional. Save whenever you are done.</p>
-      )}
-
-      {/* Step 1 — the only part that matters when you are standing in a field. */}
       <div className={step === 0 ? "space-y-6" : "hidden"}>
         <div className="space-y-1.5">
           <label className={labelClass}>Photos</label>
@@ -198,9 +214,6 @@ export function CaptureForm({
           )}
         </div>
 
-        {/* Optional, and deliberately below the photos. A slope or an approach
-            road reads on video and does not read in a still, but nobody should
-            be waiting on a clip to upload before they can save a capture. */}
         <div className="space-y-1.5">
           <label htmlFor="videos" className={labelClass}>
             Video <span className="font-normal text-muted-foreground">(optional)</span>
@@ -215,6 +228,13 @@ export function CaptureForm({
             onChange={onVideosChange}
             className={inputClass}
           />
+          {videoFiles.length > 0 && (
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              {isPending && <Loader2 className="h-3 w-3 animate-spin" />}
+              {isPending ? "Uploading" : "Ready"} · {videoFiles.length} clip
+              {videoFiles.length === 1 ? "" : "s"} · {videoMb.toFixed(1)} MB
+            </p>
+          )}
           {videoPreviews.length > 0 && (
             <div className="grid grid-cols-2 gap-2 pt-1">
               {videoPreviews.map((src) => (
@@ -222,9 +242,6 @@ export function CaptureForm({
               ))}
             </div>
           )}
-          <p className="text-xs text-muted-foreground">
-            Keep clips short — they upload as-is, so a long one is slow on mobile data.
-          </p>
         </div>
 
         <div className="space-y-1.5">
@@ -244,6 +261,7 @@ export function CaptureForm({
               Refresh
             </button>
           </div>
+
           <div className="grid grid-cols-2 gap-2">
             <input
               aria-label="Latitude"
@@ -265,30 +283,38 @@ export function CaptureForm({
             />
           </div>
           <input type="hidden" name="locationAccuracyM" value={accuracy ?? ""} />
+
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
-            <MapPin className="h-3 w-3" />
+            <MapPin className="h-3 w-3 shrink-0" />
             {geoStatus === "locating" && "Getting your location…"}
-            {geoStatus === "success" && `Captured${accuracy ? ` (±${Math.round(accuracy)}m)` : ""} — or edit manually.`}
-            {geoStatus === "error" && "Couldn't get your location — enter it manually, or continue without it."}
-            {geoStatus === "unsupported" && "Location isn't available on this device — enter it manually if you have it."}
+            {geoStatus === "success" && `Captured${accuracy ? ` (±${Math.round(accuracy)}m)` : ""}`}
+            {geoStatus === "error" && (geoError ?? "Couldn't get your location.")}
+            {geoStatus === "unsupported" && "This device has no location — drop a pin or paste a link."}
             {geoStatus === "idle" && "Waiting for permission…"}
           </p>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">
-              Drop a pin — tap the map, or drag the marker to fine-tune.
-            </p>
-            <div className="h-64 overflow-hidden rounded-md border border-border">
-              <PinLocationPicker
-                lat={lat ? Number(lat) : null}
-                lng={lng ? Number(lng) : null}
-                onPick={(newLat, newLng) => {
-                  setLat(newLat.toFixed(6));
-                  setLng(newLng.toFixed(6));
-                  setAccuracy(null);
-                }}
-              />
-            </div>
+
+          <div className="h-44 overflow-hidden rounded-md border border-border sm:h-56">
+            <PinLocationPicker
+              lat={lat ? Number(lat) : null}
+              lng={lng ? Number(lng) : null}
+              onPick={(newLat, newLng) => {
+                setLat(newLat.toFixed(6));
+                setLng(newLng.toFixed(6));
+                setAccuracy(null);
+                setGeoStatus("success");
+              }}
+            />
           </div>
+
+          <MapLinkInput
+            canResolveShortLinks={isAdmin}
+            onResolve={(newLat, newLng) => {
+              setLat(newLat.toFixed(6));
+              setLng(newLng.toFixed(6));
+              setAccuracy(null);
+              setGeoStatus("success");
+            }}
+          />
 
           {hasPin && (
             <a
@@ -298,40 +324,55 @@ export function CaptureForm({
               className="inline-flex items-center gap-1.5 text-xs font-medium text-accent hover:underline"
             >
               <ExternalLink className="h-3 w-3" />
-              Open this pin in Google Maps
+              Open in Google Maps
             </a>
           )}
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="area" className={labelClass}>
+            Area / village
+          </label>
+          <input
+            id="area"
+            name="area"
+            value={area}
+            onChange={(e) => setArea(e.target.value)}
+            className={inputClass}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <span className={labelClass}>Extent</span>
+            <AreaInput onAcresChange={setAcres} />
+          </div>
+          <PriceInput />
         </div>
 
         <div className="space-y-1.5">
           <label htmlFor="label" className={labelClass}>
             Site label
           </label>
-          <input id="label" name="label" placeholder="e.g. Plot behind Uyyamballi lake" className={inputClass} />
+          <input
+            id="label"
+            name="label"
+            value={effectiveLabel}
+            onChange={(e) => {
+              setLabelTouched(true);
+              setLabel(e.target.value);
+            }}
+            placeholder="Fills in from the extent, area and tags"
+            className={inputClass}
+          />
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="propertySlug" className={labelClass}>
-            Link to an existing listing (optional)
-          </label>
-          <select id="propertySlug" name="propertySlug" defaultValue="" className={inputClass}>
-            <option value="">Not linked</option>
-            {properties.map((p) => (
-              <option key={p.slug} value={p.slug}>
-                {p.title}
-              </option>
-            ))}
-          </select>
+          <p className={labelClass}>Tags</p>
+          <TagPicker available={existingTags} selected={selectedTags} onChange={setSelectedTags} />
         </div>
 
-        <div className="space-y-1.5">
-          <label htmlFor="notes" className={labelClass}>
-            Notes
-          </label>
-          <textarea id="notes" name="notes" rows={3} placeholder="Anything worth flagging" className={inputClass} />
-        </div>
-
-        {showCapturedBy && (
+        {!isAdmin && (
           <div className="space-y-1.5">
             <label htmlFor="capturedBy" className={labelClass}>
               Your name
@@ -346,106 +387,12 @@ export function CaptureForm({
             />
           </div>
         )}
-
-        <div className="space-y-1.5">
-          <span className={labelClass}>Extent</span>
-          <AreaInput />
-        </div>
-
-        <p className={labelClass}>Tags</p>
-        {existingTags.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No tags set up yet.</p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {existingTags.map((tag) => (
-              <label
-                key={tag}
-                className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                  selectedTags.includes(tag)
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-input bg-background text-foreground"
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  name="tags"
-                  value={tag}
-                  checked={selectedTags.includes(tag)}
-                  onChange={() => toggleTag(tag)}
-                  className="sr-only"
-                />
-                {tag}
-              </label>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* Step 2 — anything already known about the plot itself */}
       <div className={step === 1 ? "space-y-4" : "hidden"}>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Labelled label="Area / village" htmlFor="area">
-            <input id="area" name="area" className={inputClass} />
-          </Labelled>
-          <Labelled label="Corridor" htmlFor="corridor">
-            <input id="corridor" name="corridor" placeholder="e.g. Kanakapura Road" className={inputClass} />
-          </Labelled>
-        </div>
-
-
-
-        <Labelled label="Price per acre (₹)" htmlFor="pricePerAcre">
-          <input id="pricePerAcre" name="pricePerAcre" type="number" step="1000" className={inputClass} />
-        </Labelled>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Labelled label="Soil type" htmlFor="soilType">
-            <input id="soilType" name="soilType" className={inputClass} />
-          </Labelled>
-          <Labelled label="Road access" htmlFor="roadAccess">
-            <input id="roadAccess" name="roadAccess" className={inputClass} />
-          </Labelled>
-        </div>
-
-        <Labelled label="Land observation" htmlFor="landObservation">
-          <input
-            id="landObservation"
-            name="landObservation"
-            list="captureLandObservations"
-            placeholder="Flat land, gentle fall to the south-east"
-            className={inputClass}
-          />
-          <datalist id="captureLandObservations">
-            {LAND_OBSERVATIONS.map((option) => (
-              <option key={option} value={option} />
-            ))}
-          </datalist>
-        </Labelled>
-
-
-      </div>
-
-      {/* Step 3 — documents */}
-      <div className={step === 2 ? "space-y-4" : "hidden"}>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Labelled label="Survey number" htmlFor="surveyNumber">
-            <input id="surveyNumber" name="surveyNumber" className={inputClass} />
-          </Labelled>
-          <Labelled label="Khata" htmlFor="khata">
-            <select id="khata" name="khata" defaultValue="" className={inputClass}>
-              <option value="">Not known</option>
-              {KHATA_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </Labelled>
-        </div>
-
         <div className="space-y-1.5">
           <label htmlFor="rtcImage" className={labelClass}>
-            RTC scan
+            Upload RTC
           </label>
           <input
             id="rtcImage"
@@ -460,31 +407,58 @@ export function CaptureForm({
               setRtcPreview(file ? URL.createObjectURL(file) : null);
             }}
           />
-          <p className="text-xs text-muted-foreground">
-            Photograph the RTC and it is stored with the capture. {showAssist ? "Use " : "An admin can then use "}
-            &ldquo;Read an RTC&rdquo; to pull the survey number, village and extent out of the Kannada.
-          </p>
           {rtcPreview && (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={rtcPreview} alt="" className="mt-2 max-h-56 rounded-md border border-border object-contain" />
           )}
         </div>
 
-        {/* Populated by the assist panel; carries the full reading through to review. */}
+        {/* Populated by the reader below, so the full extraction travels with
+            the capture rather than only the fields somebody applied. */}
         <input type="hidden" name="rtcExtraction" defaultValue="" />
 
-        {showAssist && <AiAssist formId="capture-form" showMap={false} />}
+        {isAdmin && (
+          <AiAssist
+            formId="capture-form"
+            showMap={false}
+            showPinResearch={false}
+            availableTags={existingTags}
+            onApplyTags={(tags) => setSelectedTags((prev) => Array.from(new Set([...prev, ...tags])))}
+          />
+        )}
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <label htmlFor="surveyNumber" className={labelClass}>
+              Survey number
+            </label>
+            <input id="surveyNumber" name="surveyNumber" className={inputClass} />
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="khata" className={labelClass}>
+              Khata
+            </label>
+            <select id="khata" name="khata" defaultValue="" className={inputClass}>
+              <option value="">Not known</option>
+              {KHATA_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 border-t border-border pt-4">
         {step > 0 && (
-          <Button type="button" variant="outline" size="sm" onClick={() => setStep((s) => s - 1)}>
+          <Button type="button" variant="outline" size="sm" onClick={() => setStep((n) => n - 1)}>
             Back
           </Button>
         )}
         {step < STEPS.length - 1 && (
-          <Button type="button" variant="outline" size="sm" onClick={() => setStep((s) => s + 1)}>
-            Add {STEPS[step + 1].toLowerCase()}
+          <Button type="button" variant="outline" size="sm" onClick={() => setStep((n) => n + 1)}>
+            Add documents
           </Button>
         )}
         <Button type="submit" disabled={isPending} className="ml-auto bg-accent text-accent-foreground hover:bg-accent/90">
@@ -493,16 +467,5 @@ export function CaptureForm({
         </Button>
       </div>
     </form>
-  );
-}
-
-function Labelled({ label, htmlFor, children }: { label: string; htmlFor: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <label htmlFor={htmlFor} className={labelClass}>
-        {label}
-      </label>
-      {children}
-    </div>
   );
 }

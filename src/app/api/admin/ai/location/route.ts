@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const body = (await request.json().catch(() => null)) as { lat?: number; lng?: number } | null;
+  const body = (await request.json().catch(() => null)) as { lat?: number; lng?: number; tags?: string[] } | null;
   const lat = Number(body?.lat);
   const lng = Number(body?.lng);
 
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    return NextResponse.json(await suggestFromPin(lat, lng));
+    return NextResponse.json(await suggestFromPin(lat, lng, body?.tags ?? []));
   } catch (error) {
     if (error instanceof AiUnavailableError) {
       return NextResponse.json({ error: error.message }, { status: 503 });

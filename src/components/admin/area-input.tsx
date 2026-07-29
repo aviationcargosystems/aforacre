@@ -33,7 +33,14 @@ function tidy(value: number, places: number): string {
   return String(Number(value.toFixed(places)));
 }
 
-export function AreaInput({ defaultAcres }: { defaultAcres?: number }) {
+export function AreaInput({
+  defaultAcres,
+  onAcresChange,
+}: {
+  defaultAcres?: number;
+  /** Lets a caller build on the extent, e.g. an auto-generated site label. */
+  onAcresChange?: (acres: number) => void;
+}) {
   const initial = defaultAcres ?? 0;
   const [acres, setAcres] = useState(tidy(initial, 4));
   const [gunta, setGunta] = useState(tidy(acresToGunta(initial), 2));
@@ -48,6 +55,8 @@ export function AreaInput({ defaultAcres }: { defaultAcres?: number }) {
     if (unit === "acre") setAcres(raw);
     if (unit === "gunta") setGunta(raw);
     if (unit === "sqft") setSqft(raw);
+
+    onAcresChange?.(valid ? (unit === "acre" ? n : unit === "gunta" ? guntaToAcres(n) : sqftToAcres(n)) : 0);
 
     if (!valid) {
       // Blank or half-typed ("1.") — clear the derived fields rather than

@@ -39,6 +39,7 @@ interface LocationPayload {
   driveMinutes: number | null;
   distanceMethod: "road" | "straight-line";
   nearbyLandmarks: string[];
+  tags: string[];
   soilType: string;
   description: string;
   uncertain: string[];
@@ -74,6 +75,9 @@ interface RtcPayload {
   documentUrl?: string;
 }
 
+/** Sentinel: routed to the tag callback rather than to a form input. */
+const TAGS_FIELD = "__tags__";
+
 /** Mirrors slugify in property-builder, so an applied title and its slug agree. */
 function slugify(text: string): string {
   return text
@@ -95,7 +99,25 @@ function setFieldValue(form: HTMLFormElement, name: string, value: string): bool
   return true;
 }
 
-export function AiAssist({ formId, showMap = true }: { formId: string; showMap?: boolean }) {
+export function AiAssist({
+  formId,
+  showMap = true,
+  showPinResearch = true,
+  availableTags = [],
+  onApplyTags,
+}: {
+  formId: string;
+  showMap?: boolean;
+  /** Off where a pin is not the subject — a documents step has nothing to research. */
+  showPinResearch?: boolean;
+  /** The catalogue's tag vocabulary. Suggestions are constrained to it. */
+  availableTags?: string[];
+  /**
+   * Tags are checkbox state in the surrounding form, not an input value, so
+   * they cannot be written through the DOM like the other fields.
+   */
+  onApplyTags?: (tags: string[]) => void;
+}) {
   const [busy, setBusy] = useState<"pin" | "rtc" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -193,7 +215,7 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
       const response = await fetch("/api/admin/ai/location", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ lat: Number(lat), lng: Number(lng) }),
+        body: JSON.stringify({ lat: Number(lat), lng: Number(lng), tags: availableTags }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Research failed.");
@@ -219,6 +241,7 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
             value: p.distanceFromBangaloreKm ? String(p.distanceFromBangaloreKm) : "",
           },
           { label: "Soil type", field: "soilType", value: p.soilType },
+          { label: "Tags", field: onApplyTags ? TAGS_FIELD : null, value: p.tags.join(", ") },
           { label: "Nearby landmarks", field: "nearbyLandmarks", value: p.nearbyLandmarks.join("\n") },
           { label: "Description", field: "description", value: p.description },
         ].filter((s) => s.value)
@@ -314,6 +337,12 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
     const el = form();
     if (!el || !suggestion.field) return;
 
+    if (suggestion.field === TAGS_FIELD) {
+      onApplyTags?.(suggestion.value.split(",").map((t) => t.trim()).filter(Boolean));
+      setApplied((prev) => new Set(prev).add(suggestion.label));
+      return;
+    }
+
     // The extent inputs are three linked units; writing acres alone would leave
     // the gunta and sq ft boxes showing the previous plot's numbers.
     if (suggestion.field === "extentAcres") {
@@ -350,7 +379,9 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
     <section className="rounded-[1.25rem] border border-accent/25 bg-accent/[0.05] p-4 sm:p-5">
       <div className="flex flex-wrap items-center gap-2">
         <Sparkles className="h-4 w-4 shrink-0 text-accent" />
-        <h2 className="font-heading text-base font-semibold text-foreground">Pin on map, or read an RTC</h2>
+        <h2 className="font-heading text-base font-semibold text-foreground">
+          {showPinResearch ? "Pin on map, or read an RTC" : "Read the RTC"}
+        </h2>
       </div>
 
       {showMap && (
@@ -390,6 +421,7 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
       )}
 
       <div className="mt-4 flex flex-wrap gap-2">
+        {showPinResearch && (
         <Button
           type="button"
           variant="pill-outline"
@@ -400,6 +432,7 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
           {busy === "pin" ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />}
           {busy === "pin" ? "Reading the area…" : "Read this pin"}
         </Button>
+        )}
 
         <Button
           type="button"
