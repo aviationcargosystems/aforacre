@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-07-29 20:20 IST · Measured distance, auto FID, multi-step Add Property
+
+- Add Property is now a five-step panel (Location, Pricing, Land, Media, Records) with its own header and a Save button in the bar. Only a title is required, so a part-filled listing can be saved and finished later.
+- Distance from Bengaluru is measured from the pin via OSRM road routing rather than estimated by the model, with drive time when available and an explicit fallback label when only a straight line could be computed.
+- FID is assigned automatically at creation — the lowest number not in use, so deleting a farm frees its number.
+- Images and videos are upload-only; the paste-a-URL fields are gone.
+- Pin research also proposes a listing title, and applying it fills the slug.
+- Apply all is now a primary button above the suggestion list.
+
 ## 2026-07-29 19:05 IST · Explore app shell, drag rails, motion, homepage polish
 
 - Explore is now a fixed-height app shell: the page itself does not scroll, only the listing column does. Title scrolls away, search and filters stay. Map pinned on the right.

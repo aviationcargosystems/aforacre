@@ -22,13 +22,5 @@ export default async function EditPropertyPage({
 
   const boundAction = updatePropertyAction.bind(null, slug);
 
-  return (
-    <div className="max-w-3xl">
-      <h1 className="font-heading text-2xl font-semibold text-foreground">Edit property</h1>
-      <p className="mt-1 text-sm text-muted-foreground">{property.title}</p>
-      <div className="mt-6">
-        <PropertyForm action={boundAction} property={property} existingTags={existingTags} errorMessage={error} />
-      </div>
-    </div>
-  );
+  return <PropertyForm action={boundAction} property={property} existingTags={existingTags} errorMessage={error} />;
 }

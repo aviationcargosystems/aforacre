@@ -23,15 +23,5 @@ export default async function NewPropertyPage({
       }
     : undefined;
 
-  return (
-    <div className="max-w-3xl">
-      <h1 className="font-heading text-2xl font-semibold text-foreground">Add property</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        {capture ? "Pre-filled from a field capture — fill in the rest of the details." : "Taxes and land-suitability scores are computed automatically."}
-      </p>
-      <div className="mt-6">
-        <PropertyForm action={createPropertyAction} existingTags={existingTags} errorMessage={error} prefill={prefill} />
-      </div>
-    </div>
-  );
+  return <PropertyForm action={createPropertyAction} existingTags={existingTags} errorMessage={error} prefill={prefill} />;
 }
