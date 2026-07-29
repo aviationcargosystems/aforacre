@@ -13,8 +13,15 @@
 --
 -- Client contact details are deliberately absent. Agents must not see buyers.
 
-create type recce_type as enum ('scout', 'pre_visit', 'client_visit');
-create type recce_status as enum ('assigned', 'in_progress', 'submitted', 'approved', 'rejected');
+-- Guarded so a partial run can be fixed and the file re-run without cleaning
+-- up by hand. Postgres has no "create type if not exists".
+do $$ begin
+  create type recce_type as enum ('scout', 'pre_visit', 'client_visit');
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create type recce_status as enum ('assigned', 'in_progress', 'submitted', 'approved', 'rejected');
+exception when duplicate_object then null; end $$;
 
 create table if not exists recces (
   id             uuid primary key default gen_random_uuid(),
