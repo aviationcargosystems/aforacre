@@ -323,7 +323,6 @@ export function CaptureForm({
               id="images"
               type="file"
               accept="image/*"
-              capture="environment"
               multiple
               onChange={onFilesChange}
               className="sr-only"
@@ -347,7 +346,6 @@ export function CaptureForm({
             id="videos"
             type="file"
             accept="video/*"
-            capture="environment"
             multiple
             onChange={onVideosChange}
             className={inputClass}
@@ -530,7 +528,6 @@ export function CaptureForm({
             name="rtcImage"
             type="file"
             accept="image/*"
-            capture="environment"
             className={inputClass}
             onChange={(e) => {
               if (rtcPreview) URL.revokeObjectURL(rtcPreview);
