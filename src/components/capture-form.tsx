@@ -496,7 +496,8 @@ export function CaptureForm({
         </div>
 
         {!isAdmin && (
-          <div className="space-y-1.5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
             <label htmlFor="capturedBy" className={labelClass}>
               Your name
             </label>
@@ -508,6 +509,13 @@ export function CaptureForm({
               placeholder="So we know who to follow up with"
               className={inputClass}
             />
+            </div>
+            <div className="space-y-1.5">
+              <label htmlFor="phone" className={labelClass}>
+                Phone
+              </label>
+              <input id="phone" name="phone" type="tel" inputMode="tel" className={inputClass} />
+            </div>
           </div>
         )}
       </div>

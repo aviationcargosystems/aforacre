@@ -152,6 +152,25 @@ export function AiAssist({
     if (!el) return;
     setFieldValue(el, "lat", lat.toFixed(6));
     setFieldValue(el, "lng", lng.toFixed(6));
+
+    // Distance is a routing lookup, not a research question, so it fills itself
+    // in as soon as there is a pin. Only when the field is empty — a figure
+    // somebody typed deliberately is not ours to overwrite.
+    const distanceField = el.elements.namedItem("distanceFromBangaloreKm");
+    if (!(distanceField instanceof HTMLInputElement) || distanceField.value.trim()) return;
+
+    void fetch("/api/admin/distance", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ lat, lng }),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.km && !distanceField.value.trim()) setFieldValue(el, "distanceFromBangaloreKm", String(d.km));
+      })
+      .catch(() => {
+        // Best effort. The field stays editable either way.
+      });
   }
 
   async function applyLink() {

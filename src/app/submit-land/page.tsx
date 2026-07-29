@@ -1,11 +1,15 @@
-import { LandSubmissionForm } from "@/components/land-submission-form";
+import { getAllTags } from "@/lib/store/tags";
+import { CaptureForm } from "@/components/capture-form";
 
 export const metadata = {
   title: "Submit Land — A for Acre",
   description: "List your farmland with A for Acre. Our team reviews every submission before it goes live.",
 };
 
-export default function SubmitLandPage() {
+export const dynamic = "force-dynamic";
+
+export default async function SubmitLandPage() {
+  const tags = await getAllTags();
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
       <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent">List your land</p>
@@ -17,7 +21,7 @@ export default function SubmitLandPage() {
         approved.
       </p>
       <div className="mt-8">
-        <LandSubmissionForm />
+        <CaptureForm existingTags={tags} />
       </div>
     </div>
   );

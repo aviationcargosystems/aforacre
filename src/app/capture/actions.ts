@@ -50,7 +50,7 @@ function text(formData: FormData, key: string): string {
 function buildDetails(formData: FormData): CaptureDetails {
   const details: CaptureDetails = {};
 
-  const strings = ["area", "corridor", "soilType", "landObservation", "roadAccess", "surveyNumber"] as const;
+  const strings = ["area", "corridor", "soilType", "landObservation", "roadAccess", "surveyNumber", "phone", "ownerType"] as const;
   for (const key of strings) {
     const value = text(formData, key);
     if (value) details[key] = value;

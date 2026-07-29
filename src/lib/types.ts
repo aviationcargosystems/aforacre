@@ -153,6 +153,9 @@ export interface Capture {
 }
 
 export interface CaptureDetails {
+  /** Seller contact, only ever collected on the public form. */
+  phone?: string;
+  ownerType?: string;
   area?: string;
   corridor?: string;
   extentAcres?: number;
