@@ -60,6 +60,7 @@ export function CaptureForm({
   const [lng, setLng] = useState("");
   const [accuracy, setAccuracy] = useState<number | null>(null);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
   const [rtcPreview, setRtcPreview] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [capturedBy, setCapturedBy] = useState("");
@@ -99,9 +100,11 @@ export function CaptureForm({
     if (state.ok) {
       formRef.current?.reset();
       previews.forEach((url) => URL.revokeObjectURL(url));
+      videoPreviews.forEach((url) => URL.revokeObjectURL(url));
       if (rtcPreview) URL.revokeObjectURL(rtcPreview);
       /* eslint-disable react-hooks/set-state-in-effect */
       setPreviews([]);
+      setVideoPreviews([]);
       setRtcPreview(null);
       setSelectedTags([]);
       setStep(0);
@@ -124,6 +127,11 @@ export function CaptureForm({
   }
 
   const hasPin = Boolean(lat && lng);
+
+  function onVideosChange(e: React.ChangeEvent<HTMLInputElement>) {
+    videoPreviews.forEach((url) => URL.revokeObjectURL(url));
+    setVideoPreviews(Array.from(e.target.files ?? []).map((f) => URL.createObjectURL(f)));
+  }
 
   function toggleTag(tag: string) {
     setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
@@ -188,6 +196,35 @@ export function CaptureForm({
               ))}
             </div>
           )}
+        </div>
+
+        {/* Optional, and deliberately below the photos. A slope or an approach
+            road reads on video and does not read in a still, but nobody should
+            be waiting on a clip to upload before they can save a capture. */}
+        <div className="space-y-1.5">
+          <label htmlFor="videos" className={labelClass}>
+            Video <span className="font-normal text-muted-foreground">(optional)</span>
+          </label>
+          <input
+            id="videos"
+            name="videos"
+            type="file"
+            accept="video/*"
+            capture="environment"
+            multiple
+            onChange={onVideosChange}
+            className={inputClass}
+          />
+          {videoPreviews.length > 0 && (
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              {videoPreviews.map((src) => (
+                <video key={src} src={src} controls preload="metadata" className="w-full rounded-md bg-black" />
+              ))}
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Keep clips short — they upload as-is, so a long one is slow on mobile data.
+          </p>
         </div>
 
         <div className="space-y-1.5">

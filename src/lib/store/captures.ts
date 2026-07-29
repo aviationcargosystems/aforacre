@@ -5,6 +5,7 @@ interface CaptureRow {
   id: string;
   created_at: string;
   images: string[];
+  videos: string[] | null;
   lat: number | null;
   lng: number | null;
   location_accuracy_m: number | null;
@@ -22,6 +23,7 @@ function rowToCapture(row: CaptureRow): Capture {
     id: row.id,
     createdAt: row.created_at,
     images: row.images ?? [],
+    videos: row.videos ?? [],
     lat: row.lat,
     lng: row.lng,
     locationAccuracyM: row.location_accuracy_m,
@@ -52,6 +54,7 @@ export async function createCapture(capture: Capture): Promise<void> {
     id: capture.id,
     created_at: capture.createdAt,
     images: capture.images,
+    videos: capture.videos,
     lat: capture.lat,
     lng: capture.lng,
     location_accuracy_m: capture.locationAccuracyM,

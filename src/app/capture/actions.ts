@@ -76,6 +76,9 @@ export async function submitCaptureAction(
   const imageFiles = formData.getAll("images").filter((f): f is File => f instanceof File && f.size > 0);
   const images = await saveUploadedFiles(imageFiles, "captures");
 
+  const videoFiles = formData.getAll("videos").filter((f): f is File => f instanceof File && f.size > 0);
+  const videos = await saveUploadedFiles(videoFiles, "captures");
+
   const rtcFiles = formData.getAll("rtcImage").filter((f): f is File => f instanceof File && f.size > 0);
   const [rtcImage] = await saveUploadedFiles(rtcFiles, "captures/rtc");
 
@@ -88,6 +91,7 @@ export async function submitCaptureAction(
     id: randomUUID(),
     createdAt: new Date().toISOString(),
     images,
+    videos,
     lat: parseNumberOrNull(formData.get("lat")),
     lng: parseNumberOrNull(formData.get("lng")),
     locationAccuracyM: parseNumberOrNull(formData.get("locationAccuracyM")),

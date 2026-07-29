@@ -132,6 +132,8 @@ export interface Capture {
   id: string;
   createdAt: string;
   images: string[]; // paths under /uploads/captures/
+  /** Optional clips from the same visit. A slope reads on video and not in a still. */
+  videos: string[];
   lat: number | null;
   lng: number | null;
   locationAccuracyM: number | null;
