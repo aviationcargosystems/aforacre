@@ -361,11 +361,9 @@ export function AiAssist({
       }
     }
 
-    const ok = setFieldValue(el, suggestion.field, suggestion.value);
-    if (!ok && suggestion.field !== "extentAcres") {
-      setError(`This form has no "${suggestion.label}" field — copy it across by hand.`);
-      return;
-    }
+    // A form without this field is not a failure: the full reading is stored
+    // with the record either way, so there is nothing lost to warn about.
+    setFieldValue(el, suggestion.field, suggestion.value);
     setApplied((prev) => new Set(prev).add(suggestion.label));
   }
 

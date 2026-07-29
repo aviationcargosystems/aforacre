@@ -82,14 +82,16 @@ export async function submitCaptureAction(
   _prevState: CaptureActionState,
   formData: FormData
 ): Promise<CaptureActionState> {
-  const imageFiles = formData.getAll("images").filter((f): f is File => f instanceof File && f.size > 0);
-  const images = await saveUploadedFiles(imageFiles, "captures");
-
-  const videoFiles = formData.getAll("videos").filter((f): f is File => f instanceof File && f.size > 0);
-  const videos = await saveUploadedFiles(videoFiles, "captures");
+  // Media is uploaded straight to Storage from the browser and arrives here as
+  // URLs. Sending the bytes through this action meant sending them through a
+  // Vercel function, which rejects any body over 4.5MB before our code runs —
+  // one phone video was enough to kill the request and take the page with it.
+  const images = formData.getAll("imageUrls").map(String).filter(Boolean);
+  const videos = formData.getAll("videoUrls").map(String).filter(Boolean);
 
   const rtcFiles = formData.getAll("rtcImage").filter((f): f is File => f instanceof File && f.size > 0);
   const [rtcImage] = await saveUploadedFiles(rtcFiles, "captures/rtc");
+
 
   const details = buildDetails(formData);
   if (rtcImage) details.rtcImage = rtcImage;

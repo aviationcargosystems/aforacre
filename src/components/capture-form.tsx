@@ -13,6 +13,8 @@ import { AiAssist } from "@/components/admin/ai-assist";
 import { KHATA_OPTIONS } from "@/components/admin/property-form-shared";
 import { buildSiteLabel } from "@/lib/site-label";
 import { useDraft } from "@/lib/use-draft";
+import { compressImage } from "@/lib/images/compress";
+import { uploadDirect } from "@/lib/direct-upload";
 
 /**
  * Capture, in two passes: the site, then its documents.
@@ -58,6 +60,9 @@ export function CaptureForm({
   const [accuracy, setAccuracy] = useState<number | null>(null);
   const [previews, setPreviews] = useState<string[]>([]);
   const [videoFiles, setVideoFiles] = useState<File[]>([]);
+  const [uploaded, setUploaded] = useState<{ images: string[]; videos: string[] }>({ images: [], videos: [] });
+  const [uploading, setUploading] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
   const [rtcPreview, setRtcPreview] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -146,6 +151,7 @@ export function CaptureForm({
       setPreviews([]);
       setVideoPreviews([]);
       setVideoFiles([]);
+      setUploaded({ images: [], videos: [] });
       setRtcPreview(null);
       setSelectedTags([]);
       setArea("");
@@ -174,16 +180,58 @@ export function CaptureForm({
     window.localStorage.setItem("pa_captured_by", value);
   }
 
-  function onFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
     previews.forEach((url) => URL.revokeObjectURL(url));
-    setPreviews(Array.from(e.target.files ?? []).map((f) => URL.createObjectURL(f)));
+    const picked = Array.from(e.target.files ?? []);
+    setPreviews(picked.map((f) => URL.createObjectURL(f)));
+    if (picked.length === 0) return;
+
+    setUploadError(null);
+    const urls: string[] = [];
+    try {
+      for (const [i, file] of picked.entries()) {
+        setUploading(`Photo ${i + 1} of ${picked.length}`);
+        // Compressed first: a phone photo is 4-8MB and nothing on the site ever
+        // displays it at that size.
+        const { blob } = await compressImage(file).catch(() => ({ blob: file as Blob }));
+        const asFile = new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", {
+          type: blob.type || "image/jpeg",
+        });
+        const { publicUrl } = await uploadDirect(asFile, "captures", (f) =>
+          setUploading(`Photo ${i + 1} of ${picked.length} — ${Math.round(f * 100)}%`)
+        );
+        urls.push(publicUrl);
+      }
+      setUploaded((prev) => ({ ...prev, images: [...prev.images, ...urls] }));
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Could not upload those photos.");
+    } finally {
+      setUploading(null);
+    }
   }
 
-  function onVideosChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onVideosChange(e: React.ChangeEvent<HTMLInputElement>) {
     videoPreviews.forEach((url) => URL.revokeObjectURL(url));
     const picked = Array.from(e.target.files ?? []);
     setVideoFiles(picked);
     setVideoPreviews(picked.map((f) => URL.createObjectURL(f)));
+    if (picked.length === 0) return;
+
+    setUploadError(null);
+    const urls: string[] = [];
+    try {
+      for (const [i, file] of picked.entries()) {
+        const { publicUrl } = await uploadDirect(file, "captures", (f) =>
+          setUploading(`Video ${i + 1} of ${picked.length} — ${Math.round(f * 100)}%`)
+        );
+        urls.push(publicUrl);
+      }
+      setUploaded((prev) => ({ ...prev, videos: [...prev.videos, ...urls] }));
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Could not upload that video.");
+    } finally {
+      setUploading(null);
+    }
   }
 
   const hasPin = Boolean(lat && lng);
@@ -218,6 +266,28 @@ export function CaptureForm({
         </div>
       )}
 
+      {/* Media is already in Storage by the time this submits; only its URLs
+          travel with the form, which keeps the request far under Vercel's
+          4.5MB function body cap. */}
+      {uploaded.images.map((url) => (
+        <input key={url} type="hidden" name="imageUrls" value={url} />
+      ))}
+      {uploaded.videos.map((url) => (
+        <input key={url} type="hidden" name="videoUrls" value={url} />
+      ))}
+
+      {uploading && (
+        <p className="flex items-center gap-2 rounded-md border border-border bg-background px-4 py-2.5 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Uploading {uploading}
+        </p>
+      )}
+      {uploadError && (
+        <p className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+          {uploadError}
+        </p>
+      )}
+
       <nav className="flex flex-wrap gap-1.5">
         {STEPS.map((name, i) => (
           <button
@@ -246,7 +316,6 @@ export function CaptureForm({
             Tap to take or choose photos
             <input
               id="images"
-              name="images"
               type="file"
               accept="image/*"
               capture="environment"
@@ -271,7 +340,6 @@ export function CaptureForm({
           </label>
           <input
             id="videos"
-            name="videos"
             type="file"
             accept="video/*"
             capture="environment"
