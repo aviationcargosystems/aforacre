@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { ADMIN_SESSION_COOKIE, isValidSessionToken } from "@/lib/auth";
-import { AGENT_SESSION_COOKIE, agentIdFromSessionToken } from "@/lib/agent-auth";
 
 type Role = "super_admin" | "agent" | "partner" | "buyer";
 
@@ -67,19 +66,16 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  // Legacy gates, removed in Phase 7 when admin and agent are rebuilt on the
-  // new schema. Kept for now so the running product does not lose access
-  // mid-rebuild: the shared admin password and the standalone agent accounts
-  // still work until their replacements exist. New surfaces never use these.
+  // Agents are profiles now, so there is no second cookie tier to fall back to
+  // for /agent. Anyone without a Supabase session goes to the one login page.
   if (pathname.startsWith("/agent")) {
-    const agentId = await agentIdFromSessionToken(request.cookies.get(AGENT_SESSION_COOKIE)?.value);
-    if (agentId) return response;
-
-    const loginUrl = new URL("/agent/login", request.url);
+    const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
+  // The shared admin password is the last legacy gate. It goes when admin moves
+  // onto Supabase Auth; until then it is what keeps the running product usable.
   if (await isValidSessionToken(request.cookies.get(ADMIN_SESSION_COOKIE)?.value)) {
     return response;
   }

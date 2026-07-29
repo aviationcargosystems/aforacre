@@ -19,7 +19,7 @@ import { getAllCaptures } from "@/lib/store/captures";
 import { getAllLandSubmissions } from "@/lib/store/land-submissions";
 import { getAllEnquiries } from "@/lib/store/enquiries";
 import { getAllRecces } from "@/lib/store/recces";
-import { getAllAgents } from "@/lib/store/agents";
+import { getStaff } from "@/lib/store/staff";
 import { formatINR } from "@/lib/tax";
 import { Button } from "@/components/ui/button";
 
@@ -56,7 +56,7 @@ export default async function AdminDashboardPage() {
     getAllLandSubmissions(),
     getAllEnquiries(),
     getAllRecces(),
-    getAllAgents(),
+    getStaff(),
   ]);
 
   // ---- Triage queues -------------------------------------------------------
