@@ -70,6 +70,8 @@ interface RtcPayload {
   unreadableFields: string[];
   notes: string;
   extentAcresTotal: number | null;
+  /** Where the scan itself was stored, so the reading can be checked against it. */
+  documentUrl?: string;
 }
 
 /** Mirrors slugify in property-builder, so an applied title and its slug agree. */
@@ -246,7 +248,13 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
       // reading alongside the capture. A reviewer can then audit what the model
       // claimed against the scan, including the fields nobody applied.
       const el = form();
-      if (el) setFieldValue(el, "rtcExtraction", JSON.stringify(r));
+      if (el) {
+        setFieldValue(el, "rtcExtraction", JSON.stringify(r));
+        // The scan is attached immediately rather than offered as a proposal:
+        // it is the evidence for everything below it, so there is nothing to
+        // review before keeping it.
+        if (r.documentUrl) setFieldValue(el, "rtcDocument", r.documentUrl);
+      }
 
       const owners = r.owners
         .map((o) => [o.nameLatin, o.relation].filter(Boolean).join(" "))
@@ -257,16 +265,16 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
         { label: "Survey number", field: "surveyNumber", value: r.surveyNumber },
         { label: "Hissa", field: null, value: r.hissaNumber },
         { label: "Village", field: "area", value: r.villageLatin },
-        { label: "Hobli", field: null, value: r.hobliLatin },
-        { label: "Taluk", field: null, value: r.talukLatin },
-        { label: "District", field: null, value: r.district },
-        // A listing does not carry the owner's name — we never expose vendor
-        // identity to a buyer — so this is shown for the reviewer's eyes only.
-        { label: "Owner on record", field: null, value: owners },
+        { label: "Hobli", field: "hobli", value: r.hobliLatin },
+        { label: "Taluk", field: "taluk", value: r.talukLatin },
+        { label: "District", field: "district", value: r.district },
+        // Stored against the listing but never rendered publicly — vendor
+        // identity is not a buyer-facing field.
+        { label: "Owner on record", field: "ownerOnRecord", value: owners },
         { label: "Land classification", field: null, value: r.landClassification },
-        { label: "Land revenue (₹)", field: null, value: r.landRevenueRupees },
-        { label: "Mutation reference", field: null, value: r.mutationReference },
-        { label: "Valid from", field: null, value: r.validFrom },
+        { label: "Land revenue (₹)", field: "landRevenueRupees", value: r.landRevenueRupees },
+        { label: "Mutation reference", field: "mutationReference", value: r.mutationReference },
+        { label: "Valid from", field: "rtcValidFrom", value: r.validFrom },
       ];
 
       if (r.extentAcresTotal !== null) {
@@ -287,6 +295,7 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
 
       setSuggestions(next.filter((s) => s.value));
       setCaveats([
+        ...(r.documentUrl ? ["The scan itself has been attached to this listing."] : []),
         ...(r.confidence !== "high"
           ? [`Model confidence on this scan is ${r.confidence}. Check every figure against the document.`]
           : []),

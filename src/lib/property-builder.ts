@@ -129,6 +129,14 @@ export interface PropertyInput {
   rtcAvailable: boolean;
   encumbranceClear: boolean;
   surveyNumber: string;
+  hobli: string;
+  taluk: string;
+  district: string;
+  mutationReference: string;
+  rtcValidFrom: string;
+  landRevenueRupees: string;
+  ownerOnRecord: string;
+  rtcDocument: string;
   legalNotes: string[];
   nearbyLandmarks: string[];
   distanceFromBangaloreKm: number;
@@ -180,6 +188,14 @@ export function buildProperty(input: PropertyInput): Property {
       rtcAvailable: input.rtcAvailable,
       encumbranceClear: input.encumbranceClear,
       surveyNumber: input.surveyNumber,
+      hobli: input.hobli,
+      taluk: input.taluk,
+      district: input.district,
+      mutationReference: input.mutationReference,
+      rtcValidFrom: input.rtcValidFrom,
+      landRevenueRupees: input.landRevenueRupees,
+      ownerOnRecord: input.ownerOnRecord,
+      rtcDocument: input.rtcDocument,
       notes: input.legalNotes,
     },
     nearbyLandmarks: input.nearbyLandmarks,

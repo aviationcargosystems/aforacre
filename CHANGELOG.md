@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-29 21:10 IST · RTC values become appliable, scan is kept
+
+- Reading an RTC now stores the scan itself against the listing, not just what was read off it — the extraction is a proposal about a legal document and a reviewer needs the document to check it against. A link to the stored scan appears in the Legal step.
+- Hobli, taluk, district, mutation reference, RTC valid-from, land revenue and owner-on-record are now real property fields, so every value the RTC reader returns can be applied instead of sitting there as reference.
+- Owner on record is stored but flagged internal: vendor identity is never rendered on a buyer-facing page.
+- Add Property's Location step is two columns — fields left, a smaller sticky map right — so the pin and the address fields are side by side rather than stacked.
+- These are all inside the existing `legal` jsonb column, so no migration is needed for them.
+
 ## 2026-07-29 20:20 IST · Measured distance, auto FID, multi-step Add Property
 
 - Add Property is now a five-step panel (Location, Pricing, Land, Media, Records) with its own header and a Save button in the bar. Only a title is required, so a part-filled listing can be saved and finished later.

@@ -44,6 +44,23 @@ export interface TaxBreakdown {
 
 export interface LegalStatus {
   khata: KhataType;
+  /** Revenue hierarchy as printed on the RTC. */
+  hobli: string;
+  taluk: string;
+  district: string;
+  /** Mutation reference, e.g. "MR H41/2025-2026". */
+  mutationReference: string;
+  /** The RTC's "valid from" date, as printed. */
+  rtcValidFrom: string;
+  /** Land revenue in rupees, as printed. */
+  landRevenueRupees: string;
+  /**
+   * Owner as named on the RTC. Admin-only: vendor identity is never rendered on
+   * a buyer-facing surface, so this must not reach a public page.
+   */
+  ownerOnRecord: string;
+  /** Stored scan of the RTC itself, so a reviewer can check the reading against it. */
+  rtcDocument: string;
   dcConverted: boolean;
   dcConversionNote: string;
   rtcAvailable: boolean;

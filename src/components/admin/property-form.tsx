@@ -349,6 +349,17 @@ export function PropertyForm({
           <div className={step === 4 ? "space-y-8" : "hidden"}>
             <section className="space-y-4">
                     <h2 className="font-heading text-lg font-semibold text-foreground">Legal</h2>
+                    <input type="hidden" name="rtcDocument" defaultValue={property?.legal.rtcDocument ?? ""} />
+                    {property?.legal.rtcDocument && (
+                      <a
+                        href={property.legal.rtcDocument}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="inline-flex text-sm font-medium text-accent hover:underline"
+                      >
+                        View the stored RTC scan
+                      </a>
+                    )}
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="Khata" htmlFor="khata">
                         <select id="khata" name="khata" defaultValue={property?.legal.khata ?? "A"} className={inputClass}>
@@ -361,6 +372,31 @@ export function PropertyForm({
                       </Field>
                       <Field label="Survey number" htmlFor="surveyNumber">
                         <input id="surveyNumber" name="surveyNumber" defaultValue={property?.legal.surveyNumber} className={inputClass} />
+                      </Field>
+                      <Field label="Hobli" htmlFor="hobli">
+                        <input id="hobli" name="hobli" defaultValue={property?.legal.hobli} className={inputClass} />
+                      </Field>
+                      <Field label="Taluk" htmlFor="taluk">
+                        <input id="taluk" name="taluk" defaultValue={property?.legal.taluk} className={inputClass} />
+                      </Field>
+                      <Field label="District" htmlFor="district">
+                        <input id="district" name="district" defaultValue={property?.legal.district} className={inputClass} />
+                      </Field>
+                      <Field label="Mutation reference" htmlFor="mutationReference">
+                        <input id="mutationReference" name="mutationReference" defaultValue={property?.legal.mutationReference} className={inputClass} />
+                      </Field>
+                      <Field label="RTC valid from" htmlFor="rtcValidFrom">
+                        <input id="rtcValidFrom" name="rtcValidFrom" defaultValue={property?.legal.rtcValidFrom} className={inputClass} />
+                      </Field>
+                      <Field label="Land revenue (₹)" htmlFor="landRevenueRupees">
+                        <input id="landRevenueRupees" name="landRevenueRupees" defaultValue={property?.legal.landRevenueRupees} className={inputClass} />
+                      </Field>
+                      <Field
+                        label="Owner on record"
+                        htmlFor="ownerOnRecord"
+                        hint="Internal only. Vendor identity is never shown on a buyer-facing page."
+                      >
+                        <input id="ownerOnRecord" name="ownerOnRecord" defaultValue={property?.legal.ownerOnRecord} className={inputClass} />
                       </Field>
                     </div>
                     <div className="flex flex-wrap gap-6">
