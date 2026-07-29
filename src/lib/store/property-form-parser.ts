@@ -27,7 +27,7 @@ function checkboxList<T extends string>(formData: FormData, key: string): T[] {
 
 export async function parsePropertyForm(
   formData: FormData,
-  opts: { existingImages: string[] }
+  opts: { existingImages: string[]; existingVideos?: string[] }
 ): Promise<{ input: PropertyInput; newTags: string[] }> {
   const title = str(formData, "title");
   const slugRaw = str(formData, "slug");
@@ -55,6 +55,15 @@ export async function parsePropertyForm(
   const keptExisting = opts.existingImages.filter((img) => !removedImages.has(img));
   const images = Array.from(new Set([...keptExisting, ...pastedUrls, ...uploadedPaths]));
 
+  // Same three sources as images: files uploaded now, URLs pasted in, and
+  // whatever the listing already had minus anything ticked for removal.
+  const uploadedVideoFiles = formData.getAll("videoFiles").filter((f): f is File => f instanceof File && f.size > 0);
+  const uploadedVideoPaths = await saveUploadedFiles(uploadedVideoFiles, "properties");
+  const pastedVideoUrls = lines(formData, "videoUrls");
+  const removedVideos = new Set(checkboxList<string>(formData, "removeVideo"));
+  const keptVideos = (opts.existingVideos ?? []).filter((v) => !removedVideos.has(v));
+  const videos = Array.from(new Set([...keptVideos, ...pastedVideoUrls, ...uploadedVideoPaths]));
+
   const input: PropertyInput = {
     slug,
     title,
@@ -68,11 +77,13 @@ export async function parsePropertyForm(
     tags,
     useCaseFit,
     soilType: str(formData, "soilType"),
+    landObservation: str(formData, "landObservation"),
     waterSources: checkboxList<WaterSource>(formData, "waterSources"),
     roadAccess: str(formData, "roadAccess"),
     fencing: formData.get("fencing") === "on",
     electricity: formData.get("electricity") === "on",
     images,
+    videos,
     description: str(formData, "description"),
     khata: (str(formData, "khata") || "none") as KhataType,
     dcConverted: formData.get("dcConverted") === "on",

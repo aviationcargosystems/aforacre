@@ -10,5 +10,16 @@ const SouthBangaloreMap = dynamic(() => import("./south-bangalore-map"), {
 });
 
 export function SouthBangaloreMapView({ areas }: { areas: CoverageArea[] }) {
-  return <SouthBangaloreMap areas={areas} />;
+  return (
+    <div className="flex h-full flex-col">
+      {/* Leaflet paints tiles to the container edge, so the rounding has to be
+          clipped here rather than set on the map itself. */}
+      <div className="relative min-h-0 flex-1 overflow-hidden rounded-[1.75rem]">
+        <SouthBangaloreMap areas={areas} />
+      </div>
+      <p className="mt-2.5 text-right text-[10px] leading-none text-muted-foreground/55">
+        © OpenStreetMap contributors, © CARTO
+      </p>
+    </div>
+  );
 }

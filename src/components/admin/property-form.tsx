@@ -5,11 +5,14 @@ import Image from "next/image";
 import type { Property } from "@/lib/types";
 import {
   KHATA_OPTIONS,
+  LAND_OBSERVATIONS,
   USE_CASE_FIELDS,
   VERIFIED_FIELDS,
   WATER_SOURCE_OPTIONS,
   fieldNameForUseCase,
 } from "@/components/admin/property-form-shared";
+import { AreaInput } from "@/components/admin/area-input";
+import { AiAssist } from "@/components/admin/ai-assist";
 import { Button } from "@/components/ui/button";
 
 const inputClass =
@@ -50,12 +53,14 @@ export function PropertyForm({
   }
 
   return (
-    <form action={action} className="space-y-8">
+    <form id="property-form" action={action} className="space-y-8">
       {errorMessage && (
         <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {errorMessage}
         </div>
       )}
+
+      <AiAssist formId="property-form" />
 
       <section className="space-y-4">
         <h2 className="font-heading text-lg font-semibold text-foreground">Basics</h2>
@@ -134,18 +139,11 @@ export function PropertyForm({
 
       <section className="space-y-4">
         <h2 className="font-heading text-lg font-semibold text-foreground">Pricing</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Field label="Extent (acres)" htmlFor="extentAcres">
-            <input
-              id="extentAcres"
-              name="extentAcres"
-              type="number"
-              step="0.1"
-              required
-              defaultValue={property?.extentAcres}
-              className={inputClass}
-            />
-          </Field>
+        <div className="space-y-1.5">
+          <span className={labelClass}>Extent</span>
+          <AreaInput defaultAcres={property?.extentAcres} />
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Price per acre (₹)" htmlFor="pricePerAcre">
             <input
               id="pricePerAcre"
@@ -230,6 +228,25 @@ export function PropertyForm({
             <input id="roadAccess" name="roadAccess" required defaultValue={property?.roadAccess} className={inputClass} />
           </Field>
         </div>
+        <Field
+          label="Land observation"
+          htmlFor="landObservation"
+          hint="What the plot looks like standing on it. Soil type and extent do not tell a buyer whether it needs levelling first."
+        >
+          <input
+            id="landObservation"
+            name="landObservation"
+            list="landObservationSuggestions"
+            defaultValue={property?.landObservation}
+            placeholder="Flat land, gentle fall to the south-east"
+            className={inputClass}
+          />
+          <datalist id="landObservationSuggestions">
+            {LAND_OBSERVATIONS.map((option) => (
+              <option key={option} value={option} />
+            ))}
+          </datalist>
+        </Field>
         <div>
           <p className={labelClass}>Water sources</p>
           <div className="mt-2 flex flex-wrap gap-3">
@@ -301,6 +318,45 @@ export function PropertyForm({
         </Field>
         <Field label="Or upload photos" htmlFor="imageFiles">
           <input id="imageFiles" name="imageFiles" type="file" accept="image/*" multiple className={inputClass} />
+        </Field>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="font-heading text-lg font-semibold text-foreground">Videos</h2>
+        <p className="text-sm text-muted-foreground">
+          Optional. A walkthrough clip does more for a plot than another still, but most listings will not have one.
+        </p>
+
+        {property?.videos && property.videos.length > 0 && (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {property.videos.map((src) => (
+              <div key={src} className="relative overflow-hidden rounded-xl border border-border">
+                <video src={src} controls preload="metadata" className="h-40 w-full bg-black object-cover" />
+                <label className="flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground">
+                  <input type="checkbox" name="removeVideo" value={src} className="h-4 w-4" />
+                  Remove this video
+                </label>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <Field label="Add video URLs" htmlFor="videoUrls" hint="One URL per line.">
+          <textarea id="videoUrls" name="videoUrls" rows={2} className={inputClass} />
+        </Field>
+        <Field
+          label="Or upload clips"
+          htmlFor="videoFiles"
+          hint="MP4, MOV or WebM. Keep each under about 50 MB — these are uploaded as-is, with no transcoding step, so a long 4K clip will be slow for buyers on mobile data."
+        >
+          <input
+            id="videoFiles"
+            name="videoFiles"
+            type="file"
+            accept="video/mp4,video/quicktime,video/webm"
+            multiple
+            className={inputClass}
+          />
         </Field>
       </section>
 

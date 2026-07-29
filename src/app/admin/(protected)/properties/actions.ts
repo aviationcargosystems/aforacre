@@ -17,7 +17,7 @@ function revalidatePublicPaths(slug?: string) {
 
 export async function createPropertyAction(formData: FormData) {
   await requireAdmin();
-  const { input, newTags } = await parsePropertyForm(formData, { existingImages: [] });
+  const { input, newTags } = await parsePropertyForm(formData, { existingImages: [], existingVideos: [] });
 
   if (!input.title || !input.slug) {
     redirect(`/admin/properties/new?error=${encodeURIComponent("Title is required.")}`);
@@ -44,7 +44,7 @@ export async function updatePropertyAction(originalSlug: string, formData: FormD
     redirect("/admin/properties");
   }
 
-  const { input, newTags } = await parsePropertyForm(formData, { existingImages: existing.images });
+  const { input, newTags } = await parsePropertyForm(formData, { existingImages: existing.images, existingVideos: existing.videos });
   // Slug is immutable after creation — editing the title doesn't move the URL.
   input.slug = originalSlug;
 

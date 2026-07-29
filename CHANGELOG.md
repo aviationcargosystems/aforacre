@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-07-29 15:40 IST · Homepage order, region maps, flexible extent, AI assist
+
+- Homepage: removed the two hero sub-paragraphs; Featured land now sits third, directly after the corridor map, with the corridor argument moved below it as supporting evidence.
+- Corridor map: centred with even padding on all four sides (the old proportional pad left the region off-centre), rounded corners, and Leaflet's white attribution bar replaced by a plain credit line under the map. Carto and OSM are still credited.
+- Our Geography: each region with a verified pin now shows a small map thumbnail built from raster tiles rather than a Leaflet instance. Maralavadi, Kalanakuppe, Sheetalwadi and Bannerghatta have no reliable coordinate yet and stay as plain chips rather than getting an invented pin.
+- Add property: extent can be entered in guntas, acres or sq ft, with the other two following live. Acres stays the stored unit.
+- Add property: new "Land observation" field for terrain (flat, gently sloping, rocky in patches), with suggestions but free text.
+- Properties can now carry optional walkthrough videos, uploaded to the existing CDN-backed Storage bucket. Uploads are stored as-is with no transcoding step; server action body limit raised to 64 MB.
+- New AI assist panel on the property form: researches a dropped pin using Claude Sonnet 5 with web search, and reads Kannada RTC documents to extract survey number, village, hobli, taluk, owner and acre-gunta extent. Every value arrives as a proposal with its own Apply button; nothing is written to the form or published automatically.
+- User-facing: property pages now show extent in guntas, acres and sq ft, the land observation, and a walkthrough video section when a listing has one.
+- Requires `ANTHROPIC_API_KEY` in .env.local and Vercel, and migration 0011 run in Supabase.
+
 ## 2026-07-28 18:15 IST · Phase 3: partner capture and QC queue
 
 **`/partner/capture`, built for a broker standing in a field on 4G.**

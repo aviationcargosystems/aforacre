@@ -53,7 +53,10 @@ function FitToRegion({ areas }: { areas: CoverageArea[] }) {
       ...GROWTH_ANCHORS.map((a) => [a.lat, a.lng] as [number, number]),
       BENGALURU,
     ];
-    map.fitBounds(L.latLngBounds(points).pad(0.1), { animate: false });
+    // Even padding on all four sides. `.pad()` grows the bounds rectangle
+    // proportionally, so a tall, narrow spread of points ends up with far more
+    // slack on one axis than the other and the region sits off-centre.
+    map.fitBounds(L.latLngBounds(points), { padding: [48, 48], animate: false });
   }, [areas, map]);
   return null;
 }
@@ -69,7 +72,10 @@ export default function SouthBangaloreMap({ areas }: { areas: CoverageArea[] }) 
       scrollWheelZoom={false}
       doubleClickZoom={false}
       zoomControl={false}
-      attributionControl
+      // Carto and OSM still require credit, so it is not dropped — it moves to
+      // a plain line under the map instead of Leaflet's white bar, which was
+      // cutting across the rounded bottom corners.
+      attributionControl={false}
       className="h-full w-full bg-transparent"
     >
       <TileLayer url={POSITRON.url} attribution={POSITRON.attribution} />

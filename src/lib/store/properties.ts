@@ -37,6 +37,8 @@ interface PropertyRow {
   legal: Property["legal"];
   nearby_landmarks: string[];
   distance_from_bangalore_km: number;
+  land_observation: string | null;
+  videos: string[] | null;
   featured: boolean;
   fid: string | null;
   verified: Property["verified"];
@@ -53,11 +55,13 @@ function rowToProperty(row: PropertyRow): Property {
     tags: row.tags ?? [],
     useCaseFit: row.journey_fit,
     soilType: row.soil_type,
+    landObservation: row.land_observation ?? "",
     waterSources: row.water_sources ?? [],
     roadAccess: row.road_access,
     fencing: row.fencing,
     electricity: row.electricity,
     images: row.images ?? [],
+    videos: row.videos ?? [],
     description: row.description,
     taxes: row.taxes,
     suitability: row.suitability,
@@ -84,11 +88,13 @@ function propertyToRow(p: Property): Omit<PropertyRow, "created_at" | "updated_a
     tags: p.tags,
     journey_fit: p.useCaseFit,
     soil_type: p.soilType,
+    land_observation: p.landObservation,
     water_sources: p.waterSources,
     road_access: p.roadAccess,
     fencing: p.fencing,
     electricity: p.electricity,
     images: p.images,
+    videos: p.videos,
     description: p.description,
     taxes: p.taxes,
     suitability: p.suitability,

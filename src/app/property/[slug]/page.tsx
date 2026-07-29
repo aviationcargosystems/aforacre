@@ -11,6 +11,7 @@ import {
   Fence,
   MapPin,
   Route,
+  Mountain,
   Ruler,
   ScrollText,
   ShieldCheck,
@@ -20,6 +21,7 @@ import { getProperty } from "@/lib/store/properties";
 import { USE_CASES } from "@/data/use-cases";
 import { karnatakaLegalTerms } from "@/data/legal";
 import { formatINR } from "@/lib/tax";
+import { acresToGunta, acresToSqft } from "@/lib/land-units";
 import { Badge } from "@/components/ui/badge";
 import { GrowthAnchors } from "@/components/property/growth-anchors";
 import { Card, CardContent } from "@/components/ui/card";
@@ -200,16 +202,54 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
             </CardContent>
           </Card>
 
+          {/* Optional. Most plots have no clip, and an empty player would read
+              as something failing to load rather than as nothing to show. */}
+          {property.videos.length > 0 && (
+            <Card className="p-6 sm:p-7">
+              <CardContent className="space-y-6 p-0">
+                <SectionHeading
+                  kicker="Walkthrough"
+                  title={property.videos.length === 1 ? "A walk across the plot" : "Walking the plot"}
+                  subtitle="Filmed on site. Photographs flatten a slope; a walkthrough does not."
+                />
+                <div className={property.videos.length > 1 ? "grid gap-4 sm:grid-cols-2" : ""}>
+                  {property.videos.map((src) => (
+                    <video
+                      key={src}
+                      src={src}
+                      controls
+                      playsInline
+                      // Metadata only: a listing page can carry several clips and
+                      // nobody should pay for megabytes they never press play on.
+                      preload="metadata"
+                      className="w-full rounded-2xl border border-border/70 bg-black"
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <Card className="p-6 sm:p-7">
             <CardContent className="space-y-6 p-0">
               <SectionHeading kicker="Key facts" title="Core property details" />
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                <FactItem icon={Ruler} label="Extent" value={`${property.extentAcres} acres`} />
+                <FactItem
+                  icon={Ruler}
+                  label="Extent"
+                  value={`${property.extentAcres} acres`}
+                  detail={`${formatUnit(acresToGunta(property.extentAcres))} guntas · ${formatUnit(
+                    acresToSqft(property.extentAcres)
+                  )} sq ft`}
+                />
                 <FactItem icon={Droplets} label="Water source" value={property.waterSources.join(", ") || "None"} />
                 <FactItem icon={Route} label="Road access" value={property.roadAccess} />
                 <FactItem icon={Fence} label="Fencing" value={property.fencing ? "Fenced" : "Not fenced"} />
                 <FactItem icon={Zap} label="Electricity" value={property.electricity ? "Connected" : "Not connected"} />
                 <FactItem icon={ScrollText} label="Soil type" value={property.soilType} />
+                {property.landObservation && (
+                  <FactItem icon={Mountain} label="Land observation" value={property.landObservation} />
+                )}
               </div>
             </CardContent>
           </Card>
@@ -353,21 +393,30 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
   );
 }
 
+/** Trims float noise without forcing decimals onto round numbers. */
+function formatUnit(value: number): string {
+  return Number(value.toFixed(2)).toLocaleString("en-IN");
+}
+
 function FactItem({
   icon: Icon,
   label,
   value,
+  detail,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string;
+  /** Secondary line, e.g. the same extent expressed in guntas and sq ft. */
+  detail?: string;
 }) {
   return (
     <div className="flex items-start gap-2.5 rounded-2xl border border-border/70 bg-white/75 p-4 backdrop-blur-sm">
       <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-      <div>
+      <div className="min-w-0">
         <p className="text-xs text-muted-foreground">{label}</p>
         <p className="mt-1 text-sm font-medium capitalize text-foreground">{value}</p>
+        {detail && <p className="mt-0.5 text-xs leading-5 text-muted-foreground">{detail}</p>}
       </div>
     </div>
   );

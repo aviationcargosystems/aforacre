@@ -116,11 +116,13 @@ export interface PropertyInput {
   tags: string[];
   useCaseFit: Record<UseCase, number>;
   soilType: string;
+  landObservation: string;
   waterSources: WaterSource[];
   roadAccess: string;
   fencing: boolean;
   electricity: boolean;
   images: string[];
+  videos: string[];
   description: string;
   khata: KhataType;
   dcConverted: boolean;
@@ -159,11 +161,13 @@ export function buildProperty(input: PropertyInput): Property {
     tags: input.tags,
     useCaseFit: input.useCaseFit,
     soilType: input.soilType,
+    landObservation: input.landObservation,
     waterSources: input.waterSources,
     roadAccess: input.roadAccess,
     fencing: input.fencing,
     electricity: input.electricity,
     images: input.images,
+    videos: input.videos,
     description: input.description,
     taxes,
     suitability: buildSuitability(input.useCaseFit, ctx),

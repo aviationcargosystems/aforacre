@@ -78,11 +78,25 @@ export interface Property {
   tags: string[];
   useCaseFit: Record<UseCase, number>; // 0-100
   soilType: string;
+  /**
+   * What the land actually looks like standing on it — flat, gently sloping,
+   * rocky in patches. Soil type says what is under the surface and acreage says
+   * how much there is; neither tells a buyer whether they can build on it
+   * without levelling first, which is usually the first thing they ask.
+   */
+  landObservation: string;
   waterSources: WaterSource[];
   roadAccess: string;
   fencing: boolean;
   electricity: boolean;
   images: string[];
+  /**
+   * Walkthrough clips. Optional per plot: some listings have one, most do not,
+   * and an empty array must render as no video section rather than an empty
+   * player. Served from the same Supabase Storage bucket as images, which is
+   * already CDN-backed, so there is no separate host to configure.
+   */
+  videos: string[];
   description: string;
   taxes: TaxBreakdown;
   suitability: LandSuitability;

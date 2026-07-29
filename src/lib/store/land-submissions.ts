@@ -133,11 +133,15 @@ export async function approveLandSubmission(id: string): Promise<string> {
     tags: submission.tags,
     useCaseFit: { polyhouse: 50, "commercial-farming": 50, retirement: 50, getaway: 50 },
     soilType: "Not yet assessed",
+    landObservation: "",
     waterSources: [],
     roadAccess: "Not yet assessed",
     fencing: false,
     electricity: false,
     images: submission.images,
+    // Sellers submit stills today; a video field on the intake form is a
+    // separate change, so an approved submission starts with none.
+    videos: [],
     description: submission.notes || "Details pending admin review after site visit.",
     khata: "none",
     dcConverted: false,

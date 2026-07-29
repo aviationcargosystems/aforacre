@@ -10,6 +10,13 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  experimental: {
+    // Property submissions carry photos and now walkthrough clips through a
+    // server action. The 1 MB default rejects a single phone video outright,
+    // and the failure surfaces as an opaque action error rather than anything
+    // the admin could act on.
+    serverActions: { bodySizeLimit: "64mb" },
+  },
   async redirects() {
     return [
       // Journeys let a buyer self-select a category, which pre-empts the match

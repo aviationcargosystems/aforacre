@@ -74,18 +74,10 @@ export default async function Home() {
           <h1 className="font-heading text-5xl font-semibold leading-[1.02] tracking-tight text-balance text-foreground sm:text-6xl lg:text-7xl">
             Buy holistic lands in south Bengaluru!
           </h1>
-          <p className="mt-6 max-w-3xl text-pretty text-lg leading-8 text-foreground/85 sm:text-xl sm:leading-9">
-            South Bengaluru is quietly becoming one of India&apos;s most exciting growth corridors.
-          </p>
-          <p className="mt-4 max-w-3xl text-pretty text-base leading-8 text-muted-foreground sm:text-lg sm:leading-9">
-            Within a comfortable one to one-and-a-half-hour drive from the city lies an extraordinary landscape of
-            forests, lakes, hills and fertile farmland that many Bengaluru residents have never explored.
-          </p>
-
           {/* One CTA. A second button beside it splits attention at the exact
               moment we want a single decision, and everything on this page
               already leads somewhere. */}
-          <div className="mt-11 w-full sm:w-auto">
+          <div className="mt-10 w-full sm:w-auto">
             <Button asChild variant="pill" size="pill" className="h-14 w-full px-10 text-base sm:w-auto">
               <Link href="/match">
                 Find myself <ArrowRight className="ml-1.5 h-5 w-5" />
@@ -130,11 +122,12 @@ export default async function Home() {
           </div>
         </div>
 
-        <WhyThisCorridor />
-
       </div>
 
-      <section className="relative pb-24 pt-4 lg:pb-28">
+      {/* Featured sits third, directly after the map: once someone has seen
+          where the corridor is, the next honest question is what is actually
+          for sale there. The corridor argument follows as supporting evidence. */}
+      <section className="relative pb-24 pt-16 lg:pb-28 lg:pt-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
             <SectionHeading
@@ -151,6 +144,12 @@ export default async function Home() {
           <FeaturedLandCarousel properties={featured} />
         </div>
       </section>
+
+      {/* The corridor argument now follows the listings rather than preceding
+          them: it reads as evidence for what you have just seen, not as a claim
+          you have to take on trust before seeing anything. */}
+      <WhyThisCorridor />
+
       <OurGeography />
 
       {closingImage && (

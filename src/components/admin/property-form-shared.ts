@@ -22,6 +22,22 @@ export function fieldNameForUseCase(id: UseCase) {
   return `useCaseFit_${id}`;
 }
 
+/**
+ * Suggestions only, offered through a datalist rather than a select. The field
+ * stays free text because real plots rarely fit one word — "mostly flat, rocky
+ * along the north boundary" is the useful answer and no fixed list contains it.
+ */
+export const LAND_OBSERVATIONS = [
+  "Flat land",
+  "Gently sloping",
+  "Sloping",
+  "Undulating",
+  "Elevated, plateau-like",
+  "Valley floor",
+  "Rocky in patches",
+  "Terraced",
+];
+
 export const VERIFIED_FIELDS: { key: keyof VerifiedChecklist; label: string }[] = [
   { key: "ownership", label: "Ownership verified" },
   { key: "survey", label: "Survey checked" },
