@@ -1,30 +1,30 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import type { Agent } from "@/lib/types";
-import { AGENT_SESSION_COOKIE, agentIdFromSessionToken } from "@/lib/agent-auth";
-import { getAgent } from "@/lib/store/agents";
+import { getSessionProfile, type SessionProfile } from "@/lib/auth/roles";
 
-// Defense in depth, same shape as requireAdmin(): middleware already gates
-// /agent/* on the cookie signature, but server actions can be invoked directly,
-// so every agent action re-checks here.
-//
-// This is also where deactivation actually bites. The session token is
-// stateless — a deactivated agent still holds a validly-signed cookie — so the
-// `active` flag has to be re-read from the database on each request. That DB
-// lookup can't happen in Edge middleware, which is exactly why it lives here.
-export async function requireAgent(): Promise<Agent> {
-  const store = await cookies();
-  const token = store.get(AGENT_SESSION_COOKIE)?.value;
-  const agentId = await agentIdFromSessionToken(token);
+/**
+ * Gate for the agent portal.
+ *
+ * Defense in depth, same shape as requireRole(): middleware already gates
+ * /agent/* on the session, but a server action can be invoked directly, so
+ * every agent action re-checks here.
+ *
+ * This is also where a disabled account actually bites. Disabling bans the
+ * login in Supabase, and getSessionProfile() revalidates the token with
+ * Supabase rather than decoding the cookie, so a banned agent stops getting
+ * through on the next request instead of whenever their token happens to
+ * expire.
+ *
+ * Super admins pass too, so they can see the portal their agents are using.
+ */
+export async function requireAgent(): Promise<SessionProfile> {
+  const profile = await getSessionProfile();
 
-  if (!agentId) {
-    redirect("/agent/login");
+  if (!profile) {
+    redirect("/login?next=%2Fagent");
+  }
+  if (profile.role !== "agent" && profile.role !== "super_admin") {
+    redirect("/login?error=not_an_agent");
   }
 
-  const agent = await getAgent(agentId);
-  if (!agent || !agent.active) {
-    redirect("/agent/login?error=inactive");
-  }
-
-  return agent;
+  return profile;
 }

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { MapPin } from "lucide-react";
 import type { RecceStatus } from "@/lib/types";
 import { getAllRecces } from "@/lib/store/recces";
-import { getAllAgents } from "@/lib/store/agents";
+import { getStaff } from "@/lib/store/staff";
 import { getAllProperties } from "@/lib/store/properties";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,13 +34,22 @@ export default async function AdminReccesPage({
   searchParams: Promise<{ status?: string; error?: string; assigned?: string }>;
 }) {
   const { status, error, assigned } = await searchParams;
-  const [recces, agents, properties] = await Promise.all([
+  const [recces, staff, properties] = await Promise.all([
     getAllRecces(),
-    getAllAgents(),
+    getStaff(),
     getAllProperties(),
   ]);
+  // Anyone with the agent role can be sent on a recce. Super admins are
+  // excluded from the assign list: they review, they do not get assigned.
+  const agents = staff
+    .filter((person) => person.role === "agent")
+    .map((person) => ({
+      id: person.id,
+      name: person.fullName || person.email || person.mobile,
+      active: !person.disabled,
+    }));
 
-  const agentNameById = new Map(agents.map((a) => [a.id, a.name || a.username]));
+  const agentNameById = new Map(agents.map((a) => [a.id, a.name]));
   const activeAgents = agents.filter((a) => a.active);
   const filtered = status ? recces.filter((r) => r.status === status) : recces;
 
@@ -75,7 +84,7 @@ export default async function AdminReccesPage({
         <p className="mt-6 rounded-xl border border-dashed border-border bg-background p-6 text-sm text-muted-foreground">
           No active agents yet —{" "}
           <Link href="/admin/agents" className="text-accent hover:underline">
-            create one first
+            add one under Staff
           </Link>
           .
         </p>
@@ -90,7 +99,7 @@ export default async function AdminReccesPage({
               <select id="agentId" name="agentId" required className={inputClass}>
                 {activeAgents.map((agent) => (
                   <option key={agent.id} value={agent.id}>
-                    {agent.name || agent.username}
+                    {agent.name}
                   </option>
                 ))}
               </select>
