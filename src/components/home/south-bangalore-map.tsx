@@ -28,10 +28,22 @@ export interface CoverageArea {
   count: number;
 }
 
-const POSITRON = {
-  url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; CARTO',
-};
+/**
+ * Positron, split into its base and its labels.
+ *
+ * Place names are baked into the raster in the combined `light_all` tiles, so
+ * there is no way to restyle them once they arrive. Taking the labels as their
+ * own layer puts them in a separate DOM container, which a CSS filter can then
+ * darken — the point being that someone should be able to find Harohalli or
+ * Anekal at a glance rather than squinting at grey-on-grey.
+ *
+ * The label layer also sits above the heat blooms, so names stay readable where
+ * a bloom passes under them.
+ */
+const POSITRON_BASE = "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png";
+const POSITRON_LABELS = "https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png";
+const ATTRIBUTION =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; CARTO';
 
 const BENGALURU: [number, number] = [12.9716, 77.5946];
 const FOREST = "#1f3a2e";
@@ -39,17 +51,24 @@ const TERRACOTTA = "#c56a4a";
 
 /**
  * Stacked rings, widest and faintest first, so each project reads as a bloom.
- * Weighted heavily towards the centre: at the previous opacities the blooms
- * washed out against the basemap and the map read as a scatter of dots.
+ *
+ * The reach is deliberately wide, but the falloff is gentle and the core stays
+ * light. Stacking opacity steeply towards the centre gave each project a solid
+ * disc that read as a boundary someone had drawn, which is a stronger claim
+ * than we can make: these mark where investment is landing, not a catchment
+ * with an edge.
  */
 const HEAT_BANDS = [
-  { radius: 14000, opacity: 0.07 },
-  { radius: 10000, opacity: 0.1 },
-  { radius: 7000, opacity: 0.14 },
-  { radius: 4500, opacity: 0.19 },
-  { radius: 2600, opacity: 0.26 },
-  { radius: 1300, opacity: 0.34 },
+  { radius: 14000, opacity: 0.035 },
+  { radius: 10000, opacity: 0.045 },
+  { radius: 7000, opacity: 0.055 },
+  { radius: 4500, opacity: 0.07 },
+  { radius: 2600, opacity: 0.085 },
+  { radius: 1300, opacity: 0.1 },
 ];
+
+/** Fractions of a zoom level to pull back after fitting, for breathing room. */
+const ZOOM_BACK_OFF = 1.25;
 
 function FitToRegion({ areas }: { areas: CoverageArea[] }) {
   const map = useMap();
@@ -58,7 +77,15 @@ function FitToRegion({ areas }: { areas: CoverageArea[] }) {
     // Including the city and every listing pulled the centre north and left the
     // blooms — the actual subject — small and off to one side.
     const points = GROWTH_ANCHORS.map((a) => [a.lat, a.lng] as [number, number]);
-    map.fitBounds(L.latLngBounds(points), { padding: [96, 96], animate: false });
+    // Fit tight, then step back a fixed fraction of a zoom level.
+    //
+    // Pulling back with padding instead looks fine on a wide desktop frame and
+    // falls apart on a phone: the padding is in pixels, so on a 350px-tall box
+    // a 260px inset leaves almost nothing to fit the bounds into and Leaflet
+    // bottoms out at its minimum zoom. A zoom delta is proportional, so the
+    // framing is the same at every size.
+    map.fitBounds(L.latLngBounds(points), { padding: [36, 36], animate: false });
+    map.setZoom(map.getZoom() - ZOOM_BACK_OFF, { animate: false });
   }, [areas, map]);
   return null;
 }
@@ -68,6 +95,9 @@ export default function SouthBangaloreMap({ areas }: { areas: CoverageArea[] }) 
     <MapContainer
       center={BENGALURU}
       zoom={10}
+      // Leaflet snaps to whole zoom levels by default, which would round the
+      // fractional back-off above away to nothing.
+      zoomSnap={0.25}
       // A diagram, not a tool. Free panning invites people to treat it as a
       // search surface, which is what /explore is for.
       dragging={false}
@@ -80,7 +110,7 @@ export default function SouthBangaloreMap({ areas }: { areas: CoverageArea[] }) 
       attributionControl={false}
       className="h-full w-full bg-transparent"
     >
-      <TileLayer url={POSITRON.url} attribution={POSITRON.attribution} />
+      <TileLayer url={POSITRON_BASE} attribution={ATTRIBUTION} />
       <FitToRegion areas={areas} />
 
       {/* Heat blooms, one per committed project. */}
@@ -138,6 +168,9 @@ export default function SouthBangaloreMap({ areas }: { areas: CoverageArea[] }) 
           </Popup>
         </CircleMarker>
       ))}
+
+      {/* Last, so place names read over the blooms rather than under them. */}
+      <TileLayer url={POSITRON_LABELS} className="aa-map-labels" />
     </MapContainer>
   );
 }

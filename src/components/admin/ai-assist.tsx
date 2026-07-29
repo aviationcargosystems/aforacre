@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { FileText, Loader2, MapPin, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { FileText, Link as LinkIcon, Loader2, MapPin, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PinLocationPicker } from "@/components/map/pin-location-picker";
 import { acresToGunta, acresToSqft } from "@/lib/land-units";
+import { isShortMapLink, parseMapLink } from "@/lib/map-link";
 
 /**
  * Draft a listing from a pin or an RTC, without ever writing to it directly.
@@ -79,17 +81,77 @@ function setFieldValue(form: HTMLFormElement, name: string, value: string): bool
   return true;
 }
 
-export function AiAssist({ formId }: { formId: string }) {
+export function AiAssist({ formId, showMap = true }: { formId: string; showMap?: boolean }) {
   const [busy, setBusy] = useState<"pin" | "rtc" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [caveats, setCaveats] = useState<string[]>([]);
   const [sources, setSources] = useState<string[]>([]);
   const [applied, setApplied] = useState<Set<string>>(new Set());
+  const [pin, setPin] = useState<{ lat: number; lng: number } | null>(null);
+  const [link, setLink] = useState("");
+  const [linkBusy, setLinkBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Seed the map from whatever the form already holds, so editing an existing
+    // listing opens on its plot rather than on an empty map.
+    const el = document.getElementById(formId) as HTMLFormElement | null;
+    if (!el) return;
+    const lat = Number((el.elements.namedItem("lat") as HTMLInputElement | null)?.value);
+    const lng = Number((el.elements.namedItem("lng") as HTMLInputElement | null)?.value);
+    if (Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPin({ lat, lng });
+    }
+  }, [formId]);
 
   function form(): HTMLFormElement | null {
     return document.getElementById(formId) as HTMLFormElement | null;
+  }
+
+  function placePin(lat: number, lng: number) {
+    setPin({ lat, lng });
+    const el = form();
+    if (!el) return;
+    setFieldValue(el, "lat", lat.toFixed(6));
+    setFieldValue(el, "lng", lng.toFixed(6));
+  }
+
+  async function applyLink() {
+    const value = link.trim();
+    if (!value) return;
+    setError(null);
+
+    // Long URLs and bare "lat, lng" pastes parse here with no round trip.
+    const direct = parseMapLink(value);
+    if (direct) {
+      placePin(direct.lat, direct.lng);
+      setLink("");
+      return;
+    }
+
+    if (!isShortMapLink(value)) {
+      setError("No coordinates in that link. Paste the URL from the Maps address bar, or a \"lat, lng\" pair.");
+      return;
+    }
+
+    setLinkBusy(true);
+    try {
+      const response = await fetch("/api/admin/map-link", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ url: value }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Could not read that link.");
+      placePin(data.lat, data.lng);
+      setLink("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not read that link.");
+    } finally {
+      setLinkBusy(false);
+    }
   }
 
   function reset() {
@@ -251,17 +313,55 @@ export function AiAssist({ formId }: { formId: string }) {
     <section className="rounded-[1.25rem] border border-accent/25 bg-accent/[0.05] p-4 sm:p-5">
       <div className="flex flex-wrap items-center gap-2">
         <Sparkles className="h-4 w-4 shrink-0 text-accent" />
-        <h2 className="font-heading text-base font-semibold text-foreground">Fill this in from a pin or an RTC</h2>
+        <h2 className="font-heading text-base font-semibold text-foreground">Pin on map, or read an RTC</h2>
       </div>
-      <p className="mt-1.5 text-xs leading-6 text-muted-foreground">
-        Everything below arrives as a proposal. Nothing is written into the form until you apply it, and nothing is
-        published until you save.
-      </p>
+
+      {showMap && (
+        <div className="mt-4 space-y-1.5">
+          <div className="h-64 overflow-hidden rounded-xl border border-border/70 sm:h-72">
+            <PinLocationPicker
+              lat={pin?.lat ?? null}
+              lng={pin?.lng ?? null}
+              onPick={placePin}
+            />
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  // This panel lives inside the property form; Enter here must
+                  // move the pin, not submit the listing.
+                  e.preventDefault();
+                  void applyLink();
+                }
+              }}
+              placeholder="…or paste a Google Maps link"
+              className="min-w-0 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+            <Button type="button" variant="pill-outline" size="sm" onClick={applyLink} disabled={linkBusy || !link.trim()}>
+              {linkBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <LinkIcon className="h-4 w-4" />}
+              Use link
+            </Button>
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            {pin ? `${pin.lat.toFixed(5)}, ${pin.lng.toFixed(5)}` : "Tap the map to drop a pin."}
+          </p>
+        </div>
+      )}
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <Button type="button" variant="pill-outline" size="sm" onClick={researchPin} disabled={busy !== null}>
+        <Button
+          type="button"
+          variant="pill-outline"
+          size="sm"
+          onClick={researchPin}
+          disabled={busy !== null || (showMap && !pin)}
+        >
           {busy === "pin" ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />}
-          {busy === "pin" ? "Researching the pin…" : "Research this pin"}
+          {busy === "pin" ? "Reading the area…" : "Read this pin"}
         </Button>
 
         <Button
@@ -272,7 +372,7 @@ export function AiAssist({ formId }: { formId: string }) {
           disabled={busy !== null}
         >
           {busy === "rtc" ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
-          {busy === "rtc" ? "Reading the RTC…" : "Read an RTC"}
+          {busy === "rtc" ? "Reading the RTC…" : "Read RTC"}
         </Button>
         <input
           ref={fileRef}
@@ -295,7 +395,9 @@ export function AiAssist({ formId }: { formId: string }) {
       {suggestions.length > 0 && (
         <div className="mt-4 space-y-2">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Proposed values</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Proposed — nothing is saved until you apply
+            </p>
             {applicable > 0 && (
               <button type="button" onClick={applyAll} className="text-xs font-medium text-accent hover:underline">
                 Apply all {applicable}

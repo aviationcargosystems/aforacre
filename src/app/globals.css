@@ -189,6 +189,19 @@
   font-weight: 500;
 }
 
+/* Positron's place names ship as light grey pixels inside the label tiles, and
+   over a warm background with heat blooms behind them they are close to
+   unreadable. The labels come in as their own layer purely so this filter can
+   reach them: drop the brightness to darken the glyphs, then push contrast so
+   the darkened text separates from the near-white tile it sits on. */
+.aa-map-labels {
+  /* Enough to lift the names off a warm background, and no more. Pushed
+     harder, every minor hamlet turns solid black and the label layer starts
+     competing with the blooms it is supposed to sit behind. */
+  filter: brightness(0.78) contrast(1.08);
+  opacity: 0.88;
+}
+
 /* Leaflet popup content is a plain DOM node outside Tailwind's reach — override
    its default padding/rounding so the property-card popup image can go full-bleed. */
 .property-popup .leaflet-popup-content-wrapper {

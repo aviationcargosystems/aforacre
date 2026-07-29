@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-07-29 17:50 IST · Map legibility, pin-by-link, table and capture fixes
+
+- Corridor map: place names split onto their own tile layer so they can be darkened enough to read against the warm background, without turning every hamlet solid black. Section is now an even 50/50 split, the map is taller, and on mobile it sits above the copy.
+- Corridor map: Leaflet's panes were outranking the sticky header (z-index 400+ vs 50), so an open popup painted over it. The map wrapper now creates its own stacking context.
+- Explore map: one place-name chip per area instead of one per plot, plus zoom-aware collision culling — any chip that would touch one already placed is demoted to a dot and reappears as you zoom in. Chips restyled flat and small.
+- Add property: the map is embedded directly in the assist panel. Drop a pin, or paste a Google Maps link (including the shortened share links, resolved server-side) and the coordinates fill themselves in. "Read this pin" is disabled until a pin exists, so the "set latitude first" error can no longer fire repeatedly.
+- Assist panel stripped to its two actions; the explanatory paragraph is gone.
+- Field capture now has the map picker too, not just latitude and longitude boxes, plus a link out to the pin in Google Maps.
+- Admin properties table: price column no longer wraps ("Rs 89.10 L" was breaking across two lines). Explicit column widths, right-aligned tabular numerals, truncating title and corridor.
+
 ## 2026-07-29 16:35 IST · Multi-step capture, map emphasis, hero subtext
 
 - Quick capture is now four optional steps: site (photos, pin, notes), tags, property details (area, extent in gunta/acre/sq ft, price, soil, land observation, water, fencing, electricity) and documents (survey number, khata, RTC scan). Only step one matters; the save button sits outside the stepper so the twenty-second path in a field is unchanged.

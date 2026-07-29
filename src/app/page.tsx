@@ -93,8 +93,12 @@ export default async function Home() {
             inside one. Infrastructure carries it; our listings are context. */}
         <div className="relative mt-14 lg:mt-20">
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-            <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
-              <div>
+            {/* On a phone the map leads: the point of this section is where the
+                corridor is, and a list of project names lands better once you
+                have seen them placed. Side by side, reading order wins and the
+                text goes first. */}
+            <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
+              <div className="order-2 lg:order-1">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Why south Bengaluru</p>
                 <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
                   The region is expected to benefit from major infrastructure.
@@ -117,7 +121,7 @@ export default async function Home() {
                 </p>
               </div>
 
-              <div className="h-[24rem] sm:h-[30rem] lg:h-[34rem]">
+              <div className="order-1 h-[26rem] sm:h-[36rem] lg:order-2 lg:h-[44rem]">
                 <SouthBangaloreMapView areas={coverage} />
               </div>
             </div>

@@ -3,7 +3,7 @@
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Ruler } from "lucide-react";
@@ -48,39 +48,113 @@ const BASEMAPS: Record<Basemap, { label: string; url: string; attribution: strin
  * Price on every pin turned the map into a wall of numbers and led with cost,
  * which is not how someone browses land. The label is the place name; the price
  * appears once you open a pin and are actually looking at that plot.
+ *
+ * Only one plot per area carries the name. Three plots in Harohalli used to
+ * mean three identical chips stacked on top of each other, which was both
+ * unreadable and told the reader nothing the first chip had not already said.
+ * The rest are dots: still hoverable, still clickable, no collision.
  */
-function placeIcon(property: Property, active: boolean) {
-  const label = property.location.area;
+function placeIcon(label: string | null, active: boolean) {
   const bg = active ? "#c56a4a" : "#1f3a2e";
-  const width = Math.max(56, label.length * 6.6 + 22);
+
+  if (!label) {
+    const size = active ? 14 : 11;
+    return L.divIcon({
+      className: "aa-place-pin",
+      html: `<div style="
+        width:${size}px;height:${size}px;border-radius:50%;
+        background:${bg};border:2px solid #fff;
+        box-shadow:0 2px 8px rgba(15,23,42,0.3);
+      "></div>`,
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2],
+      popupAnchor: [0, -(size / 2) - 2],
+    });
+  }
+
+  const width = Math.max(48, label.length * 6.2 + 18);
 
   return L.divIcon({
     className: "aa-place-pin",
     html: `
-      <div style="position:relative;transform:translate(-50%,-100%);">
+      <div style="transform:translate(-50%,-50%);">
         <div style="
-          display:flex;align-items:center;gap:5px;
           background:${bg};color:#fff;
-          padding:5px 11px;border-radius:999px;
-          font-size:11.5px;font-weight:600;letter-spacing:0.01em;
+          padding:3px 9px;border-radius:999px;
+          font-size:11px;font-weight:500;letter-spacing:0.01em;
           white-space:nowrap;font-family:inherit;
-          border:2px solid #fff;
-          box-shadow:0 4px 14px rgba(15,23,42,0.28);
-        ">
-          <span style="width:5px;height:5px;border-radius:50%;background:#fff;opacity:0.75;"></span>
-          ${label}
-        </div>
-        <div style="
-          position:absolute;left:50%;bottom:-5px;
-          width:9px;height:9px;background:${bg};
-          border-right:2px solid #fff;border-bottom:2px solid #fff;
-          transform:translateX(-50%) rotate(45deg);
-        "></div>
+          box-shadow:0 2px 8px rgba(15,23,42,0.28);
+        ">${label}</div>
       </div>`,
-    iconSize: [width, 30],
-    iconAnchor: [width / 2, 30],
-    popupAnchor: [0, -32],
+    iconSize: [width, 22],
+    iconAnchor: [width / 2, 11],
+    popupAnchor: [0, -14],
   });
+}
+
+/** Rough on-screen size of a chip, matching the markup in placeIcon. */
+function chipWidth(label: string): number {
+  return Math.max(48, label.length * 6.2 + 18);
+}
+
+const CHIP_HEIGHT = 22;
+/** Clear space demanded around every chip, so labels read as separate. */
+const GUTTER = 10;
+
+/**
+ * Decides which area names fit at the current zoom.
+ *
+ * Deduplicating by area stopped three "Harohalli" chips stacking, but eighteen
+ * distinct villages inside one taluk still overlap when the map is pulled out.
+ * So placement is resolved in screen space and re-run whenever the view moves:
+ * chips are laid down in order and any that would touch one already placed is
+ * demoted to a dot. Zoom in and the survivors reappear as the space opens up.
+ */
+function LabelPlacement({
+  candidates,
+  onResolve,
+}: {
+  candidates: Property[];
+  onResolve: (slugs: Set<string>) => void;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    function resolve() {
+      const placed: { left: number; right: number; top: number; bottom: number }[] = [];
+      const keep = new Set<string>();
+
+      for (const property of candidates) {
+        const point = map.latLngToContainerPoint([property.location.lat, property.location.lng]);
+        const halfWidth = chipWidth(property.location.area) / 2 + GUTTER / 2;
+        const halfHeight = CHIP_HEIGHT / 2 + GUTTER / 2;
+        const box = {
+          left: point.x - halfWidth,
+          right: point.x + halfWidth,
+          top: point.y - halfHeight,
+          bottom: point.y + halfHeight,
+        };
+
+        const collides = placed.some(
+          (other) => box.left < other.right && other.left < box.right && box.top < other.bottom && other.top < box.bottom
+        );
+        if (collides) continue;
+
+        placed.push(box);
+        keep.add(property.slug);
+      }
+
+      onResolve(keep);
+    }
+
+    resolve();
+    map.on("zoomend moveend resize", resolve);
+    return () => {
+      map.off("zoomend moveend resize", resolve);
+    };
+  }, [candidates, map, onResolve]);
+
+  return null;
 }
 
 function FitBounds({ properties }: { properties: Property[] }) {
@@ -106,6 +180,20 @@ export default function LeafletMap({
 }) {
   const [basemap, setBasemap] = useState<Basemap>("satellite");
 
+  // One candidate per area; which of those actually get a chip is decided at
+  // the current zoom by LabelPlacement below.
+  const candidates = useMemo(() => {
+    const seen = new Set<string>();
+    return properties.filter((property) => {
+      const area = property.location.area;
+      if (seen.has(area)) return false;
+      seen.add(area);
+      return true;
+    });
+  }, [properties]);
+
+  const [labelledSlugs, setLabelledSlugs] = useState<Set<string>>(new Set());
+
   return (
     <div className="relative h-full w-full">
       <MapContainer center={SOUTH_BANGALORE_CENTER} zoom={11} scrollWheelZoom className="h-full w-full">
@@ -116,11 +204,15 @@ export default function LeafletMap({
           maxZoom={BASEMAPS[basemap].maxZoom}
         />
         <FitBounds properties={properties} />
+        <LabelPlacement candidates={candidates} onResolve={setLabelledSlugs} />
         {properties.map((property) => (
           <Marker
             key={property.slug}
             position={[property.location.lat, property.location.lng]}
-            icon={placeIcon(property, hoveredSlug === property.slug)}
+            icon={placeIcon(
+              labelledSlugs.has(property.slug) ? property.location.area : null,
+              hoveredSlug === property.slug
+            )}
             zIndexOffset={hoveredSlug === property.slug ? 1000 : 0}
             eventHandlers={{
               mouseover: () => onHover(property.slug),

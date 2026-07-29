@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import { Camera, CheckCircle2, Loader2, MapPin, RefreshCw } from "lucide-react";
+import { Camera, CheckCircle2, ExternalLink, Loader2, MapPin, RefreshCw } from "lucide-react";
 import { submitCaptureAction, type CaptureActionState } from "@/app/capture/actions";
 import { Button } from "@/components/ui/button";
 import { PinLocationPicker } from "@/components/map/pin-location-picker";
@@ -42,7 +42,10 @@ export function CaptureForm({
   /** "admin" is for staff already logged into /admin — adds a map pin, skips the "who are you" field. */
   variant?: "public" | "admin";
 }) {
-  const showMap = variant === "admin";
+  // The map is for everyone. Two decimal boxes are a fine way to *store* a
+  // location and a poor way to check one: somebody in a field has no way to
+  // tell 12.6801 from 12.6810 without seeing it on a map, and that is roughly a
+  // kilometre of difference.
   const showCapturedBy = variant === "public";
   // RTC reading and pin research go through admin-only API routes, so the
   // panel is only useful to someone already signed in.
@@ -119,6 +122,8 @@ export function CaptureForm({
     const files = Array.from(e.target.files ?? []);
     setPreviews(files.map((f) => URL.createObjectURL(f)));
   }
+
+  const hasPin = Boolean(lat && lng);
 
   function toggleTag(tag: string) {
     setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
@@ -204,6 +209,7 @@ export function CaptureForm({
           </div>
           <div className="grid grid-cols-2 gap-2">
             <input
+              aria-label="Latitude"
               name="lat"
               value={lat}
               onChange={(e) => setLat(e.target.value)}
@@ -212,6 +218,7 @@ export function CaptureForm({
               className={inputClass}
             />
             <input
+              aria-label="Longitude"
               name="lng"
               value={lng}
               onChange={(e) => setLng(e.target.value)}
@@ -229,23 +236,33 @@ export function CaptureForm({
             {geoStatus === "unsupported" && "Location isn't available on this device — enter it manually if you have it."}
             {geoStatus === "idle" && "Waiting for permission…"}
           </p>
-          {showMap && (
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">
-                Or drop a pin — click the map, or drag the marker to fine-tune.
-              </p>
-              <div className="h-64 overflow-hidden rounded-md border border-border">
-                <PinLocationPicker
-                  lat={lat ? Number(lat) : null}
-                  lng={lng ? Number(lng) : null}
-                  onPick={(newLat, newLng) => {
-                    setLat(newLat.toFixed(6));
-                    setLng(newLng.toFixed(6));
-                    setAccuracy(null);
-                  }}
-                />
-              </div>
+          <div className="space-y-1">
+            <p className="text-xs text-muted-foreground">
+              Drop a pin — tap the map, or drag the marker to fine-tune.
+            </p>
+            <div className="h-64 overflow-hidden rounded-md border border-border">
+              <PinLocationPicker
+                lat={lat ? Number(lat) : null}
+                lng={lng ? Number(lng) : null}
+                onPick={(newLat, newLng) => {
+                  setLat(newLat.toFixed(6));
+                  setLng(newLng.toFixed(6));
+                  setAccuracy(null);
+                }}
+              />
             </div>
+          </div>
+
+          {hasPin && (
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-accent hover:underline"
+            >
+              <ExternalLink className="h-3 w-3" />
+              Open this pin in Google Maps
+            </a>
           )}
         </div>
 
@@ -439,7 +456,7 @@ export function CaptureForm({
         {/* Populated by the assist panel; carries the full reading through to review. */}
         <input type="hidden" name="rtcExtraction" defaultValue="" />
 
-        {showAssist && <AiAssist formId="capture-form" />}
+        {showAssist && <AiAssist formId="capture-form" showMap={false} />}
       </div>
 
       <div className="flex flex-wrap items-center gap-2 border-t border-border pt-4">

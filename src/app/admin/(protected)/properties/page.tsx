@@ -26,13 +26,24 @@ export default async function AdminPropertiesPage() {
       </div>
 
       <div className="mt-6 overflow-x-auto rounded-xl border border-border bg-background">
-        <table className="w-full min-w-[720px] text-sm">
+        <table className="w-full min-w-[860px] text-sm">
+          {/* Explicit widths. Left to itself the browser was giving Price barely
+              more than the header word, so "Rs 89.10 L" broke across two lines
+              while Title had room to spare. */}
+          <colgroup>
+            <col className="w-[30%]" />
+            <col className="w-[22%]" />
+            <col className="w-[8%]" />
+            <col className="w-[12%]" />
+            <col className="w-[20%]" />
+            <col className="w-[8%]" />
+          </colgroup>
           <thead>
             <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
               <th className="px-4 py-3">Title</th>
               <th className="px-4 py-3">Corridor</th>
-              <th className="px-4 py-3">Extent</th>
-              <th className="px-4 py-3">Price</th>
+              <th className="whitespace-nowrap px-4 py-3 text-right">Extent</th>
+              <th className="whitespace-nowrap px-4 py-3 text-right">Price</th>
               <th className="px-4 py-3">Tags</th>
               <th className="px-4 py-3" />
             </tr>
@@ -41,14 +52,22 @@ export default async function AdminPropertiesPage() {
             {properties.map((p) => (
               <tr key={p.slug} className="border-b border-border last:border-0">
                 <td className="px-4 py-3 font-medium text-foreground">
-                  {p.title}
-                  {p.featured && <Badge className="ml-2">Featured</Badge>}
+                  <span className="flex items-center gap-2">
+                    <span className="min-w-0 truncate">{p.title}</span>
+                    {p.featured && <Badge className="shrink-0">Featured</Badge>}
+                  </span>
                 </td>
                 <td className="px-4 py-3 text-muted-foreground">
-                  {p.location.area}, {p.location.corridor}
+                  <span className="block truncate">
+                    {p.location.area}, {p.location.corridor}
+                  </span>
                 </td>
-                <td className="px-4 py-3 text-muted-foreground">{p.extentAcres} ac</td>
-                <td className="px-4 py-3 text-muted-foreground">{formatINR(p.totalPrice)}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-muted-foreground">
+                  {p.extentAcres} ac
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-right font-medium tabular-nums text-foreground">
+                  {formatINR(p.totalPrice)}
+                </td>
                 <td className="px-4 py-3 text-muted-foreground">
                   <div className="flex flex-wrap gap-1">
                     {p.tags.slice(0, 2).map((t) => (
@@ -58,7 +77,7 @@ export default async function AdminPropertiesPage() {
                     ))}
                   </div>
                 </td>
-                <td className="px-4 py-3">
+                <td className="whitespace-nowrap px-4 py-3">
                   <div className="flex items-center justify-end gap-3">
                     <Link href={`/admin/properties/${p.slug}/edit`} className="text-sm font-medium text-accent hover:underline">
                       Edit
