@@ -25,13 +25,6 @@ import { PropertyMediaGallery } from "@/components/property/property-media-galle
 
 export const dynamic = "force-dynamic";
 
-const suitabilityLabels: Record<string, string> = {
-  polyhouse: "Polyhouse farming",
-  openFarming: "Open farming",
-  orchard: "Orchard",
-  residentialFarmhouse: "Farmhouse living",
-  getaway: "Weekend getaway",
-};
 
 export default async function PropertyPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -123,30 +116,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
             </dl>
           </Section>
 
-          <Section id="suitability" eyebrow="Use potential" title="What works here">
-            <div className="divide-y divide-border/70 border-y border-border/70">
-              {(Object.keys(property.suitability) as (keyof typeof property.suitability)[])
-                .sort((a, b) => property.suitability[b].score - property.suitability[a].score)
-                .map((key) => {
-                  const item = property.suitability[key];
-                  return (
-                    <div key={key} className="grid gap-3 py-5 sm:grid-cols-[11rem_1fr_4rem] sm:items-center">
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">{suitabilityLabels[key]}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">{item.score >= 70 ? "Strong fit" : item.score >= 50 ? "Possible fit" : "Limited fit"}</p>
-                      </div>
-                      <div>
-                        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                          <div className="h-full rounded-full bg-primary" style={{ width: `${item.score}%` }} />
-                        </div>
-                        <p className="mt-2 text-xs leading-5 text-muted-foreground">{item.note}</p>
-                      </div>
-                      <p className="font-heading text-2xl font-semibold text-foreground sm:text-right">{item.score}</p>
-                    </div>
-                  );
-                })}
-            </div>
-          </Section>
 
           <Section id="due-diligence" eyebrow="Due diligence" title="Legal and verification">
             <div className="grid gap-10 md:grid-cols-2">
