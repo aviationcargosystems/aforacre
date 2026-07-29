@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Camera, CheckCircle2, ExternalLink, Loader2, MapPin, RefreshCw } from "lucide-react";
 import { submitCaptureAction, type CaptureActionState } from "@/app/capture/actions";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,7 @@ export function CaptureForm({
 
   const [state, formAction, isPending] = useActionState(submitCaptureAction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
 
   const [step, setStep] = useState(0);
   const [geoStatus, setGeoStatus] = useState<GeoStatus>("idle");
@@ -163,6 +165,9 @@ export function CaptureForm({
       discardDraft();
       setSubmitCount((n) => n + 1);
       locate();
+      // Staff go to the queue they just added to. The public form has nowhere
+      // to send someone, so it stays put with its confirmation.
+      if (isAdmin) router.push("/admin/captures");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);

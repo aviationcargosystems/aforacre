@@ -6,6 +6,7 @@ import type { Capture, CaptureDetails, KhataType } from "@/lib/types";
 import { createCapture } from "@/lib/store/captures";
 import { saveUploadedFiles } from "@/lib/store/uploads";
 import { addTag } from "@/lib/store/tags";
+import { getSessionProfile } from "@/lib/auth/roles";
 
 export interface CaptureActionState {
   ok: boolean;
@@ -108,7 +109,10 @@ export async function submitCaptureAction(
     locationAccuracyM: parseNumberOrNull(formData.get("locationAccuracyM")),
     label: String(formData.get("label") || "").trim(),
     notes: String(formData.get("notes") || "").trim(),
-    capturedBy: String(formData.get("capturedBy") || "").trim(),
+    // A signed-in person is known; only fall back to the typed name for the
+    // public form, where there is no session to read.
+    capturedBy: (await getSessionProfile().catch(() => null))?.fullName
+      || String(formData.get("capturedBy") || "").trim(),
     propertySlug: propertySlug || null,
     status: "new",
     tags: formData.getAll("tags").map(String).filter(Boolean),

@@ -15,11 +15,26 @@ export default async function NewPropertyPage({
   const { error, captureId } = await searchParams;
   const [existingTags, capture] = await Promise.all([getAllTags(), captureId ? getCapture(captureId) : undefined]);
 
+  // Everything the capture collected, not just its photos and pin. The point of
+  // asking for extent, price and tags in the field is that nobody retypes them.
   const prefill = capture
     ? {
         images: capture.images,
+        videos: capture.videos,
         lat: capture.lat ?? undefined,
         lng: capture.lng ?? undefined,
+        title: capture.label || undefined,
+        tags: capture.tags,
+        area: capture.details.area,
+        corridor: capture.details.corridor,
+        extentAcres: capture.details.extentAcres,
+        pricePerAcre: capture.details.pricePerAcre,
+        soilType: capture.details.soilType,
+        landObservation: capture.details.landObservation,
+        roadAccess: capture.details.roadAccess,
+        surveyNumber: capture.details.surveyNumber,
+        khata: capture.details.khata,
+        rtcDocument: capture.details.rtcImage,
       }
     : undefined;
 

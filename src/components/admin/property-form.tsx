@@ -47,11 +47,29 @@ export function PropertyForm({
   property?: Property;
   existingTags: string[];
   errorMessage?: string;
-  prefill?: { images?: string[]; lat?: number; lng?: number };
+  /** Carried over when a field capture is promoted into a listing. */
+  prefill?: {
+    images?: string[];
+    videos?: string[];
+    lat?: number;
+    lng?: number;
+    title?: string;
+    tags?: string[];
+    area?: string;
+    corridor?: string;
+    extentAcres?: number;
+    pricePerAcre?: number;
+    soilType?: string;
+    landObservation?: string;
+    roadAccess?: string;
+    surveyNumber?: string;
+    khata?: string;
+    rtcDocument?: string;
+  };
 }) {
   const isEdit = Boolean(property);
-  const [selectedTags, setSelectedTags] = useState<string[]>(property?.tags ?? []);
-  const [titleValue, setTitleValue] = useState(property?.title ?? "");
+  const [selectedTags, setSelectedTags] = useState<string[]>(property?.tags ?? prefill?.tags ?? []);
+  const [titleValue, setTitleValue] = useState(property?.title ?? prefill?.title ?? "");
   const [step, setStep] = useState(0);
   const [uploaded, setUploaded] = useState<{ images: string[]; videos: string[] }>({ images: [], videos: [] });
   const [uploading, setUploading] = useState<string | null>(null);
@@ -180,7 +198,13 @@ export function PropertyForm({
 
           <div className={step === 0 ? "grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start" : "hidden"}>
             <div className="lg:order-2 lg:sticky lg:top-0">
-              {uploaded.images.map((url) => (
+              {(prefill?.images ?? []).map((url) => (
+        <input key={url} type="hidden" name="imageUrls" value={url} />
+      ))}
+      {(prefill?.videos ?? []).map((url) => (
+        <input key={url} type="hidden" name="videoUrls" value={url} />
+      ))}
+      {uploaded.images.map((url) => (
         <input key={url} type="hidden" name="imageUrls" value={url} />
       ))}
       {uploaded.videos.map((url) => (
@@ -202,7 +226,7 @@ export function PropertyForm({
                         <input
                           id="title"
                           name="title"
-                          defaultValue={property?.title}
+                          defaultValue={property?.title ?? prefill?.title}
                           onChange={(e) => setTitleValue(e.target.value)}
                           className={inputClass}
                         />
@@ -222,10 +246,10 @@ export function PropertyForm({
                         />
                       </Field>
                       <Field label="Area" htmlFor="area">
-                        <input id="area" name="area" defaultValue={property?.location.area} className={inputClass} />
+                        <input id="area" name="area" defaultValue={property?.location.area ?? prefill?.area} className={inputClass} />
                       </Field>
                       <Field label="Corridor" htmlFor="corridor">
-                        <input id="corridor" name="corridor" defaultValue={property?.location.corridor} className={inputClass} />
+                        <input id="corridor" name="corridor" defaultValue={property?.location.corridor ?? prefill?.corridor} className={inputClass} />
                       </Field>
                       <Field label="Latitude" htmlFor="lat">
                         <input
@@ -272,9 +296,9 @@ export function PropertyForm({
                     <h2 className="font-heading text-lg font-semibold text-foreground">Pricing</h2>
                     <div className="space-y-1.5">
                       <span className={labelClass}>Extent</span>
-                      <AreaInput defaultAcres={property?.extentAcres} />
+                      <AreaInput defaultAcres={property?.extentAcres ?? prefill?.extentAcres} />
                     </div>
-                    <PriceInput defaultPricePerAcre={property?.pricePerAcre} />
+                    <PriceInput defaultPricePerAcre={property?.pricePerAcre ?? prefill?.pricePerAcre} />
                     </section>
           </div>
 
@@ -283,10 +307,10 @@ export function PropertyForm({
                     <h2 className="font-heading text-lg font-semibold text-foreground">Land details</h2>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="Soil type" htmlFor="soilType">
-                        <input id="soilType" name="soilType" defaultValue={property?.soilType} className={inputClass} />
+                        <input id="soilType" name="soilType" defaultValue={property?.soilType ?? prefill?.soilType} className={inputClass} />
                       </Field>
                       <Field label="Road access" htmlFor="roadAccess">
-                        <input id="roadAccess" name="roadAccess" defaultValue={property?.roadAccess} className={inputClass} />
+                        <input id="roadAccess" name="roadAccess" defaultValue={property?.roadAccess ?? prefill?.roadAccess} className={inputClass} />
                       </Field>
                     </div>
                     <Field
@@ -298,7 +322,7 @@ export function PropertyForm({
                         id="landObservation"
                         name="landObservation"
                         list="landObservationSuggestions"
-                        defaultValue={property?.landObservation}
+                        defaultValue={property?.landObservation ?? prefill?.landObservation}
                         placeholder="Flat land, gentle fall to the south-east"
                         className={inputClass}
                       />
@@ -404,7 +428,7 @@ export function PropertyForm({
           <div className={step === 4 ? "space-y-8" : "hidden"}>
             <section className="space-y-4">
                     <h2 className="font-heading text-lg font-semibold text-foreground">Legal</h2>
-                    <input type="hidden" name="rtcDocument" defaultValue={property?.legal.rtcDocument ?? ""} />
+                    <input type="hidden" name="rtcDocument" defaultValue={property?.legal.rtcDocument ?? prefill?.rtcDocument ?? ""} />
                     {property?.legal.rtcDocument && (
                       <a
                         href={property.legal.rtcDocument}
@@ -426,7 +450,7 @@ export function PropertyForm({
                         </select>
                       </Field>
                       <Field label="Survey number" htmlFor="surveyNumber">
-                        <input id="surveyNumber" name="surveyNumber" defaultValue={property?.legal.surveyNumber} className={inputClass} />
+                        <input id="surveyNumber" name="surveyNumber" defaultValue={property?.legal.surveyNumber ?? prefill?.surveyNumber} className={inputClass} />
                       </Field>
                       <Field label="Hobli" htmlFor="hobli">
                         <input id="hobli" name="hobli" defaultValue={property?.legal.hobli} className={inputClass} />
