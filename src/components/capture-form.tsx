@@ -160,6 +160,12 @@ export function CaptureForm({
 
   return (
     <form id="capture-form" ref={formRef} action={formAction} className="space-y-6" key={submitCount}>
+      {state.error && (
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {state.error}
+        </div>
+      )}
+
       {state.ok && (
         <div className="flex items-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-primary">
           <CheckCircle2 className="h-4 w-4 shrink-0" />

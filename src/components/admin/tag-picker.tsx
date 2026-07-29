@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Search, X } from "lucide-react";
+import { Check, Plus, Search, X } from "lucide-react";
 
 /**
  * Tag selection that stays usable as the vocabulary grows.
@@ -35,8 +35,25 @@ export function TagPicker({
     return unselected.filter((tag) => tag.toLowerCase().includes(q));
   }, [available, selected, query]);
 
+  const trimmed = query.trim();
+  // Offer creation only when nothing in the vocabulary already covers it,
+  // case-insensitively — "Flat land" and "Flat Land" are the same tag, and
+  // ending up with both is how a filter starts missing listings.
+  const canCreate =
+    trimmed.length > 0 &&
+    ![...available, ...selected].some((tag) => tag.toLowerCase() === trimmed.toLowerCase());
+
+  /** Selected tags that are not in the vocabulary yet, so the action can persist them. */
+  const created = selected.filter((tag) => !available.includes(tag));
+
   function toggle(tag: string) {
     onChange(selected.includes(tag) ? selected.filter((t) => t !== tag) : [...selected, tag]);
+  }
+
+  function create() {
+    if (!canCreate) return;
+    onChange([...selected, trimmed]);
+    setQuery("");
   }
 
   return (
@@ -45,6 +62,8 @@ export function TagPicker({
       {selected.map((tag) => (
         <input key={tag} type="hidden" name={name} value={tag} />
       ))}
+      {/* Comma-joined, matching what the property action already parses. */}
+      <input type="hidden" name="newTags" value={created.join(", ")} />
 
       {selected.length > 0 && (
         <div className="flex flex-wrap gap-2">
@@ -76,6 +95,8 @@ export function TagPicker({
             if (matches[0]) {
               toggle(matches[0]);
               setQuery("");
+            } else {
+              create();
             }
           }}
           placeholder="Search tags"
@@ -83,9 +104,20 @@ export function TagPicker({
         />
       </div>
 
+      {canCreate && (
+        <button
+          type="button"
+          onClick={create}
+          className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent transition-colors hover:bg-accent/15"
+        >
+          <Plus className="h-3 w-3" />
+          Add &ldquo;{trimmed}&rdquo; as a new tag
+        </button>
+      )}
+
       {matches.length === 0 ? (
         <p className="text-xs text-muted-foreground">
-          {query ? `Nothing matches "${query}".` : "Every tag is already selected."}
+          {canCreate ? null : query ? `Nothing matches "${query}".` : "Every tag is already selected."}
         </p>
       ) : (
         <div className="flex flex-wrap gap-2">

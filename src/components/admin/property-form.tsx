@@ -13,6 +13,7 @@ import {
 import { AreaInput } from "@/components/admin/area-input";
 import { PriceInput } from "@/components/admin/price-input";
 import { AiAssist } from "@/components/admin/ai-assist";
+import { TagPicker } from "@/components/admin/tag-picker";
 import { compressImage } from "@/lib/images/compress";
 import { Button } from "@/components/ui/button";
 
@@ -84,10 +85,6 @@ export function PropertyForm({
     } finally {
       setCompressing(false);
     }
-  }
-
-  function toggleTag(tag: string) {
-    setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
   }
 
   return (
@@ -467,31 +464,7 @@ export function PropertyForm({
                   </section>
             <section className="space-y-4">
                     <h2 className="font-heading text-lg font-semibold text-foreground">Tags</h2>
-                    <div className="flex flex-wrap gap-2">
-                      {existingTags.map((tag) => (
-                        <label
-                          key={tag}
-                          className={`cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                            selectedTags.includes(tag)
-                              ? "border-primary bg-primary text-primary-foreground"
-                              : "border-input bg-background text-foreground"
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            name="tags"
-                            value={tag}
-                            checked={selectedTags.includes(tag)}
-                            onChange={() => toggleTag(tag)}
-                            className="sr-only"
-                          />
-                          {tag}
-                        </label>
-                      ))}
-                    </div>
-                    <Field label="Add new tags" htmlFor="newTags" hint="Comma-separated. New tags are added to the tag list automatically.">
-                      <input id="newTags" name="newTags" placeholder="e.g. Corner Plot, Lake View" className={inputClass} />
-                    </Field>
+                    <TagPicker available={existingTags} selected={selectedTags} onChange={setSelectedTags} />
                   </section>
             <section className="space-y-4">
                     <h2 className="font-heading text-lg font-semibold text-foreground">Use-case fit (0 to 100)</h2>

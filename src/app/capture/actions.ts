@@ -5,10 +5,26 @@ import { revalidatePath } from "next/cache";
 import type { Capture, CaptureDetails, KhataType } from "@/lib/types";
 import { createCapture } from "@/lib/store/captures";
 import { saveUploadedFiles } from "@/lib/store/uploads";
+import { addTag } from "@/lib/store/tags";
 
 export interface CaptureActionState {
   ok: boolean;
   message?: string;
+  error?: string;
+}
+
+/**
+ * PostgREST rejects a whole insert when it names a column the schema does not
+ * have, which is what an unrun migration looks like from here. Left to throw it
+ * takes the page down with it and the person capturing sees a blank error
+ * screen with their photos gone.
+ */
+function describe(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/column .* does not exist|Could not find the '.*' column|schema cache/i.test(message)) {
+    return "The database is missing a column this form writes to. Run the pending migrations in Supabase, then try again.";
+  }
+  return message || "Could not save that capture.";
 }
 
 function parseNumberOrNull(raw: FormDataEntryValue | null): number | null {
@@ -97,7 +113,20 @@ export async function submitCaptureAction(
     details,
   };
 
-  await createCapture(capture);
+  try {
+    await createCapture(capture);
+
+    // Tags invented in the field join the vocabulary, so the next person sees
+    // them in the picker instead of typing a near-duplicate.
+    const newTags = String(formData.get("newTags") || "")
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+    await Promise.all(newTags.map((t) => addTag(t)));
+  } catch (error) {
+    return { ok: false, error: describe(error) };
+  }
+
   revalidatePath("/admin/captures");
   revalidatePath("/admin");
 
