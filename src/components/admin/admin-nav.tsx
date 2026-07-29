@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   Camera,
@@ -8,10 +9,12 @@ import {
   IdCard,
   LayoutDashboard,
   MapPinned,
+  Menu,
   MessageCircle,
   Route,
   Tag,
   Upload,
+  X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -112,41 +115,73 @@ export function AdminSidebarNav({ counts }: { counts: AdminAttentionCounts }) {
 
 export function AdminMobileNav({ counts }: { counts: AdminAttentionCounts }) {
   const pathname = usePathname();
-  const items = ADMIN_NAV.flatMap((group) => group.items);
+  const [open, setOpen] = useState(false);
+
+  // A rail of chips could only ever show four of eleven destinations, and
+  // scrolling sideways to find one is worse than opening a list. The drawer
+  // shows the same grouped menu as the sidebar, so there is one mental model.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    // The page behind a full-height drawer must not scroll with it.
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  const current = ADMIN_NAV.flatMap((g) => g.items).find((i) => isActive(pathname, i.href));
+  const waiting = Object.values(counts).reduce((n, c) => n + (c ?? 0), 0);
 
   return (
-    // The fade on the right edge is the affordance that more items exist off-screen.
-    <div className="relative sm:hidden">
-      <nav className="flex gap-1.5 overflow-x-auto border-b border-border bg-background px-3 py-2 pr-10">
-        {items.map((item) => {
-          const active = isActive(pathname, item.href);
-          const count = counts[item.href] ?? 0;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={active ? "page" : undefined}
-              className={cn(
-                "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
-                active ? "bg-primary text-primary-foreground" : "bg-secondary/60 text-foreground hover:bg-secondary"
-              )}
-            >
-              {item.short}
-              {count > 0 && (
-                <span
-                  className={cn(
-                    "flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold",
-                    active ? "bg-white/25 text-primary-foreground" : "bg-accent text-accent-foreground"
-                  )}
-                >
-                  {count}
-                </span>
-              )}
-            </Link>
-          );
-        })}
-      </nav>
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background to-transparent" />
+    <div className="sm:hidden">
+      <div className="flex items-center gap-2 border-b border-border bg-background px-3 py-2">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Open menu"
+          aria-expanded={open}
+          className="relative flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm font-medium text-foreground"
+        >
+          <Menu className="h-4 w-4" />
+          {current?.short ?? "Menu"}
+          {waiting > 0 && !open && (
+            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-accent-foreground">
+              {waiting}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {open && (
+        <div className="fixed inset-0 z-50 flex">
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={() => setOpen(false)}
+            className="absolute inset-0 bg-black/40"
+          />
+
+          <div className="relative flex h-full w-[17rem] max-w-[82vw] flex-col bg-[#0e241b] p-4">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="font-heading text-base font-semibold text-[#ede6d5]">A for Acre</span>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Close menu"
+                className="rounded-full p-1 text-[#ede6d5]/70 hover:text-[#ede6d5]"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <AdminSidebarNav counts={counts} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
