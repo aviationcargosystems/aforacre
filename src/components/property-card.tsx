@@ -11,8 +11,11 @@ export function PropertyCard({ property, highlightLabel }: { property: Property;
 
   return (
     <Link href={`/property/${property.slug}`} className="group block h-full">
-      <Card className="h-full overflow-hidden border-white/60 p-0 shadow-[0_20px_60px_rgba(15,23,42,0.10)] transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_28px_70px_rgba(15,23,42,0.14)]">
+      <Card className="h-full overflow-hidden border-white/60 p-0 shadow-[0_8px_24px_rgba(15,23,42,0.07)] transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_14px_36px_rgba(15,23,42,0.11)]">
         <div className="relative aspect-[5/4] w-full overflow-hidden bg-muted">
+          {/* A listing can exist before its photos do. Passing an undefined src
+              to next/image renders a broken frame rather than nothing. */}
+          {property.images[0] && (
           <Image
             src={property.images[0]}
             alt={property.title}
@@ -20,6 +23,7 @@ export function PropertyCard({ property, highlightLabel }: { property: Property;
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
+          )}
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,14,0)_0%,rgba(8,18,14,0.05)_45%,rgba(8,18,14,0.68)_100%)]" />
           <div className="absolute left-4 top-4 flex flex-wrap gap-2">
             {property.featured && (

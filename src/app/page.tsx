@@ -79,8 +79,8 @@ export default async function Home() {
           {/* One CTA. A second button beside it splits attention at the exact
               moment we want a single decision, and everything on this page
               already leads somewhere. */}
-          <div className="mt-9 w-full sm:w-auto">
-            <Button asChild variant="pill" size="pill" className="h-14 w-full px-10 text-base sm:w-auto">
+          <div className="mt-9">
+            <Button asChild variant="pill" size="pill" className="h-14 px-10 text-base">
               <Link href="/match">
                 Find myself <ArrowRight className="ml-1.5 h-5 w-5" />
               </Link>
@@ -103,25 +103,24 @@ export default async function Home() {
                 <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
                   Everything being built south of Bengaluru.
                 </h2>
-                <ul className="mt-7 space-y-3">
+                {/* A rule per item rather than a bullet or an index. Numbering
+                    these would imply a sequence or a ranking, and there is
+                    neither: they are six things happening at once. The rule
+                    still carries the one distinction that matters, accent for
+                    the three we can place on the map. */}
+                <ul className="mt-8 grid gap-x-6 gap-y-6 sm:grid-cols-2">
                   {INFRASTRUCTURE.map((item) => (
-                    <li key={item.label} className="flex items-baseline gap-3">
-                      <span
-                        className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${
-                          item.mapped ? "bg-accent" : "bg-muted-foreground/40"
-                        }`}
-                      />
-                      <span className="text-sm leading-7 text-muted-foreground sm:text-base">{item.label}</span>
+                    <li
+                      key={item.label}
+                      className={`border-l-2 pl-4 ${item.mapped ? "border-accent/70" : "border-border"}`}
+                    >
+                      <span className="text-sm leading-6 text-foreground/80">{item.label}</span>
                     </li>
                   ))}
                 </ul>
-                <p className="mt-6 max-w-md text-xs leading-6 text-muted-foreground/80">
-                  Highlighted areas mark the three projects with confirmed sites. The ring road, metro extension and
-                  wider connectivity work are named here but not drawn, because their alignments are not settled.
-                </p>
               </div>
 
-              <div className="order-1 h-[26rem] sm:h-[36rem] lg:order-2 lg:h-[44rem]">
+              <div className="order-1 h-[22rem] sm:h-[26rem] lg:order-2 lg:h-[32rem]">
                 <SouthBangaloreMapView areas={coverage} />
               </div>
             </div>

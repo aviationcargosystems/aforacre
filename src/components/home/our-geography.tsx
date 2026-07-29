@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, Clock } from "lucide-react";
 import { CORE_REGIONS, isPlaced } from "@/lib/regions";
 import { RegionMiniMap } from "./region-mini-map";
+import { DragRail } from "@/components/drag-rail";
 
 /**
  * The belt we actually work in, shown rather than listed.
@@ -34,9 +35,12 @@ export function OurGeography() {
         </div>
       </div>
 
-      <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      {/* A rail rather than a grid. Nine regions wrap into an uneven last row
+          at every breakpoint, and the ones that fall off the end read as less
+          important than the ones that fit. Scrolling keeps them equal. */}
+      <DragRail className="mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {placed.map((region) => (
-          <li key={region.name}>
+          <div key={region.name} className="w-[min(60vw,220px)] shrink-0 snap-start">
             <Link
               href={`/explore?q=${encodeURIComponent(region.name)}`}
               className="group block overflow-hidden rounded-[1.25rem] border border-border/70 bg-white/80 transition-all hover:border-primary/35 hover:bg-white hover:shadow-[0_12px_32px_rgba(15,23,42,0.10)]"
@@ -49,9 +53,9 @@ export function OurGeography() {
                 <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </div>
             </Link>
-          </li>
+          </div>
         ))}
-      </ul>
+      </DragRail>
 
       {unplaced.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2">

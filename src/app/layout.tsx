@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Montserrat } from "next/font/google";
 import "./globals.css";
 import { SiteChrome } from "@/components/site-chrome";
+import { SmoothScroll } from "@/components/smooth-scroll";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -31,6 +32,7 @@ export default function RootLayout({
       className={`${montserrat.variable} ${playfair.variable} h-full`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-accent/20 selection:text-foreground">
+        <SmoothScroll />
         <SiteChrome>{children}</SiteChrome>
       </body>
     </html>

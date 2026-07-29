@@ -115,13 +115,20 @@ export default function SouthBangaloreMap({ areas }: { areas: CoverageArea[] }) 
 
       {/* Heat blooms, one per committed project. */}
       {GROWTH_ANCHORS.map((anchor) =>
-        HEAT_BANDS.map((band) => (
+        HEAT_BANDS.map((band, i) => (
           <Circle
             key={`${anchor.id}-${band.radius}`}
             center={[anchor.lat, anchor.lng]}
             radius={band.radius}
             interactive={false}
-            pathOptions={{ stroke: false, fillColor: TERRACOTTA, fillOpacity: band.opacity }}
+            pathOptions={{
+              stroke: false,
+              fillColor: TERRACOTTA,
+              fillOpacity: band.opacity,
+              // Index drives the animation offset, so the rings breathe outward
+              // rather than all brightening on the same beat.
+              className: `aa-heat-band aa-heat-band-${i}`,
+            }}
           />
         ))
       )}

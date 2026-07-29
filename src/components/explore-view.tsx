@@ -145,76 +145,88 @@ export function ExploreView({
   );
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="rounded-[2rem] border border-white/70 bg-white/70 p-5 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent">Browse land</p>
-            <h1 className="font-heading text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-              Explore the best land.
-            </h1>
+    /* An app shell, not a document.
+     *
+     * The page itself does not scroll: the whole thing is pinned to the
+     * viewport and only the listing column moves. On a map-and-list screen a
+     * page scroll is actively wrong — it drags the map out of view exactly when
+     * you are using it to decide which listing to look at next.
+     *
+     * `100dvh` rather than `100vh` because mobile browsers shrink the visual
+     * viewport as their chrome collapses, and `vh` would leave the last card
+     * permanently under the address bar.
+     */
+    <div className="flex h-[100dvh] flex-col overflow-hidden">
+      {/* Only the search bar and the count survive at rest. The title is
+          reference, not navigation, so it is allowed to leave. */}
+      <div className="shrink-0 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <div className="relative min-w-0 flex-1">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search by location, tag, or type"
+                className="w-full rounded-full border border-border/70 bg-background/80 py-2.5 pl-11 pr-4 text-sm text-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              />
+            </div>
+
+            <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+              <SheetTrigger asChild>
+                <Button variant="pill-outline" className="shrink-0 rounded-full">
+                  <SlidersHorizontal className="h-4 w-4 sm:mr-1.5" />
+                  <span className="hidden sm:inline">
+                    Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
+                  </span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-80 overflow-y-auto border-border/70 bg-background/95 backdrop-blur-xl">
+                <SheetHeader>
+                  <SheetTitle>Filters</SheetTitle>
+                </SheetHeader>
+                <div className="px-4 pb-8">{filterPanel}</div>
+              </SheetContent>
+            </Sheet>
+
+            <span className="hidden shrink-0 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary sm:inline">
+              {filtered.length} of {properties.length}
+            </span>
           </div>
-
-          <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
-            <SheetTrigger asChild>
-              <Button variant="pill-outline" className="rounded-full">
-                <SlidersHorizontal className="mr-1.5 h-4 w-4" /> Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-80 overflow-y-auto border-border/70 bg-background/95 backdrop-blur-xl">
-              <SheetHeader>
-                <SheetTitle>Filters</SheetTitle>
-              </SheetHeader>
-              <div className="px-4 pb-8">{filterPanel}</div>
-            </SheetContent>
-          </Sheet>
-        </div>
-
-        <div className="relative mt-6">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search by location, tag, or type — e.g. rental farmland"
-            className="w-full rounded-full border border-border/70 bg-background/80 py-2.5 pl-11 pr-4 text-sm text-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-          />
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-          <span className="rounded-full bg-primary/10 px-3 py-1 font-medium text-primary">
-            {filtered.length} of {properties.length} listings
-          </span>
-          {activeFilterCount > 0 && <span>{activeFilterCount} active filters</span>}
         </div>
       </div>
 
-      {/* No permanent filter rail. With seven listings a full filter set is
-          furniture, so it lives behind a button and the space goes to the
-          listings and the map instead. */}
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)]">
-        <div className="order-2 lg:order-1 lg:sticky lg:top-28 lg:max-h-[calc(100vh-190px)] lg:overflow-y-auto lg:pr-1">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {filtered.length === 0 ? (
-            <div className="sm:col-span-2 rounded-[1.75rem] border border-dashed border-border/70 bg-white/65 p-10 text-center text-muted-foreground backdrop-blur-sm">
-              No land matches these filters yet. Try widening the distance, price range, or tags.
+      {/* min-h-0 on both the row and the scrolling column: without it a flex
+          child refuses to shrink below its content and the overflow lands on
+          the page instead of inside the list. */}
+      <div className="mx-auto flex w-full min-h-0 max-w-7xl flex-1 gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col lg:max-w-[46%]">
+          <div className="min-h-0 flex-1 overflow-y-auto pr-1 [scrollbar-width:thin]">
+            <div className="grid grid-cols-1 gap-4 pb-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+              {filtered.length === 0 ? (
+                <div className="rounded-[1.75rem] border border-dashed border-border/70 bg-white/65 p-10 text-center text-muted-foreground backdrop-blur-sm sm:col-span-2 lg:col-span-1 xl:col-span-2">
+                  No land matches these filters yet. Try widening the distance, price range, or tags.
+                </div>
+              ) : (
+                filtered.map((property) => (
+                  <div
+                    key={property.slug}
+                    onMouseEnter={() => setHoveredSlug(property.slug)}
+                    onMouseLeave={() => setHoveredSlug(null)}
+                    className={hoveredSlug === property.slug ? "rounded-[1.75rem] ring-2 ring-accent/60" : ""}
+                  >
+                    <PropertyCard property={property} />
+                  </div>
+                ))
+              )}
             </div>
-          ) : (
-            filtered.map((property) => (
-              <div
-                key={property.slug}
-                onMouseEnter={() => setHoveredSlug(property.slug)}
-                onMouseLeave={() => setHoveredSlug(null)}
-                className={hoveredSlug === property.slug ? "rounded-[1.75rem] ring-2 ring-accent/60" : ""}
-              >
-                <PropertyCard property={property} />
-              </div>
-            ))
-          )}
           </div>
         </div>
 
-        <div className="order-1 h-[460px] overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/70 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:order-2 lg:sticky lg:top-28 lg:h-[calc(100vh-170px)]">
+        {/* isolate for the same reason as the corridor map: Leaflet's panes
+            outrank the site header without a stacking context to sit in. */}
+        <div className="relative isolate z-0 hidden min-h-0 flex-1 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/70 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:block">
           <PropertyMap properties={filtered} hoveredSlug={hoveredSlug} onHover={setHoveredSlug} />
         </div>
       </div>

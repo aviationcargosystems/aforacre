@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-07-29 19:05 IST · Explore app shell, drag rails, motion, homepage polish
+
+- Explore is now a fixed-height app shell: the page itself does not scroll, only the listing column does. Title scrolls away, search and filters stay. Map pinned on the right.
+- Featured and Our Geography are drag-scrollable rails — grab with a mouse, throw with a trackpad, snap per card. A drag no longer triggers the card's link on release.
+- Featured rail had snap-start on its children but no snap type on the scroller, so it parked mid-card and looked like a half-loaded image. Fixed.
+- Property cards: shadow tightened. At 60px blur the shadows of adjacent cards merged into one pale panel that read as a stray container behind the row.
+- Property cards guard against a listing that has no photo yet, instead of handing next/image an undefined src.
+- Corridor map heat blooms pulse on a slow, shallow, per-ring offset cycle. Suppressed under prefers-reduced-motion.
+- Lenis smooth scrolling added, kept away from Leaflet and from every self-scrolling rail, and skipped entirely under prefers-reduced-motion.
+- Homepage: infrastructure list is now ruled items in two columns rather than bullets, with no numbering. Map height dropped, caption paragraph removed, hero CTA no longer full width on mobile.
+
 ## 2026-07-29 17:50 IST · Map legibility, pin-by-link, table and capture fixes
 
 - Corridor map: place names split onto their own tile layer so they can be darkened enough to read against the warm background, without turning every hamlet solid black. Section is now an even 50/50 split, the map is taller, and on mobile it sits above the copy.

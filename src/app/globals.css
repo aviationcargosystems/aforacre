@@ -202,6 +202,37 @@
   opacity: 0.88;
 }
 
+/* Corridor-map heat blooms. A very shallow opacity cycle, offset per ring so
+   the bloom breathes outward instead of every ring brightening on one beat.
+   Opacity only, so it composites and costs no layout. The range is deliberately
+   narrow: this is meant to register as life in the page, not as a thing
+   demanding to be looked at. */
+@keyframes heat-pulse {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.aa-heat-band {
+  animation: heat-pulse 7s ease-in-out infinite;
+  transform-origin: center;
+}
+.aa-heat-band-0 { animation-delay: 0s; }
+.aa-heat-band-1 { animation-delay: -0.55s; }
+.aa-heat-band-2 { animation-delay: -1.1s; }
+.aa-heat-band-3 { animation-delay: -1.65s; }
+.aa-heat-band-4 { animation-delay: -2.2s; }
+.aa-heat-band-5 { animation-delay: -2.75s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .aa-heat-band {
+    animation: none;
+  }
+}
+
 /* Leaflet popup content is a plain DOM node outside Tailwind's reach — override
    its default padding/rounding so the property-card popup image can go full-bleed. */
 .property-popup .leaflet-popup-content-wrapper {

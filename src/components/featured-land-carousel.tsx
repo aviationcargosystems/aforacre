@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { Property } from "@/lib/types";
 import { PropertyCard } from "@/components/property-card";
 import { Button } from "@/components/ui/button";
+import { DragRail } from "@/components/drag-rail";
 
 export function FeaturedLandCarousel({ properties }: { properties: Property[] }) {
   const railRef = useRef<HTMLDivElement>(null);
@@ -45,10 +46,7 @@ export function FeaturedLandCarousel({ properties }: { properties: Property[] })
         </Button>
       </div>
 
-      <div
-        ref={railRef}
-        className="flex gap-5 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
+      <DragRail innerRef={railRef} className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {properties.map((property) => (
           <div
             key={property.slug}
@@ -58,7 +56,7 @@ export function FeaturedLandCarousel({ properties }: { properties: Property[] })
             <PropertyCard property={property} />
           </div>
         ))}
-      </div>
+      </DragRail>
     </div>
   );
 }

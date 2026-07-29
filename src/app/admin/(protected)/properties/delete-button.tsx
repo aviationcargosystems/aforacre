@@ -11,9 +11,13 @@ export function DeletePropertyButton({ slug, title }: { slug: string; title: str
           e.preventDefault();
         }
       }}
+      className="inline-flex"
     >
       <input type="hidden" name="slug" value={slug} />
-      <button type="submit" className="text-sm font-medium text-destructive hover:underline">
+      <button
+        type="submit"
+        className="rounded-full px-2 py-1 text-[10px] font-semibold text-destructive transition hover:bg-destructive/8"
+      >
         Delete
       </button>
     </form>
