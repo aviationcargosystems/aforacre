@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-29 22:15 IST · Correct gunta conversion, price per gunta, leaner pricing step
+
+- Corrected the square-foot conversion: 1 gunta is 1,089 sq ft, not 1,100. The spec's figure did not survive multiplication — 40 x 1,100 is 44,000 sq ft, about 1% over an acre — where 40 x 1,089 is exactly 43,560, the survey acre. Nothing stored changes; extent is held in acres.
+- Price can now be entered per gunta or per acre, each following the other. Per-acre stays the stored value.
+- Removed the guidance-value field. Stamp duty is charged on the higher of transaction value and guidance value, so leaving it out falls back to the transaction price rather than understating duty.
+- Removed the conversion explainer captions from the extent and price inputs.
+
 ## 2026-07-29 21:45 IST · Coordinate precision fix, image weight, map text
 
 - Fixed: latitude and longitude inputs had step="0.0001", so the six decimals a dropped pin writes were rejected as invalid and the form refused to submit. Coordinates are continuous, so there is no step to enforce.

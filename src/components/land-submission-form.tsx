@@ -158,7 +158,7 @@ export function LandSubmissionForm() {
             className={inputClass}
           />
           <p className="text-xs text-muted-foreground">
-            40 gunta = 1 acre, 1 gunta ≈ 1100 sq ft.{" "}
+            40 gunta = 1 acre, 1 gunta = 1,089 sq ft.{" "}
             {acresPreview !== null && <span className="font-medium text-foreground">≈ {acresPreview.toFixed(2)} acres</span>}
           </p>
           <input type="hidden" name="extentAcres" value={acresPreview !== null ? acresPreview.toFixed(2) : ""} />

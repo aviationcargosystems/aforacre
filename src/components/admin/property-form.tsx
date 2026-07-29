@@ -12,6 +12,7 @@ import {
   fieldNameForUseCase,
 } from "@/components/admin/property-form-shared";
 import { AreaInput } from "@/components/admin/area-input";
+import { PriceInput } from "@/components/admin/price-input";
 import { AiAssist } from "@/components/admin/ai-assist";
 import { compressImage } from "@/lib/images/compress";
 import { Button } from "@/components/ui/button";
@@ -224,29 +225,8 @@ export function PropertyForm({
                       <span className={labelClass}>Extent</span>
                       <AreaInput defaultAcres={property?.extentAcres} />
                     </div>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <Field label="Price per acre (₹)" htmlFor="pricePerAcre">
-                        <input
-                          id="pricePerAcre"
-                          name="pricePerAcre"
-                          type="number"
-                          step="1000"
-                          defaultValue={property?.pricePerAcre}
-                          className={inputClass}
-                        />
-                      </Field>
-                      <Field label="Guidance value per acre (₹)" htmlFor="guidanceValuePerAcre" hint="Used to compute stamp duty & registration.">
-                        <input
-                          id="guidanceValuePerAcre"
-                          name="guidanceValuePerAcre"
-                          type="number"
-                          step="1000"
-                          defaultValue={property?.taxes.guidanceValuePerAcre}
-                          className={inputClass}
-                        />
-                      </Field>
-                    </div>
-                  </section>
+                    <PriceInput defaultPricePerAcre={property?.pricePerAcre} />
+                    </section>
           </div>
 
           <div className={step === 2 ? "space-y-8" : "hidden"}>

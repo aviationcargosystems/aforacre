@@ -2,9 +2,6 @@
 
 import { useState } from "react";
 import {
-  GUNTA_PER_ACRE,
-  SQFT_PER_ACRE,
-  SQFT_PER_GUNTA,
   acresToGunta,
   acresToSqft,
   guntaToAcres,
@@ -99,11 +96,6 @@ export function AreaInput({ defaultAcres }: { defaultAcres?: number }) {
       {/* Acres is what the rest of the system stores. The three visible inputs
           are an entry convenience, not three separate pieces of data. */}
       <input type="hidden" name="extentAcres" value={acres} />
-
-      <p className="text-xs text-muted-foreground">
-        {GUNTA_PER_ACRE} guntas = 1 acre · 1 gunta = {SQFT_PER_GUNTA.toLocaleString("en-IN")} sq ft · 1 acre ={" "}
-        {SQFT_PER_ACRE.toLocaleString("en-IN")} sq ft. Type into any one and the other two follow.
-      </p>
     </div>
   );
 }

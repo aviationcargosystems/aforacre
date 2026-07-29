@@ -71,7 +71,10 @@ export async function parsePropertyForm(
     lng: num(formData, "lng"),
     extentAcres: num(formData, "extentAcres"),
     pricePerAcre: num(formData, "pricePerAcre"),
-    guidanceValuePerAcre: num(formData, "guidanceValuePerAcre"),
+    // No longer collected. Stamp duty is charged on the higher of transaction
+    // value and guidance value, so leaving this at zero falls back to the
+    // transaction price rather than understating the duty.
+    guidanceValuePerAcre: 0,
     tags,
     useCaseFit,
     soilType: str(formData, "soilType"),
