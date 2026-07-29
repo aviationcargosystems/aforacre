@@ -101,7 +101,7 @@ export default async function Home() {
               <div className="order-2 lg:order-1">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Why south Bengaluru</p>
                 <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
-                  The region is expected to benefit from major infrastructure.
+                  Everything being built south of Bengaluru.
                 </h2>
                 <ul className="mt-7 space-y-3">
                   {INFRASTRUCTURE.map((item) => (
