@@ -1,4 +1,8 @@
--- Clear the seeded demo catalogue, ready for real listings.
+-- Clear the catalogue back to empty, ready for real listings.
+--
+-- Already run once on 2026-07-29 (30 properties, 1 capture, 1 recce, 5 quiz
+-- responses), with a snapshot taken to backups/ first. Kept here for the next
+-- time, and because it documents exactly what a reset touches.
 --
 -- READ BEFORE RUNNING. This deletes rows permanently and there is no undo. Take
 -- a backup first if there is anything here you would miss (Supabase dashboard →
@@ -7,7 +11,6 @@
 -- What it deliberately does NOT touch:
 --   profiles / auth users  — deleting these locks you out of admin
 --   tags                   — your filtering vocabulary, not demo content
---   captures               — real field work by the time you read this
 --   storage objects        — the seeded images are Unsplash URLs, so there is
 --                            nothing of yours to delete; anything you uploaded
 --                            stays in the bucket
@@ -26,10 +29,7 @@ begin
   if to_regclass('public.quiz_responses') is not null then delete from quiz_responses; end if;
   if to_regclass('public.enquiries') is not null then delete from enquiries; end if;
   if to_regclass('public.recces') is not null then delete from recces; end if;
-  -- Captures are NOT cleared. By the time you run this you may already have
-  -- real field captures in here, and they are not part of the seeded demo.
-  -- Uncomment the next line only if you genuinely want them gone too.
-  -- if to_regclass('public.captures') is not null then delete from captures; end if;
+  if to_regclass('public.captures') is not null then delete from captures; end if;
   if to_regclass('public.land_submissions') is not null then delete from land_submissions; end if;
   if to_regclass('public.submissions') is not null then delete from submissions; end if;
 end $$;

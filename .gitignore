@@ -47,3 +47,6 @@ next-env.d.ts
 
 # /build skill state (local task tracking, not shared repo content)
 /.claude/state/
+
+# Local DB snapshots — real data, never commit.
+backups/
