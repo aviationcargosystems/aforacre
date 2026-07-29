@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { FeaturedLandCarousel } from "@/components/featured-land-carousel";
 import { SectionHeading } from "@/components/section-heading";
 import { WhyThisCorridor } from "@/components/home/why-this-corridor";
+import { OurGeography } from "@/components/home/our-geography";
 import { SouthBangaloreMapView } from "@/components/home/south-bangalore-map-view";
 import { featuredProperties, getAllProperties } from "@/lib/store/properties";
 
@@ -59,7 +60,13 @@ export default async function Home() {
           <h1 className="font-heading text-5xl font-semibold leading-[1.02] tracking-tight text-balance text-foreground sm:text-6xl lg:text-7xl">
             Buy holistic lands in south Bengaluru!
           </h1>
-          <p className="mt-7 max-w-3xl text-pretty text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-9">
+          {/* The four words carry the promise; the paragraph gives it a place.
+              Kept as two lines because collapsing them would either lose the
+              rhythm or bury it inside prose. */}
+          <p className="mt-6 text-lg font-medium tracking-tight text-foreground sm:text-xl">
+            Discover. Own. Build. Grow.
+          </p>
+          <p className="mt-4 max-w-3xl text-pretty text-base leading-8 text-muted-foreground sm:text-lg sm:leading-9">
             Within a comfortable 90 minute drive from the city lies an extraordinary landscape of forests, lakes,
             hills and fertile farmland that many Bengaluru residents have never explored.
           </p>
@@ -124,6 +131,8 @@ export default async function Home() {
           <FeaturedLandCarousel properties={featured} />
         </div>
       </section>
+      <OurGeography />
+
       {closingImage && (
         <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-[2.25rem] border border-white/70 shadow-[0_30px_90px_rgba(15,23,42,0.18)]">
