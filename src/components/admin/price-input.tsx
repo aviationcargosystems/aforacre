@@ -22,8 +22,8 @@ type Unit = "acre" | "gunta";
 
 export function PriceInput({ defaultPricePerAcre, label = "Price" }: { defaultPricePerAcre?: number; label?: string }) {
   const initial = defaultPricePerAcre ?? 0;
-  const [unit, setUnit] = useState<Unit>("acre");
-  const [value, setValue] = useState(initial > 0 ? String(Math.round(initial)) : "");
+  const [unit, setUnit] = useState<Unit>("gunta");
+  const [value, setValue] = useState(initial > 0 ? String(Math.round(initial / GUNTA_PER_ACRE)) : "");
 
   const entered = Number.parseFloat(value);
   const perAcre = Number.isFinite(entered) && entered > 0 ? (unit === "acre" ? entered : entered * GUNTA_PER_ACRE) : 0;
@@ -41,9 +41,11 @@ export function PriceInput({ defaultPricePerAcre, label = "Price" }: { defaultPr
   return (
     <div className="space-y-1.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-sm font-medium text-foreground">{label} (₹)</span>
+        <span className="text-sm font-medium text-foreground">
+          {label} <span className="text-accent">per {unit}</span> (₹)
+        </span>
         <div className="inline-flex overflow-hidden rounded-full border border-border">
-          {(["acre", "gunta"] as const).map((option) => (
+          {(["gunta", "acre"] as const).map((option) => (
             <button
               key={option}
               type="button"

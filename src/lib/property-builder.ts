@@ -1,5 +1,6 @@
 import type { UseCase, KhataType, LandSuitability, Property, VerifiedChecklist, WaterSource } from "@/lib/types";
 import { computeKarnatakaTaxes } from "@/lib/tax";
+import { makeRtcRecord } from "@/lib/rtc-records";
 
 export const EMPTY_VERIFIED: VerifiedChecklist = {
   ownership: false,
@@ -180,6 +181,22 @@ export function buildProperty(input: PropertyInput): Property {
     taxes,
     suitability: buildSuitability(input.useCaseFit, ctx),
     legal: {
+      // The form still submits one flat set of RTC fields; rtcRecords is the
+      // shape everything reads. One record in, so a single-survey plot behaves
+      // exactly as before and multi-survey support has somewhere to grow.
+      rtcRecords: [
+        makeRtcRecord({
+          surveyNumber: input.surveyNumber,
+          document: input.rtcDocument,
+          hobli: input.hobli,
+          taluk: input.taluk,
+          district: input.district,
+          mutationReference: input.mutationReference,
+          rtcValidFrom: input.rtcValidFrom,
+          landRevenueRupees: input.landRevenueRupees,
+          ownerOnRecord: input.ownerOnRecord,
+        }),
+      ],
       khata: input.khata,
       dcConverted: input.dcConverted,
       dcConversionNote: input.dcConverted
