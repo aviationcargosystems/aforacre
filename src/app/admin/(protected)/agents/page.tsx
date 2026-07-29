@@ -1,4 +1,5 @@
 import { getStaff } from "@/lib/store/staff";
+import { PasswordField } from "@/components/admin/password-field";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -66,7 +67,7 @@ export default async function AdminAgentsPage({
           </label>
           <label className="space-y-1.5">
             <span className="text-sm font-medium text-foreground">Temporary password</span>
-            <input name="password" type="password" required minLength={8} className={inputClass} />
+            <PasswordField required className={inputClass} />
           </label>
           <label className="space-y-1.5">
             <span className="text-sm font-medium text-foreground">Role</span>
@@ -138,10 +139,7 @@ export default async function AdminAgentsPage({
                 <td className="px-4 py-3">
                   <form action={resetAgentPasswordAction} className="flex items-center gap-2">
                     <input type="hidden" name="id" value={person.id} />
-                    <input
-                      name="password"
-                      type="password"
-                      minLength={8}
+                    <PasswordField
                       placeholder="New password"
                       className="w-36 rounded-lg border border-input bg-background px-2 py-1 text-xs"
                     />
