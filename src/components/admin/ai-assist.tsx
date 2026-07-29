@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { FileText, Link as LinkIcon, Loader2, MapPin, Sparkles } from "lucide-react";
+import { Check, FileText, Link as LinkIcon, Loader2, MapPin, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PinLocationPicker } from "@/components/map/pin-location-picker";
 import { acresToGunta, acresToSqft } from "@/lib/land-units";
@@ -29,6 +29,7 @@ interface Suggestion {
 }
 
 interface LocationPayload {
+  title: string;
   area: string;
   corridor: string;
   district: string;
@@ -67,6 +68,15 @@ interface RtcPayload {
   unreadableFields: string[];
   notes: string;
   extentAcresTotal: number | null;
+}
+
+/** Mirrors slugify in property-builder, so an applied title and its slug agree. */
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 /** Writes through React's own setter so controlled inputs pick the change up. */
@@ -187,6 +197,7 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
       const p = data as LocationPayload;
       setSuggestions(
         [
+          { label: "Title", field: "title", value: p.title },
           { label: "Area", field: "area", value: p.area },
           { label: "Corridor", field: "corridor", value: p.corridor },
           { label: "Taluk", field: null, value: p.taluk },
@@ -295,6 +306,15 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
       setFieldValue(el, "extentSqft", String(Math.round(acresToSqft(acres))));
     }
 
+    // The slug field auto-fills from the title only as a placeholder, so an
+    // applied title needs its slug written explicitly to actually be used.
+    if (suggestion.field === "title") {
+      const slug = el.elements.namedItem("slug");
+      if (slug instanceof HTMLInputElement && !slug.disabled && !slug.value) {
+        setFieldValue(el, "slug", slugify(suggestion.value));
+      }
+    }
+
     const ok = setFieldValue(el, suggestion.field, suggestion.value);
     if (!ok && suggestion.field !== "extentAcres") {
       setError(`This form has no "${suggestion.label}" field — copy it across by hand.`);
@@ -394,16 +414,15 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
 
       {suggestions.length > 0 && (
         <div className="mt-4 space-y-2">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Proposed — nothing is saved until you apply
-            </p>
-            {applicable > 0 && (
-              <button type="button" onClick={applyAll} className="text-xs font-medium text-accent hover:underline">
-                Apply all {applicable}
-              </button>
-            )}
-          </div>
+          {applicable > 0 && (
+            <Button type="button" variant="pill" size="sm" onClick={applyAll} className="w-full sm:w-auto">
+              <Check className="h-4 w-4" />
+              Apply all {applicable} to the form
+            </Button>
+          )}
+          <p className="pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Proposed — nothing is saved until you apply
+          </p>
 
           <ul className="divide-y divide-border/60 overflow-hidden rounded-xl border border-border/60 bg-white/80">
             {suggestions.map((s) => (
