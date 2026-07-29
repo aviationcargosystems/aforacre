@@ -346,7 +346,7 @@ export function AiAssist({ formId, showMap = true }: { formId: string; showMap?:
 
       {showMap && (
         <div className="mt-4 space-y-1.5">
-          <div className="h-64 overflow-hidden rounded-xl border border-border/70 sm:h-72">
+          <div className="h-52 overflow-hidden rounded-xl border border-border/70">
             <PinLocationPicker
               lat={pin?.lat ?? null}
               lng={pin?.lng ?? null}

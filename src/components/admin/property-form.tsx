@@ -99,16 +99,18 @@ export function PropertyForm({
           the form, so anything typed on step four would be dropped the moment
           someone stepped back to check the pin. */}
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-6xl">
           {errorMessage && (
             <div className="mb-6 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {errorMessage}
             </div>
           )}
 
-          <div className={step === 0 ? "space-y-8" : "hidden"}>
-            <AiAssist formId="property-form" />
-            <section className="space-y-4">
+          <div className={step === 0 ? "grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start" : "hidden"}>
+            <div className="lg:order-2 lg:sticky lg:top-0">
+              <AiAssist formId="property-form" />
+            </div>
+            <section className="space-y-4 lg:order-1">
                     <h2 className="font-heading text-lg font-semibold text-foreground">Basics</h2>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Field label="Title" htmlFor="title">
