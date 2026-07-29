@@ -34,12 +34,11 @@ export default async function Home() {
         {/* Centered hero. The old two-column split fought the display type for
             width and left the headline wrapping awkwardly at every breakpoint. */}
         <div className="mx-auto flex max-w-4xl flex-col items-center px-4 pb-6 text-center sm:px-6 lg:px-8">
-          <h1 className="font-heading text-6xl font-semibold leading-[0.96] tracking-tight text-balance text-foreground sm:text-7xl lg:text-8xl">
-            Land that fits your life.
+          <h1 className="font-heading text-5xl font-semibold leading-[1.02] tracking-tight text-balance text-foreground sm:text-6xl lg:text-7xl">
+            Buy holistic lands in south Bengaluru!
           </h1>
           <p className="mt-8 max-w-2xl text-pretty text-lg leading-8 text-muted-foreground sm:text-xl">
-            Holistic farmland, farmhouse plots, and weekend escapes across South Bangalore, matched to how
-            you&apos;ll actually use them.
+            Farmland, farmhouse plots and weekend escapes, matched to how you&apos;ll actually use them.
           </p>
 
           {/* No search box. With this few listings a search returns either
@@ -58,6 +57,8 @@ export default async function Home() {
 
         </div>
 
+        <WhyThisCorridor />
+
         {/* Second block. No separate background: it sits inside the same
           gradient wrapper as the hero so the colour runs straight through
           instead of stopping at a section edge. Narrower than before and
@@ -74,8 +75,6 @@ export default async function Home() {
           </div>
         </div>
       </div>
-
-      <WhyThisCorridor />
 
       <section className="relative pb-24 pt-4 lg:pb-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
