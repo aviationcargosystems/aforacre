@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FeaturedLandCarousel } from "@/components/featured-land-carousel";
 import { SectionHeading } from "@/components/section-heading";
-import { WhyThisCorridor } from "@/components/home/why-this-corridor";
 import { OurGeography } from "@/components/home/our-geography";
 import { SouthBangaloreMapView } from "@/components/home/south-bangalore-map-view";
 import { featuredProperties, getAllProperties } from "@/lib/store/properties";
@@ -74,10 +73,13 @@ export default async function Home() {
           <h1 className="font-heading text-5xl font-semibold leading-[1.02] tracking-tight text-balance text-foreground sm:text-6xl lg:text-7xl">
             Buy holistic lands in south Bengaluru!
           </h1>
+          <p className="mt-6 font-heading text-xl font-medium tracking-tight text-foreground/70 sm:text-2xl">
+            Discover. Own. Build. Grow.
+          </p>
           {/* One CTA. A second button beside it splits attention at the exact
               moment we want a single decision, and everything on this page
               already leads somewhere. */}
-          <div className="mt-10 w-full sm:w-auto">
+          <div className="mt-9 w-full sm:w-auto">
             <Button asChild variant="pill" size="pill" className="h-14 w-full px-10 text-base sm:w-auto">
               <Link href="/match">
                 Find myself <ArrowRight className="ml-1.5 h-5 w-5" />
@@ -145,11 +147,11 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* The corridor argument now follows the listings rather than preceding
-          them: it reads as evidence for what you have just seen, not as a claim
-          you have to take on trust before seeing anything. */}
-      <WhyThisCorridor />
-
+      {/* WhyThisCorridor is deliberately absent: it walked through the same
+          three projects the map section above already covers, so on this page
+          it was the argument made twice. The component still ships and still
+          carries the airport's "Site not yet finalised." clause wherever it is
+          used. */}
       <OurGeography />
 
       {closingImage && (

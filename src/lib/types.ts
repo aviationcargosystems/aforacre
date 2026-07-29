@@ -123,6 +123,32 @@ export interface Capture {
   capturedBy: string;
   propertySlug: string | null;
   status: CaptureStatus;
+  /** Brand tags picked in the field, carried through if this becomes a listing. */
+  tags: string[];
+  /**
+   * Whatever else the person in the field happened to know. Every key is
+   * optional and none of it is verified — it exists so a capture can carry
+   * detail forward instead of making someone retype it later.
+   */
+  details: CaptureDetails;
+}
+
+export interface CaptureDetails {
+  area?: string;
+  corridor?: string;
+  extentAcres?: number;
+  pricePerAcre?: number;
+  soilType?: string;
+  landObservation?: string;
+  roadAccess?: string;
+  waterSources?: WaterSource[];
+  fencing?: boolean;
+  electricity?: boolean;
+  surveyNumber?: string;
+  khata?: KhataType;
+  /** Raw RTC reading, kept whole so a reviewer can audit it against the scan. */
+  rtc?: Record<string, unknown>;
+  rtcImage?: string;
 }
 
 export type EnquiryStatus = "new" | "contacted" | "closed";

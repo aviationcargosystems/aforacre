@@ -160,6 +160,13 @@ export function AiAssist({ formId }: { formId: string }) {
       if (!response.ok) throw new Error(data.error ?? "Could not read that RTC.");
 
       const r = data as RtcPayload;
+
+      // If the surrounding form carries a hidden field for it, keep the whole
+      // reading alongside the capture. A reviewer can then audit what the model
+      // claimed against the scan, including the fields nobody applied.
+      const el = form();
+      if (el) setFieldValue(el, "rtcExtraction", JSON.stringify(r));
+
       const owners = r.owners
         .map((o) => [o.nameLatin, o.relation].filter(Boolean).join(" "))
         .filter(Boolean)

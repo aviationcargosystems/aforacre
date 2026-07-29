@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getAllProperties } from "@/lib/store/properties";
+import { getAllTags } from "@/lib/store/tags";
 import { CaptureForm } from "@/components/capture-form";
 
 export const dynamic = "force-dynamic";
@@ -10,11 +11,11 @@ export const metadata = {
 };
 
 export default async function CapturePage() {
-  const properties = await getAllProperties();
+  const [properties, tags] = await Promise.all([getAllProperties(), getAllTags()]);
   const propertyOptions = properties.map((p) => ({ slug: p.slug, title: p.title }));
 
   return (
-    <div className="mx-auto max-w-md px-4 py-8 sm:py-12">
+    <div className="mx-auto max-w-xl px-4 py-8 sm:py-12">
       <div className="mb-6 flex items-center gap-2 text-primary">
         <Image src="/brand/icon.png" alt="A for Acre" width={28} height={28} className="h-7 w-7 shrink-0" />
         <span className="font-heading text-lg font-semibold">A for Acre</span>
@@ -24,7 +25,7 @@ export default async function CapturePage() {
         Take photos and confirm your location — this goes straight to the team for review.
       </p>
       <div className="mt-6">
-        <CaptureForm properties={propertyOptions} />
+        <CaptureForm properties={propertyOptions} existingTags={tags} />
       </div>
     </div>
   );

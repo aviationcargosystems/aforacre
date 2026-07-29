@@ -1,7 +1,7 @@
 "use client";
 
 import "leaflet/dist/leaflet.css";
-import { MapContainer, TileLayer, Circle, CircleMarker, Tooltip, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Circle, CircleMarker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { useEffect } from "react";
 import { GROWTH_ANCHORS } from "@/lib/anchors";
@@ -37,26 +37,28 @@ const BENGALURU: [number, number] = [12.9716, 77.5946];
 const FOREST = "#1f3a2e";
 const TERRACOTTA = "#c56a4a";
 
-/** Stacked rings, widest and faintest first, so each project reads as a bloom. */
+/**
+ * Stacked rings, widest and faintest first, so each project reads as a bloom.
+ * Weighted heavily towards the centre: at the previous opacities the blooms
+ * washed out against the basemap and the map read as a scatter of dots.
+ */
 const HEAT_BANDS = [
-  { radius: 9000, opacity: 0.06 },
-  { radius: 6000, opacity: 0.08 },
-  { radius: 3600, opacity: 0.11 },
-  { radius: 1800, opacity: 0.16 },
+  { radius: 14000, opacity: 0.07 },
+  { radius: 10000, opacity: 0.1 },
+  { radius: 7000, opacity: 0.14 },
+  { radius: 4500, opacity: 0.19 },
+  { radius: 2600, opacity: 0.26 },
+  { radius: 1300, opacity: 0.34 },
 ];
 
 function FitToRegion({ areas }: { areas: CoverageArea[] }) {
   const map = useMap();
   useEffect(() => {
-    const points: [number, number][] = [
-      ...areas.map((a) => [a.lat, a.lng] as [number, number]),
-      ...GROWTH_ANCHORS.map((a) => [a.lat, a.lng] as [number, number]),
-      BENGALURU,
-    ];
-    // Even padding on all four sides. `.pad()` grows the bounds rectangle
-    // proportionally, so a tall, narrow spread of points ends up with far more
-    // slack on one axis than the other and the region sits off-centre.
-    map.fitBounds(L.latLngBounds(points), { padding: [48, 48], animate: false });
+    // Framed on the projects, not on everything we have a coordinate for.
+    // Including the city and every listing pulled the centre north and left the
+    // blooms — the actual subject — small and off to one side.
+    const points = GROWTH_ANCHORS.map((a) => [a.lat, a.lng] as [number, number]);
+    map.fitBounds(L.latLngBounds(points), { padding: [96, 96], animate: false });
   }, [areas, map]);
   return null;
 }
@@ -101,9 +103,12 @@ export default function SouthBangaloreMap({ areas }: { areas: CoverageArea[] }) 
           radius={7}
           pathOptions={{ color: "#ffffff", weight: 2, fillColor: TERRACOTTA, fillOpacity: 1 }}
         >
-          <Tooltip direction="top" offset={[0, -6]}>
+          <Popup>
             <span className="font-medium">{anchor.title}</span>
-          </Tooltip>
+            {anchor.disclaimer && (
+              <span className="mt-0.5 block text-muted-foreground">{anchor.disclaimer}</span>
+            )}
+          </Popup>
         </CircleMarker>
       ))}
 
@@ -113,9 +118,7 @@ export default function SouthBangaloreMap({ areas }: { areas: CoverageArea[] }) 
         radius={5}
         pathOptions={{ color: "#8a8578", weight: 2, fillColor: "#ffffff", fillOpacity: 1 }}
       >
-        <Tooltip direction="right" offset={[8, 0]} permanent className="aa-map-label">
-          Bengaluru
-        </Tooltip>
+        <Popup>Bengaluru</Popup>
       </CircleMarker>
 
       {/* Our listings, secondary to the infrastructure story. */}
@@ -126,13 +129,13 @@ export default function SouthBangaloreMap({ areas }: { areas: CoverageArea[] }) 
           radius={Math.min(9, 4 + area.count)}
           pathOptions={{ color: "#ffffff", weight: 1.5, fillColor: FOREST, fillOpacity: 0.9 }}
         >
-          <Tooltip direction="top" offset={[0, -5]}>
+          <Popup>
             <span className="font-medium">{area.area}</span>
             <span className="text-muted-foreground">
               {" "}
               · {area.count} {area.count === 1 ? "plot" : "plots"}
             </span>
-          </Tooltip>
+          </Popup>
         </CircleMarker>
       ))}
     </MapContainer>

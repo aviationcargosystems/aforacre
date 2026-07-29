@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-07-29 16:35 IST · Multi-step capture, map emphasis, hero subtext
+
+- Quick capture is now four optional steps: site (photos, pin, notes), tags, property details (area, extent in gunta/acre/sq ft, price, soil, land observation, water, fencing, electricity) and documents (survey number, khata, RTC scan). Only step one matters; the save button sits outside the stepper so the twenty-second path in a field is unchanged.
+- Captures carry tags and a partial-details payload, so anything known on site no longer has to be retyped into the property form later.
+- RTC scans can be photographed straight into a capture, and read with the same Sonnet 5 extraction used on the property form. The full reading is stored so a reviewer can audit it against the scan.
+- Corridor map: heat blooms roughly doubled in reach and weighted harder towards the centre; the map now frames the three projects rather than the city and every listing, so the blooms are the subject.
+- Corridor map: no labels at rest. Clicking a project, the city or a listing area opens its label; the airport's "Site not yet finalised." clause rides along in its popup.
+- Homepage: "Discover. Own. Build. Grow." added as hero subtext.
+- Homepage: removed the "Why South Bangalore, why now" section — it walked through the same three projects the map section above already covers. The component still ships for use elsewhere.
+- User-facing: no visible change to the public capture form's quick path; new optional steps only.
+- Requires migration 0012 for capture tags and details.
+
 ## 2026-07-29 15:40 IST · Homepage order, region maps, flexible extent, AI assist
 
 - Homepage: removed the two hero sub-paragraphs; Featured land now sits third, directly after the corridor map, with the corridor argument moved below it as supporting evidence.

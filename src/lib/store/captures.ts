@@ -1,4 +1,4 @@
-import type { Capture, CaptureStatus } from "@/lib/types";
+import type { Capture, CaptureDetails, CaptureStatus } from "@/lib/types";
 import { getSupabaseAdmin } from "@/lib/supabase/server";
 
 interface CaptureRow {
@@ -13,6 +13,8 @@ interface CaptureRow {
   captured_by: string;
   property_slug: string | null;
   status: CaptureStatus;
+  tags: string[] | null;
+  details: CaptureDetails | null;
 }
 
 function rowToCapture(row: CaptureRow): Capture {
@@ -28,6 +30,8 @@ function rowToCapture(row: CaptureRow): Capture {
     capturedBy: row.captured_by,
     propertySlug: row.property_slug,
     status: row.status,
+    tags: row.tags ?? [],
+    details: row.details ?? {},
   };
 }
 
@@ -56,6 +60,8 @@ export async function createCapture(capture: Capture): Promise<void> {
     captured_by: capture.capturedBy,
     property_slug: capture.propertySlug,
     status: capture.status,
+    tags: capture.tags,
+    details: capture.details,
   });
   if (error) throw error;
 }
