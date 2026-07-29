@@ -366,6 +366,14 @@ export function PropertyForm({
           <div className={step === 3 ? "space-y-8" : "hidden"}>
             <section className="space-y-4">
                     <h2 className="font-heading text-lg font-semibold text-foreground">Images</h2>
+                    {(prefill?.images ?? []).length > 0 && (
+                      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                        {(prefill?.images ?? []).map((src) => (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img key={src} src={src} alt="" className="aspect-square rounded-lg object-cover" />
+                        ))}
+                      </div>
+                    )}
                     {property && property.images.length > 0 && (
                       <div>
                         <p className={labelClass}>Existing images</p>
@@ -395,6 +403,13 @@ export function PropertyForm({
                   </section>
             <section className="space-y-4">
                     <h2 className="font-heading text-lg font-semibold text-foreground">Videos</h2>
+                    {(prefill?.videos ?? []).length > 0 && (
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {(prefill?.videos ?? []).map((src) => (
+                          <video key={src} src={src} controls preload="metadata" className="w-full rounded-lg bg-black" />
+                        ))}
+                      </div>
+                    )}
                     <p className="text-sm text-muted-foreground">
                       Optional. A walkthrough clip does more for a plot than another still, but most listings will not have one.
                     </p>

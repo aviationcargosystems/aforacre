@@ -19,6 +19,10 @@ import { haversineKm } from "@/lib/anchors";
 export const BENGALURU_CENTRE = { lat: 12.9794, lng: 77.5912 };
 
 export interface DistanceResult {
+  /** Settlement name from OpenStreetMap, when it has one for the point. */
+  area?: string;
+  taluk?: string;
+  district?: string;
   km: number;
   /** Driving time in minutes, only available from the routed measurement. */
   driveMinutes: number | null;

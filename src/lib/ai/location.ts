@@ -51,7 +51,7 @@ interface NominatimAddress {
 }
 
 /** Settlement-level reverse geocode. Free, no key, and the right authority for administrative names. */
-async function reverseGeocode(lat: number, lng: number) {
+export async function reverseGeocode(lat: number, lng: number) {
   const url = `https://nominatim.openstreetmap.org/reverse?format=json&zoom=14&lat=${lat}&lon=${lng}`;
   const response = await fetch(url, {
     headers: { "User-Agent": "aforacre/1.0 (admin property tooling)" },

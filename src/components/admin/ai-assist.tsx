@@ -157,7 +157,7 @@ export function AiAssist({
     // in as soon as there is a pin. Only when the field is empty — a figure
     // somebody typed deliberately is not ours to overwrite.
     const distanceField = el.elements.namedItem("distanceFromBangaloreKm");
-    if (!(distanceField instanceof HTMLInputElement) || distanceField.value.trim()) return;
+    if (!(distanceField instanceof HTMLInputElement)) return;
 
     void fetch("/api/admin/distance", {
       method: "POST",
@@ -166,7 +166,13 @@ export function AiAssist({
     })
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
-        if (d?.km && !distanceField.value.trim()) setFieldValue(el, "distanceFromBangaloreKm", String(d.km));
+        if (!d) return;
+        if (d.km && !distanceField.value.trim()) setFieldValue(el, "distanceFromBangaloreKm", String(d.km));
+        // Same rule as distance: only into an empty field.
+        for (const [key, value] of [["area", d.area], ["taluk", d.taluk], ["district", d.district]] as const) {
+          const field = el.elements.namedItem(key);
+          if (value && field instanceof HTMLInputElement && !field.value.trim()) setFieldValue(el, key, value);
+        }
       })
       .catch(() => {
         // Best effort. The field stays editable either way.
