@@ -71,7 +71,7 @@ export default async function Home() {
             width and left the headline wrapping awkwardly at every breakpoint. */}
         <div className="mx-auto flex max-w-4xl flex-col items-center px-4 pb-6 text-center sm:px-6 lg:px-8">
           <h1 className="font-heading text-5xl font-semibold leading-[1.02] tracking-tight text-balance text-foreground sm:text-6xl lg:text-7xl">
-            Buy holistic lands in south Bengaluru!
+            Buy lands in south Bengaluru!
           </h1>
           <p className="mt-6 font-heading text-xl font-medium tracking-tight text-foreground/70 sm:text-2xl">
             Discover. Own. Build. Grow.
