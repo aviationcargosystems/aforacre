@@ -117,9 +117,12 @@ export default async function Home() {
                 <div className="mt-9">
                   <Button asChild variant="pill" size="pill" className="h-14 w-full px-10 text-base sm:w-auto">
                     <Link href="/match">
-                      Find the land that suits you <ArrowRight className="ml-1.5 h-5 w-5" />
+                      Find myself <ArrowRight className="ml-1.5 h-5 w-5" />
                     </Link>
                   </Button>
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    Answer four questions and we will find the land that suits you.
+                  </p>
                 </div>
               </div>
 
