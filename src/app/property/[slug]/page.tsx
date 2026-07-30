@@ -43,12 +43,6 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
               <span>{property.location.corridor}</span>
             </>
           )}
-          {property.fid && (
-            <>
-              <span aria-hidden="true">/</span>
-              <span className="font-medium text-foreground">FID {property.fid}</span>
-            </>
-          )}
         </nav>
 
         <PropertyMediaGallery

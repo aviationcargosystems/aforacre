@@ -234,7 +234,8 @@ export default function LeafletMap({
                   <p className="font-heading text-sm font-semibold leading-snug text-foreground">{property.title}</p>
                   <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                     <Ruler className="h-3 w-3 shrink-0" />
-                    {property.extentAcres} acres · {property.distanceFromBangaloreKm}km from the city
+                    {property.extentAcres} acres
+                    {property.distanceFromBangaloreKm > 0 && ` · ${property.distanceFromBangaloreKm}km from the city`}
                   </p>
                   <div className="flex items-center justify-between gap-2 border-t border-border/60 pt-2">
                     <span className="text-[11px] text-muted-foreground">{formatINR(property.totalPrice)}</span>

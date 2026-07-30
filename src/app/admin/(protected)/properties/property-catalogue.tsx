@@ -260,7 +260,11 @@ export function PropertyCatalogue({ properties }: { properties: Property[] }) {
                     <td className="px-4 py-4">
                       <p className="font-medium text-foreground">{property.location.area}</p>
                       <p className="mt-1 text-xs text-muted-foreground">{property.location.corridor}</p>
-                      <p className="mt-1.5 text-[10px] text-muted-foreground">{property.distanceFromBangaloreKm} km from Bengaluru</p>
+                      {property.distanceFromBangaloreKm > 0 && (
+                        <p className="mt-1.5 text-[10px] text-muted-foreground">
+                          {property.distanceFromBangaloreKm} km from Bengaluru
+                        </p>
+                      )}
                     </td>
                     <td className="whitespace-nowrap px-4 py-4">
                       <p className="font-heading text-lg font-semibold text-foreground">{formatINR(property.totalPrice)}</p>

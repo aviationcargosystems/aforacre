@@ -65,6 +65,27 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
 // stored on every plot. "long-term-investment" and "not-sure" have no single
 // natural use case, so they stay neutral and blend across all four rather than
 // guessing.
+/**
+ * What each goal looks for in a plot's tags and description.
+ *
+ * Scoring used to run entirely on `useCaseFit`, a 0-100 figure an admin typed
+ * per property. That field lost its input, so every plot scored identically and
+ * the quiz ranked arbitrarily — silently, since a tie is not an error.
+ *
+ * Tags are what an admin actually records now, so the base score is derived
+ * from them. Matched as substrings across tags, title, description and
+ * landmarks, because the tag vocabulary is admin-editable and a new tag should
+ * count without a code change.
+ */
+const GOAL_KEYWORDS: Record<string, string[]> = {
+  "weekend-farmhouse": ["farmhouse", "weekend", "getaway", "scenic", "view", "gated", "retreat"],
+  "retirement-home": ["farmhouse", "gated", "road", "power", "electric", "water", "borewell", "quiet"],
+  "commercial-farming": ["farm", "crop", "multi-crop", "open farmland", "irrigat", "borewell", "soil"],
+  "organic-farming": ["organic", "soil", "water", "borewell", "farm", "plantation"],
+  "long-term-investment": ["investment", "potential", "road", "highway", "immediate", "clear"],
+  "not-sure": [],
+};
+
 const GOAL_TO_USE_CASE: Partial<Record<string, UseCase>> = {
   "weekend-farmhouse": "getaway",
   "retirement-home": "retirement",
@@ -112,11 +133,26 @@ export function computeMatches(properties: Property[], answers: QuizAnswers, lim
   const sceneryKeywords = (answers.scenery ?? []).flatMap((value) => SCENERY_KEYWORDS[value] ?? []);
   const budgetRanges = (answers.budget ?? []).map((value) => BUDGET_RANGES[value]).filter(Boolean);
 
-  const scored = properties.map((property) => {
-    const baseScore =
-      useCasesToScore.reduce((sum, id) => sum + property.useCaseFit[id], 0) / useCasesToScore.length;
+  const goalKeywords = Array.from(
+    new Set((answers.goals ?? []).flatMap((goal) => GOAL_KEYWORDS[goal] ?? []))
+  );
 
-    let score = baseScore;
+  const scored = properties.map((property) => {
+    const haystack = [property.title, property.description, ...property.tags, ...property.nearbyLandmarks]
+      .join(" ")
+      .toLowerCase();
+
+    // useCaseFit still counts where it was filled in, but it is no longer the
+    // whole score — a catalogue of zeroes would otherwise flatten everything.
+    const curated =
+      useCasesToScore.reduce((sum, id) => sum + (property.useCaseFit[id] ?? 0), 0) / useCasesToScore.length;
+
+    // Start from neutral and earn upward, so a plot with no curation is ranked
+    // on what it actually carries rather than pinned to the bottom.
+    const hits = goalKeywords.filter((keyword) => haystack.includes(keyword)).length;
+    const fromTags = goalKeywords.length > 0 ? Math.min(40, (hits / goalKeywords.length) * 80) : 0;
+
+    let score = curated > 0 ? Math.max(curated, 50 + fromTags) : 50 + fromTags;
 
     if (budgetRanges.length > 0) {
       const fitsAnyRange = budgetRanges.some((range) => property.totalPrice >= range.min && property.totalPrice <= range.max);
@@ -124,9 +160,6 @@ export function computeMatches(properties: Property[], answers: QuizAnswers, lim
     }
 
     if (sceneryKeywords.length > 0) {
-      const haystack = [property.title, property.description, ...property.tags, ...property.nearbyLandmarks]
-        .join(" ")
-        .toLowerCase();
       const matchesScenery = sceneryKeywords.some((keyword) => haystack.includes(keyword));
       if (matchesScenery) score += 8;
     }
