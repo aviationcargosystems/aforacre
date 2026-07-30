@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight, MapPin, Play } from "lucide-react";
 import type { Property } from "@/lib/types";
 import { formatINR } from "@/lib/tax";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,12 @@ export function PropertyCard({ property, highlightLabel }: { property: Property;
           )}
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,14,0)_0%,rgba(8,18,14,0.05)_45%,rgba(8,18,14,0.68)_100%)]" />
           <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+            {property.videos.length > 0 && (
+              <Badge className="gap-1 bg-black/55 text-white backdrop-blur">
+                <Play className="h-3 w-3 fill-current" />
+                Video
+              </Badge>
+            )}
             {property.featured && (
               <Badge className="bg-white/90 text-foreground shadow-[0_10px_24px_rgba(15,23,42,0.12)]">
                 Featured
@@ -34,15 +40,15 @@ export function PropertyCard({ property, highlightLabel }: { property: Property;
             )}
             {highlightLabel && <Badge className="bg-accent text-accent-foreground">{highlightLabel}</Badge>}
           </div>
-          <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-2 text-white sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+          <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3 text-white">
             <div className="min-w-0">
               {/* FID is an internal reference — it means nothing to a buyer. */}
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">
                 South Bangalore
               </p>
-              <p className="mt-1 font-heading text-lg font-semibold leading-tight sm:line-clamp-2 sm:text-xl">{property.title}</p>
+              <p className="mt-1 line-clamp-2 font-heading text-base font-semibold leading-tight sm:text-xl">{property.title}</p>
             </div>
-            <div className="shrink-0 self-start rounded-2xl border border-white/15 bg-white/10 px-3 py-2 backdrop-blur sm:min-w-[108px] sm:self-auto sm:text-right">
+            <div className="shrink-0 rounded-2xl border border-white/15 bg-white/10 px-3 py-2 text-right backdrop-blur">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/68">Total price</p>
               <p className="mt-1 whitespace-nowrap font-heading text-lg font-semibold leading-none">
                 {formatINR(property.totalPrice)}
