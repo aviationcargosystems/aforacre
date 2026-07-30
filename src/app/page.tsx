@@ -76,17 +76,6 @@ export default async function Home() {
           <p className="mt-6 font-heading text-xl font-medium tracking-tight text-foreground/70 sm:text-2xl">
             Discover. Own. Build. Grow.
           </p>
-          {/* One CTA. A second button beside it splits attention at the exact
-              moment we want a single decision, and everything on this page
-              already leads somewhere. */}
-          <div className="mt-9">
-            <Button asChild variant="pill" size="pill" className="h-14 px-10 text-base">
-              <Link href="/match">
-                Find myself <ArrowRight className="ml-1.5 h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
-
         </div>
 
         {/* No card, no border. The map is the section, not something sitting
@@ -118,6 +107,14 @@ export default async function Home() {
                     </li>
                   ))}
                 </ul>
+
+                <div className="mt-9">
+                  <Button asChild variant="pill" size="pill" className="h-14 w-full px-10 text-base sm:w-auto">
+                    <Link href="/match">
+                      Find myself <ArrowRight className="ml-1.5 h-5 w-5" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
 
               <div className="order-1 h-[22rem] sm:h-[26rem] lg:order-2 lg:h-[32rem]">
