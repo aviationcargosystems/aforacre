@@ -117,7 +117,7 @@ export default async function Home() {
                 </div>
               </div>
 
-              <div className="order-1 h-[22rem] sm:h-[26rem] lg:order-2 lg:h-[32rem]">
+              <div className="order-1 h-[60dvh] max-h-[26rem] sm:h-[26rem] sm:max-h-none lg:order-2 lg:h-[32rem]">
                 <SouthBangaloreMapView areas={coverage} />
               </div>
             </div>
