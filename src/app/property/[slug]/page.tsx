@@ -3,16 +3,15 @@ import { notFound } from "next/navigation";
 import {
   BadgeCheck,
   Droplets,
-  Fence,
   MapPin,
   Mountain,
   Route,
   Ruler,
   ScrollText,
-  Zap,
 } from "lucide-react";
 import { getProperty } from "@/lib/store/properties";
 import { formatINR } from "@/lib/tax";
+import { iconForTag } from "@/lib/tag-icons";
 import { acresToGunta, acresToSqft } from "@/lib/land-units";
 import { GrowthAnchors } from "@/components/property/growth-anchors";
 import { PlotAreaView } from "@/components/map/plot-area-view";
@@ -103,15 +102,37 @@ export default async function PropertyPage({ params }: { params: Promise<{ slug:
                 value={`${property.extentAcres} acres`}
                 detail={`${formatUnit(acresToGunta(property.extentAcres))} guntas · ${formatUnit(acresToSqft(property.extentAcres))} sq ft`}
               />
-              <Fact icon={ScrollText} label="Soil" value={property.soilType} />
-              <Fact icon={Droplets} label="Water" value={property.waterSources.join(", ") || "None"} />
-              <Fact icon={Route} label="Road access" value={property.roadAccess} />
-              <Fact icon={Fence} label="Boundary" value={property.fencing ? "Fenced" : "Not fenced"} />
-              <Fact icon={Zap} label="Electricity" value={property.electricity ? "Connected" : "Not connected"} />
+              {/* Only the fields that were actually filled in. A row reading
+                  "Soil —" or "Water: None" is not a fact about the plot, it is
+                  a gap in the record wearing the costume of one. */}
+              {property.soilType && <Fact icon={ScrollText} label="Soil" value={property.soilType} />}
+              {property.waterSources.filter((w) => w !== "none").length > 0 && (
+                <Fact icon={Droplets} label="Water" value={property.waterSources.filter((w) => w !== "none").join(", ")} />
+              )}
+              {property.roadAccess && <Fact icon={Route} label="Road access" value={property.roadAccess} />}
               {property.landObservation && (
                 <Fact icon={Mountain} label="Site observation" value={property.landObservation} wide />
               )}
             </dl>
+
+            {/* Tags are what an admin actually records about a plot now, so
+                they carry the description rather than a fixed field list. */}
+            {property.tags.length > 0 && (
+              <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {property.tags.map((tag) => {
+                  const Icon = iconForTag(tag);
+                  return (
+                    <li
+                      key={tag}
+                      className="flex items-center gap-2.5 rounded-2xl border border-border/70 bg-white/60 px-3.5 py-3"
+                    >
+                      <Icon className="h-4 w-4 shrink-0 text-primary" />
+                      <span className="min-w-0 text-sm leading-5 text-foreground/85">{tag}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </Section>
 
 

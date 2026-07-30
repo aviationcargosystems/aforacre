@@ -68,7 +68,7 @@ const HEAT_BANDS = [
 ];
 
 /** Fractions of a zoom level to pull back after fitting, for breathing room. */
-const ZOOM_BACK_OFF = 1.75;
+const ZOOM_BACK_OFF = 2.25;
 
 function FitToRegion({ areas }: { areas: CoverageArea[] }) {
   const map = useMap();
