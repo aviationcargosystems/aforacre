@@ -76,11 +76,17 @@ export default async function Home() {
           <p className="mt-6 font-heading text-xl font-medium tracking-tight text-foreground/70 sm:text-2xl">
             Discover. Own. Build. Grow.
           </p>
+
+          <div className="mt-8">
+            <Button asChild variant="pill-outline" size="pill">
+              <Link href="#corridor">Learn more</Link>
+            </Button>
+          </div>
         </div>
 
         {/* No card, no border. The map is the section, not something sitting
             inside one. Infrastructure carries it; our listings are context. */}
-        <div className="relative mt-14 lg:mt-20">
+        <div id="corridor" className="relative mt-14 scroll-mt-24 lg:mt-20">
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
             {/* On a phone the map leads: the point of this section is where the
                 corridor is, and a list of project names lands better once you
@@ -111,7 +117,7 @@ export default async function Home() {
                 <div className="mt-9">
                   <Button asChild variant="pill" size="pill" className="h-14 w-full px-10 text-base sm:w-auto">
                     <Link href="/match">
-                      Find myself <ArrowRight className="ml-1.5 h-5 w-5" />
+                      Find the land that suits you <ArrowRight className="ml-1.5 h-5 w-5" />
                     </Link>
                   </Button>
                 </div>
