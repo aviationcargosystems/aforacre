@@ -18,7 +18,7 @@ const NAV = [
   { href: "/explore", label: "Discover land" },
   { href: "#corridor", label: "Why south Bengaluru" },
   { href: "#experience", label: "By experience" },
-  { href: "#featured", label: "Featured" },
+  { href: "#featured", label: "Featured lands" },
   { href: "#journey", label: "How it works" },
 ];
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-31 15:40 IST · /v1 matched to the reference, stock photography
+
+- Every experience tile now carries a photograph. The seven images are stock, from the Unsplash set this project used before the catalogue was cleared. Each one was opened and checked against the category it illustrates rather than picked by id, so the forest tile is forest meeting farmland and the water tile is a river through paddy. They illustrate a kind of land, never a specific plot.
+- The corridor cards use one solid colour per project with a white glyph, as in the reference, and short two-word titles. This is a deliberate break from the forest-and-terracotta palette, confined to this row and the hero pins that mirror it: the row's job is to make five projects distinguishable at a glance, which five shades of one accent cannot do. The airport's "Site not yet finalised." still renders.
+- The finder's chip row and the tile rail now come from one shared list, so the two cannot drift apart. Chips are fixed rather than driven by the tag vocabulary — they are how someone describes what they want before they know our tags.
+- Journey steps sit on a dashed path, and a listing with no photo of its own falls back to a stock image labelled as one.
+- User-facing: the advisor phone number in the /v1 header is still a placeholder.
+
 ## 2026-07-31 14:46 IST · Design prototype at /v1, branded scrollbars, homepage fixes
 
 - New prototype route /v1 — a full interpretation of the reference layout, parked beside the live homepage so the two can be compared without either disturbing the other. Full-bleed video hero with the three growth anchors as floating pins, a land-finder panel, corridor cards, experience tiles, featured rail, journey band and a stats strip. It reads the live catalogue; nothing is seeded to make it look fuller than the data is, so the counts read zero until listings exist. Three experience tiles say "Photo needed" rather than carry a stock photo of somewhere that is not this corridor.

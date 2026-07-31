@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Search } from "lucide-react";
-import { iconForTag } from "@/lib/tag-icons";
+import { LayoutGrid, Search } from "lucide-react";
+import { EXPERIENCES } from "@/components/v1/experiences";
 
 /**
  * The hero's land finder.
@@ -73,7 +73,7 @@ function Field({
   );
 }
 
-export function V1SearchPanel({ areas, tags }: { areas: string[]; tags: string[] }) {
+export function V1SearchPanel({ areas }: { areas: string[] }) {
   const router = useRouter();
   const [area, setArea] = useState("");
   const [size, setSize] = useState("");
@@ -103,7 +103,7 @@ export function V1SearchPanel({ areas, tags }: { areas: string[]; tags: string[]
         >
           <span>
             <span className="block text-sm font-medium text-[#ede6d5]">Start with AFORACRE</span>
-            <span className="block text-[11px] text-[#ede6d5]/55">Our matching quiz</span>
+            <span className="block text-[11px] text-[#ede6d5]/55">AI land persona</span>
           </span>
           <span aria-hidden className="text-[#ede6d5]/70">
             →
@@ -121,7 +121,7 @@ export function V1SearchPanel({ areas, tags }: { areas: string[]; tags: string[]
         />
         <Field
           label="Land size"
-          placeholder="Any extent"
+          placeholder="Min – max (acres)"
           options={SIZE_OPTIONS}
           value={size}
           onChange={setSize}
@@ -150,29 +150,31 @@ export function V1SearchPanel({ areas, tags }: { areas: string[]; tags: string[]
         </button>
       </div>
 
-      {tags.length > 0 && (
-        <div className="mt-5 flex flex-wrap gap-2">
-          {["All", ...tags].map((tag) => {
-            const Icon = iconForTag(tag);
-            const active = activeTag === tag;
-            return (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => setActiveTag(tag)}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                  active
-                    ? "bg-[#ede6d5] text-[#0e241b]"
-                    : "bg-white/[0.06] text-[#ede6d5]/70 ring-1 ring-inset ring-white/10 hover:bg-white/12 hover:text-[#ede6d5]"
-                }`}
-              >
-                {tag !== "All" && <Icon className="h-3.5 w-3.5" />}
-                {tag}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      {/* The same seven categories the tile rail shows, from one shared list so
+          the two cannot drift apart. Fixed rather than driven by the tag
+          vocabulary: these are how someone describes what they want before they
+          know our tags, and the row should not change shape as tags are added. */}
+      <div className="mt-5 flex flex-wrap gap-2">
+        {[{ tag: "All", icon: LayoutGrid }, ...EXPERIENCES].map((item) => {
+          const Icon = item.icon;
+          const active = activeTag === item.tag;
+          return (
+            <button
+              key={item.tag}
+              type="button"
+              onClick={() => setActiveTag(item.tag)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                active
+                  ? "bg-[#ede6d5] text-[#0e241b]"
+                  : "bg-white/[0.06] text-[#ede6d5]/70 ring-1 ring-inset ring-white/10 hover:bg-white/12 hover:text-[#ede6d5]"
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5" />
+              {item.tag}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
