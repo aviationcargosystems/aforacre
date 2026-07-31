@@ -215,10 +215,10 @@ export default async function Home() {
           <div className="relative flex min-h-[84dvh] flex-col justify-end pb-10 pt-28 lg:pb-14">
             <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-2 lg:gap-8">
               <div className="min-w-0 px-4 sm:px-6 lg:pl-[max(2.5rem,calc((100vw-1400px)/2+2.5rem))] lg:pr-0">
-                {/* 1.8rem is text-4xl (2.25rem) less 20%. Explicit rather than a step
-                    down the scale, because the next step down is 1.875rem and
-                    would only be a 17% cut. */}
-                <h1 className="max-w-2xl font-heading text-[1.8rem] font-semibold leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[4.25rem]">
+                {/* 2.25rem on a phone. It was cut to 1.8rem and read too small
+                    against a full-bleed video, so it is back up 25%. Explicit
+                    rather than a scale step so the number is the intent. */}
+                <h1 className="max-w-2xl font-heading text-[2.25rem] font-semibold leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[4.25rem]">
                   Curated farmland around South Bengaluru
                 </h1>
                 <p className="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">

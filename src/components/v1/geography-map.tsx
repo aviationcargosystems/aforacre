@@ -127,6 +127,14 @@ export default function GeographyMap({
       zoom={11}
       zoomSnap={0.25}
       scrollWheelZoom={false}
+      // Pinned in place. This is a diagram of where we work, not a map to
+      // explore: on a phone, dragging it meant every attempt to scroll past the
+      // section panned the map instead. Zoom stays — that is the one thing
+      // somebody genuinely wants — and the pins and "Show all" do the moving.
+      dragging={false}
+      touchZoom={false}
+      doubleClickZoom={false}
+      keyboard={false}
       // Leaflet's own +/- controls, so the map can be zoomed out again after a
       // village has been flown to. "Show all" beside the list is the one-press
       // way back; these are for everything in between.
