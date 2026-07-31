@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-07-31 18:05 IST · /v1 hero rebuilt, branded scroll, all tags on the card
+
+- The /v1 hero is now headline left, poster shelf right, on a two-way scrim. "Find My Land" is the single action, with the cost of pressing it stated ("Takes 2 minutes"), and the four assurances read as one bordered bar rather than four loose lines.
+- The shelf is a real scroller: touch, wheel, pointer drag and arrow buttons, plus a gentle auto-advance that stops for good once somebody takes hold of it. It replaced a CSS marquee that moved but could not be touched, and three infrastructure pins that floated over footage they had nothing to do with. Scroll snapping means it always rests on a card edge instead of mid-poster.
+- Header is the brand lockup and one CTA. The nav, advisor number and second CTA are gone; the lockup is the same asset the public header uses, inverted to white over the video.
+- Removed the finder panel and every "Project A" label — the brand is A for Acre throughout.
+- Corridor cards: sharper icons, a colour and a line of real detail each, and a third typeface (Space Grotesk) so those five labels read as their own band rather than as more of the same page. The airport still carries "Site not yet finalised."
+- "Explore growth map" opens the homepage corridor map in a dialog instead of leaving the page. The map is only mounted once the dialog opens.
+- User-facing: property cards now show **every** tag rather than the first two, and hide the location row when a listing has no area recorded — a map pin pointing at nothing read as a bug. Tags wrap rather than scroll, because inside the featured drag-rail the inner row never received the pointer and half the tags were unreachable.
+- Smooth scrolling is linear now (Lenis `lerp`) rather than a timed ease-out, which had a slow tail that arrived after the wheel had stopped.
+- Seven new stock photographs, each opened and checked against the category it illustrates. The previous set was soft; these are requested at a width that survives the 3:4 crop on a 3x screen.
+- The journey band sits on a photograph with numbered steps, and the sections carry the homepage's ambient wash instead of flat paper.
+- Checked against the spec document: the match quiz already asks exactly its four questions, in its wording. The impression of "a lot of questions" came from the hero finder sitting above it asking four more — that panel is now gone.
+
 ## 2026-07-31 15:40 IST · /v1 matched to the reference, stock photography
 
 - Every experience tile now carries a photograph. The seven images are stock, from the Unsplash set this project used before the catalogue was cleared. Each one was opened and checked against the category it illustrates rather than picked by id, so the forest tile is forest meeting farmland and the water tile is a river through paddy. They illustrate a kind of land, never a specific plot.

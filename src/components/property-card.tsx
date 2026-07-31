@@ -7,7 +7,17 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
 export function PropertyCard({ property, highlightLabel }: { property: Property; highlightLabel?: string }) {
-  const metaItems = [`${property.extentAcres} acres`, ...property.tags.slice(0, 2), property.roadAccess];
+  // Every tag, not the first two. Tags are what a buyer actually filters on, and
+  // truncating them turned the row into a sample of the listing rather than a
+  // description of it. They scroll sideways instead of wrapping, so the card
+  // keeps one height across a grid however many tags a plot carries.
+  const metaItems = [
+    `${property.extentAcres} acres`,
+    ...property.tags,
+    property.roadAccess,
+  ].filter(Boolean);
+
+  const place = [property.location.area, property.location.corridor].filter(Boolean).join(", ");
 
   return (
     <Link href={`/property/${property.slug}`} className="group block h-full">
@@ -57,14 +67,22 @@ export function PropertyCard({ property, highlightLabel }: { property: Property;
           </div>
         </div>
         <CardContent className="space-y-4 p-5">
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5 shrink-0" />
-            {/* Joined, not interpolated: a plot with no corridor recorded was
-                rendering as "Attikuppe, " with a dangling separator. */}
-            <span className="truncate">
-              {[property.location.area, property.location.corridor].filter(Boolean).join(", ")}
-            </span>
-          </div>
+          {/* Joined, not interpolated: a plot with no corridor recorded was
+              rendering as "Attikuppe, " with a dangling separator. And when a
+              listing has neither — which happens on anything created from a
+              capture before the area is filled in — the whole row goes, rather
+              than leaving a map pin pointing at nothing. */}
+          {place && (
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">{place}</span>
+            </div>
+          )}
+          {/* Wrapped, not scrolled. A sideways-scrolling strip was the tidier
+              layout but it does not work here: these cards sit inside the
+              featured drag-rail, which swallows the pointer, so the inner row
+              never moved and half the tags were simply unreachable. Wrapping
+              costs a little height and shows every one of them. */}
           <div className="flex flex-wrap gap-1.5">
             {metaItems.map((item) => (
               <span

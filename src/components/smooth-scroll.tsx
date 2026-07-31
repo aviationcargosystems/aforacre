@@ -19,9 +19,15 @@ export function SmoothScroll() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const lenis = new Lenis({
-      duration: 0.9,
-      // Gentle exponential ease-out: quick to respond, no long glide at the end.
-      easing: (t: number) => 1 - Math.pow(1 - t, 3),
+      // Linear follow rather than a timed ease.
+      //
+      // `duration` + `easing` animates each wheel event over a fixed span, which
+      // is what gave the page its slightly rubbery arrival — the tail of the
+      // cubic ease-out is slow, so the last few pixels drift in after the wheel
+      // has stopped. `lerp` instead moves a constant fraction of the remaining
+      // distance every frame: the rate is even, it tracks the wheel one-to-one,
+      // and it settles without the glide. 0.12 is smooth without feeling heavy.
+      lerp: 0.12,
       prevent: (node) =>
         node.classList?.contains("leaflet-container") ||
         Boolean(node.closest?.(".leaflet-container, [data-lenis-prevent], [data-featured-card]")),

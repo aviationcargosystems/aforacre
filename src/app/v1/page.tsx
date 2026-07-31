@@ -2,32 +2,33 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  ArrowUpRight,
-  Building2,
   CalendarCheck,
+  Clock,
   Droplets,
   FileCheck2,
-  Landmark,
+  GraduationCap,
   Leaf,
-  MapPin,
   MapPinned,
-  Plane,
+  PlaneTakeoff,
   Route,
   ScanSearch,
   ShieldCheck,
   Sprout,
+  TrainFront,
   TrendingUp,
   Trophy,
+  Waypoints,
 } from "lucide-react";
 import { HeroVideo } from "@/components/hero-video";
 import { DragRail } from "@/components/drag-rail";
+import { PropertyCard } from "@/components/property-card";
 import { V1Header } from "@/components/v1/v1-header";
-import { V1SearchPanel } from "@/components/v1/v1-search-panel";
+import { GrowthMapDialog } from "@/components/v1/growth-map-dialog";
+import { HeroShowcase } from "@/components/v1/hero-showcase";
 import { EXPERIENCES } from "@/components/v1/experiences";
 import { GROWTH_ANCHORS } from "@/lib/anchors";
 import { CORE_REGIONS } from "@/lib/regions";
 import { getAllProperties } from "@/lib/store/properties";
-import { formatINR } from "@/lib/tax";
 import type { Property } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -53,31 +54,37 @@ export const dynamic = "force-dynamic";
  * A solid colour per project is a deliberate departure from the forest and
  * terracotta used everywhere else: this row's job is to make five projects
  * distinguishable at a glance, and five shades of one accent does not do that.
- * Confined to this row and the hero pins that mirror it.
+ * Confined to this row.
  */
 const ANCHOR_STYLE = {
-  iimb: { icon: Landmark, tint: "bg-[#7a5cb8]", short: "New IIMB campus" },
-  stadium: { icon: Trophy, tint: "bg-[#3f9e5a]", short: "Upcoming cricket stadium" },
-  airport: { icon: Plane, tint: "bg-[#df5a4c]", short: "Proposed intl. airport" },
+  iimb: {
+    icon: GraduationCap,
+    tint: "bg-[#7a5cb8]",
+    wash: "from-[#7a5cb8]/10",
+    ring: "ring-[#7a5cb8]/20",
+    glow: "shadow-[0_10px_24px_rgba(122,92,184,0.35)]",
+    short: "New IIMB Campus",
+    line: "110 acres at Jigani. Already building.",
+  },
+  stadium: {
+    icon: Trophy,
+    tint: "bg-[#3f9e5a]",
+    wash: "from-[#3f9e5a]/10",
+    ring: "ring-[#3f9e5a]/20",
+    glow: "shadow-[0_10px_24px_rgba(63,158,90,0.35)]",
+    short: "Upcoming Cricket Stadium",
+    line: "80,000 seats at Anekal. Cabinet approved.",
+  },
+  airport: {
+    icon: PlaneTakeoff,
+    tint: "bg-[#df5a4c]",
+    wash: "from-[#df5a4c]/10",
+    ring: "ring-[#df5a4c]/20",
+    glow: "shadow-[0_10px_24px_rgba(223,90,76,0.35)]",
+    short: "Proposed Intl. Airport",
+    line: "Two of three sites are on Kanakapura Road.",
+  },
 } as const;
-
-/**
- * Where each anchor's label sits over the hero footage. Composition, not
- * geography — the video is a drone shot of farmland, not a map, so a pin placed
- * by latitude would mean nothing.
- */
-const ANCHOR_PIN_POSITIONS: Record<string, string> = {
-  iimb: "left-[58%] top-[15%]",
-  stadium: "left-[66%] top-[27%]",
-  airport: "left-[73%] top-[39%]",
-};
-
-/** Shorter still than the card titles — a floating chip has less room. */
-const ANCHOR_PIN_LABELS: Record<string, string> = {
-  iimb: "New IIMB campus",
-  stadium: "Cricket stadium",
-  airport: "Second airport",
-};
 
 /** The four things every listing is checked for before it goes up. */
 const HERO_ASSURANCES = [
@@ -89,8 +96,24 @@ const HERO_ASSURANCES = [
 
 /** Two more than the three mapped anchors, matching the corridor copy on /. */
 const CORRIDOR_EXTRAS = [
-  { icon: Route, title: "STRR 300ft road", tint: "bg-[#2d6b9e]" },
-  { icon: Building2, title: "Improved connectivity", tint: "bg-[#e0a03c]" },
+  {
+    icon: Waypoints,
+    title: "STRR 300ft Road",
+    line: "Ring road tying the satellite towns together.",
+    tint: "bg-[#2d6b9e]",
+    wash: "from-[#2d6b9e]/10",
+    ring: "ring-[#2d6b9e]/20",
+    glow: "shadow-[0_10px_24px_rgba(45,107,158,0.35)]",
+  },
+  {
+    icon: TrainFront,
+    title: "Improved Connectivity",
+    line: "Metro and highway upgrades heading south.",
+    tint: "bg-[#e0a03c]",
+    wash: "from-[#e0a03c]/10",
+    ring: "ring-[#e0a03c]/20",
+    glow: "shadow-[0_10px_24px_rgba(224,160,60,0.35)]",
+  },
 ];
 
 /** The path from first visit to owning something, as the reference frames it. */
@@ -102,14 +125,6 @@ const JOURNEY_STEPS = [
   { icon: Sprout, title: "Build and grow", body: "Fencing, borewell, power — and who does it." },
 ];
 
-/**
- * Shown on a listing with no photo of its own. Every other image on this page
- * illustrates a category; this one stands in for a specific plot, so it is
- * captioned as a placeholder rather than passed off as the land.
- */
-const LISTING_PLACEHOLDER =
-  "https://images.unsplash.com/photo-1693713354781-fc9921f17141?auto=format&fit=crop&w=800&q=70";
-
 function verifiedFully(property: Property): boolean {
   return Object.values(property.verified).every(Boolean);
 }
@@ -120,10 +135,28 @@ export default async function V1Page() {
   const featured = properties.filter((p) => p.featured);
   const showcase = (featured.length > 0 ? featured : properties).slice(0, 8);
 
-  const areas = Array.from(new Set(properties.map((p) => p.location.area))).sort();
-  // Fall back to the belt we work in when the catalogue is empty, so the
-  // location filter still has something to say on a fresh database.
-  const areaOptions = areas.length > 0 ? areas : CORE_REGIONS.map((r) => r.name);
+  // One marker per area for the map dialog, not one per plot. Several listings
+  // in the same village should read as depth there rather than as clutter.
+  const coverage = Array.from(
+    properties
+      .reduce((byArea, property) => {
+        const key = property.location.area;
+        const existing = byArea.get(key);
+        if (existing) {
+          existing.count += 1;
+        } else {
+          byArea.set(key, {
+            area: key,
+            corridor: property.location.corridor,
+            lat: property.location.lat,
+            lng: property.location.lng,
+            count: 1,
+          });
+        }
+        return byArea;
+      }, new Map<string, { area: string; corridor: string; lat: number; lng: number; count: number }>())
+      .values()
+  );
 
   const totalAcres = properties.reduce((sum, p) => sum + p.extentAcres, 0);
   const verifiedCount = properties.filter(verifiedFully).length;
@@ -137,7 +170,20 @@ export default async function V1Page() {
   ];
 
   return (
-    <div className="bg-background">
+    <div className="relative">
+      {/* The same ambient wash the homepage carries, so the sections below the
+          hero have some depth instead of reading as flat paper. One fixed,
+          full-viewport layer beneath everything — which only works because no
+          section below paints an opaque background of its own, so there is no
+          seam for the gradient to stop at. The banded sections are tinted at low
+          alpha for exactly that reason. Sized in viewport widths on a phone,
+          where 600px blobs overlap into a single flat tint. */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="animate-drift-slow absolute left-[-25%] top-[8%] h-[85vw] w-[85vw] rounded-full bg-accent/20 blur-3xl sm:h-[620px] sm:w-[620px] sm:bg-accent/12" />
+        <div className="animate-drift-slower absolute right-[-25%] top-[38%] h-[80vw] w-[80vw] rounded-full bg-primary/16 blur-3xl sm:h-[560px] sm:w-[560px] sm:bg-primary/10" />
+        <div className="animate-drift-slow absolute left-[10%] top-[68%] h-[75vw] w-[75vw] rounded-full bg-[#e0bd7c]/16 blur-3xl [animation-delay:-9s] sm:left-[30%] sm:h-[460px] sm:w-[460px] sm:bg-[#e0bd7c]/10" />
+      </div>
+
       <V1Header />
 
       {/* ---------------------------------------------------------------- Hero */}
@@ -146,75 +192,77 @@ export default async function V1Page() {
           <div className="absolute inset-0">
             <HeroVideo poster="/videos/hero-poster.jpg" />
           </div>
-          {/* Two gradients, not one: a top scrim so the transparent header's
-              white text has something to sit on, and a heavier bottom one so
-              the finder panel does not float on raw footage. */}
+          {/* Two scrims. The vertical one darkens the top so the header's white
+              text has something to sit on; the horizontal one weights the left,
+              where the headline lives, and lets the footage stay bright on the
+              right behind the shelf. */}
           <div
             aria-hidden
-            className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,14,0.55)_0%,rgba(8,18,14,0.18)_28%,rgba(8,18,14,0.30)_62%,rgba(8,18,14,0.80)_100%)]"
+            className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,14,0.6)_0%,rgba(8,18,14,0.2)_30%,rgba(8,18,14,0.35)_70%,rgba(8,18,14,0.75)_100%)]"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,18,14,0.88)_0%,rgba(8,18,14,0.55)_42%,rgba(8,18,14,0.05)_78%)]"
           />
 
-          {/* Anchor callouts. Hidden below lg — at phone width they land on top
-              of the headline and each other. */}
-          <div aria-hidden className="pointer-events-none absolute inset-0 hidden lg:block">
-            {GROWTH_ANCHORS.map((anchor) => {
-              const { icon: Icon, tint } = ANCHOR_STYLE[anchor.id];
-              return (
-                <div key={anchor.id} className={`absolute ${ANCHOR_PIN_POSITIONS[anchor.id]}`}>
-                  <div className="flex items-center gap-2 rounded-full bg-white/92 py-1.5 pl-1.5 pr-4 shadow-[0_10px_30px_rgba(8,18,14,0.25)] backdrop-blur">
-                    <span className={`flex h-7 w-7 items-center justify-center rounded-full ${tint}`}>
-                      <Icon className="h-3.5 w-3.5 text-white" />
-                    </span>
-                    <span className="whitespace-nowrap text-xs font-semibold text-[#0e241b]">
-                      {ANCHOR_PIN_LABELS[anchor.id]}
-                    </span>
-                  </div>
-                  {/* Dotted drop line, purely to tie the label to the ground. */}
-                  <span className="mx-auto block h-16 w-px border-l border-dashed border-white/55" />
-                  <span className="mx-auto block h-2 w-2 -translate-y-1 rounded-full bg-white shadow-[0_0_0_4px_rgba(255,255,255,0.28)]" />
+          <div className="relative mx-auto flex min-h-[86dvh] max-w-[1400px] flex-col justify-center px-4 pb-14 pt-28 sm:px-6 lg:px-10">
+            {/* Headline left, shelf right, both vertically centred — the two
+                halves of the reference. Below lg the shelf drops under the copy
+                rather than competing with it for width. */}
+            {/* `grid-cols-1` and `min-w-0` are both load-bearing, not tidiness.
+                A grid item's default `min-width: auto` lets it grow to its
+                content, and the shelf's content is seven 168px posters — so
+                below lg the single column stretched to ~1150px, dragging the
+                headline out with it, clipped by the hero's overflow. */}
+            <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,640px)] lg:gap-12">
+              <div className="min-w-0">
+                <h1 className="font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl">
+                  Curated farmland around South Bengaluru
+                </h1>
+                <p className="mt-6 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
+                  Own your acre of nature within 1–1.5 hrs from home.
+                  <br className="hidden sm:block" /> Live it. Grow it. Build it. Retire in it.
+                </p>
+
+                {/* The one action in the hero. Everything else on this page is
+                    something to read; this is the thing to do. */}
+                <div className="mt-8">
+                  <Link
+                    href="/match"
+                    className="inline-flex items-center gap-2.5 rounded-full bg-accent px-8 py-4 text-base font-semibold text-accent-foreground shadow-[0_14px_35px_rgba(197,106,74,0.32)] transition-transform hover:-translate-y-0.5"
+                  >
+                    Find My Land <ArrowRight className="h-5 w-5" />
+                  </Link>
+                  {/* The cost of pressing it, stated up front. */}
+                  <p className="mt-3 flex items-center gap-1.5 text-sm text-white/65">
+                    <Clock className="h-3.5 w-3.5" />
+                    Takes 2 minutes
+                  </p>
                 </div>
-              );
-            })}
-          </div>
-
-          <div className="relative mx-auto flex min-h-[92dvh] max-w-[1400px] flex-col justify-end px-4 pb-8 pt-28 sm:px-6 lg:px-10 lg:pb-12">
-            <div className="max-w-2xl">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-md bg-[#0e241b] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#ede6d5]">
-                  Project A
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/75">
-                  A for Acre
-                </span>
               </div>
-              <h1 className="mt-5 font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl">
-                Curated farmland
-                <br className="hidden sm:block" /> around south Bengaluru
-              </h1>
-              <p className="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
-                Own your acre of nature within 1–1.5 hrs from home.
-                <br className="hidden sm:block" /> Live it. Grow it. Build it. Retire in it.
-              </p>
 
-              <ul className="mt-7 flex flex-wrap gap-x-6 gap-y-3">
-                {HERO_ASSURANCES.map((item) => (
-                  <li key={item.label} className="flex items-center gap-2 text-sm font-medium text-white/90">
-                    <item.icon className="h-4 w-4 text-white/70" />
-                    {item.label}
-                  </li>
-                ))}
-              </ul>
+              <HeroShowcase />
             </div>
 
-            <div className="mt-10">
-              <V1SearchPanel areas={areaOptions} />
-            </div>
+            {/* The assurances read as one claim rather than four loose lines, so
+                they get a single bordered bar with dividers. */}
+            <ul className="mt-12 flex w-fit flex-wrap items-center gap-y-3 rounded-2xl px-1 ring-1 ring-inset ring-white/20 backdrop-blur-sm sm:mt-14">
+              {HERO_ASSURANCES.map((item) => (
+                <li
+                  key={item.label}
+                  className="flex items-center gap-2 border-white/15 px-4 py-3 text-sm font-medium text-white/90 [&:not(:first-child)]:sm:border-l"
+                >
+                  <item.icon className="h-4 w-4 text-white/70" />
+                  {item.label}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
 
       {/* ------------------------------------------------------ Growth corridor */}
-      <section id="corridor" className="scroll-mt-24 bg-[#faf7f1] py-16 lg:py-20">
+      <section id="corridor" className="scroll-mt-24 bg-[#f1ebdd]/45 py-16 lg:py-20">
         <div className="mx-auto grid max-w-[1400px] gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:items-center lg:gap-14 lg:px-10">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
@@ -227,30 +275,30 @@ export default async function V1Page() {
               Major infrastructure and institutions are transforming south Bengaluru into one of the
               country&apos;s most promising regions. We list inside those rings and nowhere else.
             </p>
-            <Link
-              href="/#corridor"
-              className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-background px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:text-primary"
-            >
-              Explore growth map <ArrowRight className="h-4 w-4" />
-            </Link>
+            <GrowthMapDialog areas={coverage} />
           </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {GROWTH_ANCHORS.map((anchor) => {
-              const { icon: Icon, tint, short } = ANCHOR_STYLE[anchor.id];
+              const { icon: Icon, tint, wash, ring, glow, short, line } = ANCHOR_STYLE[anchor.id];
               return (
                 <article
                   key={anchor.id}
-                  className="flex flex-col items-center rounded-2xl bg-background px-4 py-7 text-center shadow-[0_10px_30px_rgba(15,23,42,0.06)]"
+                  className={`flex flex-col items-center rounded-2xl bg-gradient-to-b ${wash} to-background px-4 py-7 text-center ring-1 ${ring} shadow-[0_10px_30px_rgba(15,23,42,0.06)]`}
                 >
-                  <span className={`flex h-12 w-12 items-center justify-center rounded-full ${tint}`}>
-                    <Icon className="h-5 w-5 text-white" />
+                  <span
+                    className={`flex h-14 w-14 items-center justify-center rounded-2xl ${tint} ${glow}`}
+                  >
+                    <Icon className="h-6 w-6 text-white" />
                   </span>
-                  <h3 className="mt-4 text-sm font-semibold leading-snug text-foreground">{short}</h3>
+                  <h3 className="mt-4 font-display-alt text-[13px] font-bold uppercase leading-snug tracking-[0.06em] text-foreground">
+                    {short}
+                  </h3>
+                  <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{line}</p>
                   {/* Never dropped for layout. The airport site is not settled,
                       and every surface that names it has to say so. */}
                   {anchor.disclaimer && (
-                    <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">
+                    <p className="mt-1.5 text-[11px] font-medium leading-snug text-accent">
                       {anchor.disclaimer}
                     </p>
                   )}
@@ -260,12 +308,17 @@ export default async function V1Page() {
             {CORRIDOR_EXTRAS.map((item) => (
               <article
                 key={item.title}
-                className="flex flex-col items-center rounded-2xl bg-background px-4 py-7 text-center shadow-[0_10px_30px_rgba(15,23,42,0.06)]"
+                className={`flex flex-col items-center rounded-2xl bg-gradient-to-b ${item.wash} to-background px-4 py-7 text-center ring-1 ${item.ring} shadow-[0_10px_30px_rgba(15,23,42,0.06)]`}
               >
-                <span className={`flex h-12 w-12 items-center justify-center rounded-full ${item.tint}`}>
-                  <item.icon className="h-5 w-5 text-white" />
+                <span
+                  className={`flex h-14 w-14 items-center justify-center rounded-2xl ${item.tint} ${item.glow}`}
+                >
+                  <item.icon className="h-6 w-6 text-white" />
                 </span>
-                <h3 className="mt-4 text-sm font-semibold leading-snug text-foreground">{item.title}</h3>
+                <h3 className="mt-4 font-display-alt text-[13px] font-bold uppercase leading-snug tracking-[0.06em] text-foreground">
+                  {item.title}
+                </h3>
+                <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{item.line}</p>
               </article>
             ))}
           </div>
@@ -319,7 +372,7 @@ export default async function V1Page() {
       </section>
 
       {/* -------------------------------------------------------------- Featured */}
-      <section id="featured" className="scroll-mt-24 bg-[#faf7f1] py-16 lg:py-20">
+      <section id="featured" className="scroll-mt-24 bg-[#f1ebdd]/45 py-16 lg:py-20">
         <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -343,53 +396,17 @@ export default async function V1Page() {
               No listings yet. Publish one from the admin console and it will appear here.
             </p>
           ) : (
+            /* The same card the homepage uses, not a second one that drifts
+               from it: it already carries the price treatment, the video and
+               featured badges, and now the full tag row. */
             <DragRail className="mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {showcase.map((property) => (
-                <Link
+                <div
                   key={property.slug}
-                  href={`/property/${property.slug}`}
-                  className="group w-[min(82vw,300px)] shrink-0 snap-start overflow-hidden rounded-2xl bg-background shadow-[0_10px_30px_rgba(15,23,42,0.06)]"
+                  className="min-w-[min(88vw,390px)] max-w-[390px] shrink-0 snap-start md:min-w-[360px]"
                 >
-                  <span className="relative block aspect-[4/3] overflow-hidden">
-                    <Image
-                      src={property.images[0] ?? LISTING_PLACEHOLDER}
-                      alt=""
-                      fill
-                      sizes="300px"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    {!property.images[0] && (
-                      <span className="absolute right-2.5 top-2.5 rounded-md bg-black/45 px-2 py-1 text-[9px] uppercase tracking-[0.12em] text-white/80 backdrop-blur">
-                        Stock photo
-                      </span>
-                    )}
-                    {property.fid && (
-                      <span className="absolute bottom-2.5 left-2.5 rounded-md bg-[#0e241b]/85 px-2 py-1 text-[10px] font-semibold tracking-[0.08em] text-[#ede6d5] backdrop-blur">
-                        FID {property.fid}
-                      </span>
-                    )}
-                  </span>
-                  <span className="block p-4">
-                    <span className="block truncate font-heading text-base font-semibold text-foreground">
-                      {property.title}
-                    </span>
-                    <span className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                      <MapPin className="h-3 w-3" />
-                      {property.location.area}
-                    </span>
-                    <span className="mt-2.5 block truncate text-[11px] text-muted-foreground">
-                      {[`${property.extentAcres} acres`, ...property.tags.slice(0, 2)].join(" · ")}
-                    </span>
-                    <span className="mt-3 flex items-center justify-between">
-                      <span className="font-heading text-base font-semibold text-foreground">
-                        {formatINR(property.totalPrice)}
-                      </span>
-                      <span className="inline-flex items-center gap-1 text-xs font-medium text-accent">
-                        View details <ArrowUpRight className="h-3.5 w-3.5" />
-                      </span>
-                    </span>
-                  </span>
-                </Link>
+                  <PropertyCard property={property} />
+                </div>
               ))}
             </DragRail>
           )}
@@ -397,7 +414,22 @@ export default async function V1Page() {
       </section>
 
       {/* --------------------------------------------------------- Your journey */}
-      <section id="journey" className="scroll-mt-24 bg-[#0e241b] py-16 lg:py-20">
+      <section id="journey" className="relative isolate scroll-mt-24 overflow-hidden bg-[#0e241b] py-16 lg:py-20">
+        {/* A photograph under the green rather than flat colour. The band was
+            five outline circles on a solid field — accurate, and completely
+            inert. The image sits at low opacity behind a heavy scrim so the
+            type keeps its contrast; it reads as depth, not as a picture. */}
+        <Image
+          src={EXPERIENCES[5].image}
+          alt=""
+          fill
+          sizes="100vw"
+          className="-z-10 object-cover opacity-[0.14]"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,#0e241b_0%,rgba(14,36,27,0.86)_45%,#0e241b_100%)]"
+        />
         <div className="mx-auto grid max-w-[1400px] gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:gap-14 lg:px-10">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#ede6d5]/50">
@@ -413,13 +445,20 @@ export default async function V1Page() {
             <div className="relative mt-10">
               <span
                 aria-hidden
-                className="absolute left-[10%] right-[10%] top-[22px] hidden border-t border-dashed border-[#ede6d5]/18 sm:block"
+                className="aa-flow-path absolute left-[10%] right-[10%] top-[22px] hidden border-t border-dashed border-[#ede6d5]/18 sm:block"
               />
               <ol className="relative grid gap-8 sm:grid-cols-3 lg:grid-cols-5">
-                {JOURNEY_STEPS.map((step) => (
-                  <li key={step.title} className="sm:text-center">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#153026] ring-1 ring-inset ring-white/12 sm:mx-auto">
-                      <step.icon className="h-4 w-4 text-[#ede6d5]" />
+                {JOURNEY_STEPS.map((step, i) => (
+                  <li key={step.title} className={`aa-flow-step aa-flow-step-${i} sm:text-center`}>
+                    {/* Filled cream, not an outline. Five thin rings on a dark
+                        field read as placeholders; a solid disc reads as a
+                        station on the path, and the ordinal says where you are
+                        on it without a caption. */}
+                    <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-[#ede6d5] shadow-[0_8px_20px_rgba(0,0,0,0.28)] sm:mx-auto">
+                      <step.icon className="h-4 w-4 text-[#0e241b]" />
+                      <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">
+                        {i + 1}
+                      </span>
                     </span>
                     <h3 className="mt-4 text-sm font-semibold text-[#ede6d5]">{step.title}</h3>
                     <p className="mt-1.5 text-xs leading-relaxed text-[#ede6d5]/60">{step.body}</p>

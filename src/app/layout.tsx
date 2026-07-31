@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Montserrat } from "next/font/google";
+import { Playfair_Display, Montserrat, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SiteChrome } from "@/components/site-chrome";
 import { SmoothScroll } from "@/components/smooth-scroll";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
+  subsets: ["latin"],
+});
+
+/** The third voice — see --font-display-alt in globals.css. */
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
 });
 
@@ -29,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${montserrat.variable} ${playfair.variable} h-full`}
+      className={`${montserrat.variable} ${playfair.variable} ${spaceGrotesk.variable} h-full`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-accent/20 selection:text-foreground">
         <SmoothScroll />
