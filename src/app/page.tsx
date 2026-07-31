@@ -2,16 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  CalendarCheck,
   Clock,
   Droplets,
   FileCheck2,
   GraduationCap,
-  Leaf,
   MapPinned,
   PlaneTakeoff,
   Route,
-  ScanSearch,
   ShieldCheck,
   Sprout,
   TrainFront,
@@ -25,6 +22,7 @@ import { PropertyCard } from "@/components/property-card";
 import { V1Header } from "@/components/v1/v1-header";
 import { GrowthMapDialog } from "@/components/v1/growth-map-dialog";
 import { HeroShowcase } from "@/components/v1/hero-showcase";
+import { JourneySteps } from "@/components/v1/journey-steps";
 import { GeographySection } from "@/components/v1/geography-section";
 import { EXPERIENCES } from "@/components/v1/experiences";
 import { GROWTH_ANCHORS } from "@/lib/anchors";
@@ -116,48 +114,6 @@ const CORRIDOR_EXTRAS = [
   },
 ];
 
-/**
- * The path from first visit to owning something.
- *
- * Each step carries a photograph, because the five stages are the argument of
- * this section and five icons on a flat field made them read as a legend rather
- * than as a journey. Four of the images are the category photography already on
- * the page; the paperwork step needed its own, since nothing in a farmland set
- * says "title verification".
- */
-const JOURNEY_STEPS = [
-  {
-    icon: ScanSearch,
-    title: "Discover yourself",
-    body: "Tell us your vision, needs and goals. Four questions is usually enough.",
-    image: EXPERIENCES[1].image,
-  },
-  {
-    icon: MapPinned,
-    title: "Personalised matches",
-    body: "We shortlist farmland that actually fits how you want to live.",
-    image: EXPERIENCES[5].image,
-  },
-  {
-    icon: CalendarCheck,
-    title: "Visit and shortlist",
-    body: "We plan the route and come with you, so you stand on the land.",
-    image: EXPERIENCES[0].image,
-  },
-  {
-    icon: FileCheck2,
-    title: "Buy with confidence",
-    body: "RTC, khata and survey numbers verified before you commit to anything.",
-    image:
-      "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    icon: Sprout,
-    title: "Build and grow",
-    body: "Fencing, borewell, power — and the people who do each of them.",
-    image: EXPERIENCES[6].image,
-  },
-];
 
 /**
  * Social marks, drawn here rather than imported.
@@ -206,17 +162,11 @@ const FOOTER_LINKS = [
     ],
   },
   {
-    title: "Sell or list",
-    links: [
-      { label: "Submit your land", href: "/submit-land" },
-      { label: "Field capture", href: "/capture" },
-    ],
-  },
-  {
     title: "Company",
     links: [
       { label: "How it works", href: "/#journey" },
       { label: "Featured land", href: "/#featured" },
+      { label: "Our geography", href: "/#geography" },
       { label: "Admin console", href: "/admin" },
     ],
   },
@@ -227,29 +177,6 @@ export default async function Home() {
 
   const featured = properties.filter((p) => p.featured);
   const showcase = (featured.length > 0 ? featured : properties).slice(0, 8);
-
-  // One marker per area for the map dialog, not one per plot. Several listings
-  // in the same village should read as depth there rather than as clutter.
-  const coverage = Array.from(
-    properties
-      .reduce((byArea, property) => {
-        const key = property.location.area;
-        const existing = byArea.get(key);
-        if (existing) {
-          existing.count += 1;
-        } else {
-          byArea.set(key, {
-            area: key,
-            corridor: property.location.corridor,
-            lat: property.location.lat,
-            lng: property.location.lng,
-            count: 1,
-          });
-        }
-        return byArea;
-      }, new Map<string, { area: string; corridor: string; lat: number; lng: number; count: number }>())
-      .values()
-  );
 
   const totalAcres = properties.reduce((sum, p) => sum + p.extentAcres, 0);
   /**
@@ -342,7 +269,10 @@ export default async function Home() {
           <div className="relative flex min-h-[84dvh] flex-col justify-end pb-10 pt-28 lg:pb-14">
             <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-2 lg:gap-8">
               <div className="min-w-0 px-4 sm:px-6 lg:pl-[max(2.5rem,calc((100vw-1400px)/2+2.5rem))] lg:pr-0">
-                <h1 className="max-w-2xl font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-[4.25rem]">
+                {/* 1.8rem is text-4xl (2.25rem) less 20%. Explicit rather than a step
+                    down the scale, because the next step down is 1.875rem and
+                    would only be a 17% cut. */}
+                <h1 className="max-w-2xl font-heading text-[1.8rem] font-semibold leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[4.25rem]">
                   Curated farmland around South Bengaluru
                 </h1>
                 <p className="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
@@ -404,7 +334,7 @@ export default async function Home() {
               Major infrastructure and institutions are transforming south Bengaluru into one of the
               country&apos;s most promising regions. We list inside those rings and nowhere else.
             </p>
-            <GrowthMapDialog areas={coverage} />
+            <GrowthMapDialog />
           </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
@@ -596,53 +526,20 @@ export default async function Home() {
                 <circle cx="760" cy="22" r="7" fill="#e0bd7c" />
               </svg>
 
-              <ol className="relative grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4">
-                {JOURNEY_STEPS.map((step, i) => (
-                  <li
-                    key={step.title}
-                    className={`aa-flow-step aa-flow-step-${i} flex flex-col overflow-hidden rounded-2xl bg-white/[0.05] ring-1 ring-inset ring-white/12`}
-                  >
-                    <div className="relative aspect-[4/3] w-full">
-                      <Image
-                        src={step.image}
-                        alt=""
-                        fill
-                        sizes="(max-width: 1024px) 45vw, 240px"
-                        className="object-cover"
-                      />
-                      <span
-                        aria-hidden
-                        className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,14,0.35)_0%,rgba(8,18,14,0.1)_45%,rgba(14,36,27,0.9)_100%)]"
-                      />
-                      {/* The ordinal, so the row reads in sequence rather than
-                          as five parallel options. */}
-                      <span className="absolute left-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-[#0e241b]/80 font-display-alt text-[11px] font-bold text-[#e0bd7c] ring-1 ring-inset ring-[#e0bd7c]/40 backdrop-blur">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      {/* Straddling the image edge, which is what ties the
-                          picture to the words underneath it. */}
-                      <span className="absolute -bottom-5 left-4 flex h-10 w-10 items-center justify-center rounded-full bg-[#143226] ring-1 ring-inset ring-[#e0bd7c]/30">
-                        <step.icon className="h-4 w-4 text-[#e0bd7c]" />
-                      </span>
-                    </div>
-
-                    <div className="flex flex-1 flex-col px-4 pb-5 pt-8">
-                      <h3 className="font-heading text-base font-semibold leading-snug text-[#ede6d5]">
-                        {step.title}
-                      </h3>
-                      <span aria-hidden className="mt-2.5 block h-px w-8 bg-[#e0bd7c]/70" />
-                      <p className="mt-3 text-xs leading-relaxed text-[#ede6d5]/62">{step.body}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
+              <JourneySteps />
             </div>
           </div>
 
           <aside className="aa-slide-right relative h-fit overflow-hidden rounded-[1.75rem] bg-white/[0.05] p-7 ring-1 ring-inset ring-white/10 lg:self-end">
-            <Leaf
+            {/* The brand mark as the watermark, rather than a stock leaf —
+                same job, and it is actually ours. */}
+            <Image
               aria-hidden
-              className="pointer-events-none absolute -right-4 top-6 h-28 w-28 text-[#ede6d5]/[0.07]"
+              alt=""
+              src="/brand/icon.png"
+              width={200}
+              height={200}
+              className="pointer-events-none absolute -right-6 top-4 h-36 w-36 opacity-[0.07] brightness-0 invert"
             />
             <div className="relative">
               <h3 className="font-heading text-2xl font-semibold leading-tight text-[#ede6d5]">
@@ -691,7 +588,7 @@ export default async function Home() {
               name is what should stay with somebody. */}
           {/* Two-up from the smallest screen. Stacked one per row, three short
               link lists read as one long undifferentiated column. */}
-          <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-9 border-t border-white/10 pt-10 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] lg:gap-8">
+          <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-9 border-t border-white/10 pt-10 lg:grid-cols-[minmax(0,1.6fr)_repeat(2,minmax(0,1fr))] lg:gap-8">
             <div className="col-span-2 lg:col-span-1">
               <div className="relative h-12 w-[150px]">
                 <Image
@@ -706,6 +603,15 @@ export default async function Home() {
                 Curated farmland around south Bengaluru. Verified on the ground and on paper before
                 it reaches you.
               </p>
+              {/* Selling is one action, so it is a button rather than a column
+                  of links. Field capture used to sit here as a third item — it
+                  is a staff tool and has no business in a public footer. */}
+              <Link
+                href="/submit-land"
+                className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#ede6d5] px-5 py-2.5 text-xs font-semibold text-[#0e241b] transition-transform hover:-translate-y-0.5"
+              >
+                List your land <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
 
             {FOOTER_LINKS.map((group) => (

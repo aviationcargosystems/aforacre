@@ -37,15 +37,24 @@ const TERRACOTTA = "#c56a4a";
  * are in metres.
  */
 const HALO_BANDS = [
-  { radius: 4200, opacity: 0.07 },
-  { radius: 2800, opacity: 0.09 },
-  { radius: 1600, opacity: 0.11 },
+  { radius: 6500, opacity: 0.1 },
+  { radius: 4400, opacity: 0.13 },
+  { radius: 2600, opacity: 0.16 },
 ];
 
 export interface RegionPin {
   name: string;
   lat: number;
   lng: number;
+}
+
+/**
+ * A committed infrastructure project, drawn larger and labelled than a village.
+ * The corridor dialog shows these alongside the villages so the argument —
+ * "we list inside these rings" — is visible rather than asserted.
+ */
+export interface AnchorPin extends RegionPin {
+  note?: string;
 }
 
 function FitToPins({ pins, resetKey }: { pins: RegionPin[]; resetKey: number }) {
@@ -96,16 +105,21 @@ export default function GeographyMap({
   focus,
   onSelect,
   resetKey,
+  anchors = [],
 }: {
   pins: RegionPin[];
   focus: RegionPin | null;
   onSelect: (pin: RegionPin) => void;
   /** Bumped by the "Show all" control to refit the map to every village. */
   resetKey: number;
+  /** Infrastructure projects, labelled. Empty on the geography section. */
+  anchors?: AnchorPin[];
 }) {
   const [zoom, setZoom] = useState(11);
-  // Fully faded out by the time a single village fills the frame.
-  const haloOpacity = zoom >= 13 ? 0 : zoom >= 11.5 ? 0.45 : 1;
+  // Fully faded out by the time a single village fills the frame. The radii
+  // above are sized for the pulled-back view, where the blooms are the message;
+  // zoomed in they would swamp the streets, so they leave rather than shrink.
+  const haloOpacity = zoom >= 13 ? 0 : zoom >= 11.5 ? 0.4 : 1;
 
   return (
     <MapContainer
@@ -121,7 +135,7 @@ export default function GeographyMap({
       className="h-full w-full bg-transparent"
     >
       <TileLayer url={POSITRON_BASE} attribution={ATTRIBUTION} />
-      <FitToPins pins={pins} resetKey={resetKey} />
+      <FitToPins pins={[...pins, ...anchors]} resetKey={resetKey} />
       <ZoomWatcher onZoom={setZoom} />
       <FocusPin focus={focus} />
 
@@ -137,11 +151,16 @@ export default function GeographyMap({
             pathOptions={{
               stroke: false,
               fillColor: TERRACOTTA,
-              // The focused village keeps the same hue and simply burns
-              // brighter, so a click reads as emphasis rather than as a
-              // different kind of place.
+              // Strongest when nothing is selected — that is the state where
+              // the blooms are the message, "here is roughly where we work".
+              // Once a village is picked they get out of the way instead of
+              // burning brighter: the selected one drops to half so the
+              // streets under it stay readable, and the rest recede further so
+              // the choice is obvious.
               fillOpacity:
-                (focus?.name === pin.name ? band.opacity * 2.2 : band.opacity) * haloOpacity,
+                band.opacity *
+                (focus ? (focus.name === pin.name ? 0.5 : 0.25) : 1) *
+                haloOpacity,
             }}
           />
           ))
@@ -170,6 +189,21 @@ export default function GeographyMap({
           </CircleMarker>
         );
       })}
+
+      {/* The projects: bigger, terracotta, always labelled. */}
+      {anchors.map((anchor) => (
+        <CircleMarker
+          key={`anchor-${anchor.name}`}
+          center={[anchor.lat, anchor.lng]}
+          radius={10}
+          pathOptions={{ color: "#ffffff", weight: 2.5, fillColor: TERRACOTTA, fillOpacity: 1 }}
+        >
+          <Tooltip permanent direction="top" offset={[0, -10]} className="aa-anchor-label">
+            {anchor.name}
+            {anchor.note && <span className="aa-anchor-note">{anchor.note}</span>}
+          </Tooltip>
+        </CircleMarker>
+      ))}
 
       {/* Last, so place names read over the markers rather than under them. */}
       <TileLayer url={POSITRON_LABELS} className="aa-map-labels" />
