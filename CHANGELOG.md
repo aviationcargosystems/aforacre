@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-07-31 21:30 IST · /v1 becomes the homepage, geography map, real footer
+
+- The prototype is now the homepage. The previous homepage has been deleted rather than parked beside it, and /v1 is gone — everything that pointed at it now points at /.
+- New "Our geography" section above the footer: one map with every village we work in, terracotta catchment blooms, click a name to fly to it, "Show all" to pull back out, and native zoom controls. The blooms fade out as you zoom in so they stop covering the streets. Two villages that OpenStreetMap will not resolve under any spelling are named but not plotted, and say so.
+- A real footer — brand lockup, three link groups (every href points at a route that exists), Instagram and Facebook, the oversized lockup as a watermark, and "Built with ❤️ at BCON" linking to bconclub.com.
+- Slide-in and rise-in entrances across the page, tied to scroll position where the browser supports it and to page load where it does not.
+- Corridor cards moved back to brand colours, and their labels use a third typeface so those five read as their own band.
+- User-facing: the explore map now starts small so the listings lead, with an "Expand map" toggle. Every tag in the vocabulary shows in the filters again — the list was derived from the catalogue, so with one listing it silently hid the other fifteen tags an admin had created.
+- User-facing: property cards open their tags inside the card. The photograph gives up height and the panel takes it, so the card stays roughly the same size instead of a popover floating over its neighbour.
+- Removed the misleading verification stat. Both "0%" and "0/1" read as an accusation when the checklist behind them is admin-maintained and simply unticked; that slot now carries the growth-project count, and the verification promise stays in the hero where it is a promise.
+- Homepage category links all go to /explore unfiltered — with a handful of listings, a filtered explore is an empty page, and an empty page reads as "no such land".
+
 ## 2026-07-31 19:20 IST · Shelf docked and looping, journey reworked as a path
 
 - The hero shelf is docked on the same baseline as the assurance bar, starts at exactly half the viewport and bleeds off the right edge. It loops forever in both directions: the track holds the seven cards three times and the scroll position is kept inside the middle copy, shifted by exactly one copy whenever it crosses a boundary — instantly, at a point where the copies are pixel-identical, so the jump cannot be seen.

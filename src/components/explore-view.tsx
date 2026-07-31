@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Maximize2, Minimize2, Search, SlidersHorizontal, X } from "lucide-react";
 import type { Property, WaterSource } from "@/lib/types";
 import { formatINR } from "@/lib/tax";
 import { PropertyCard } from "@/components/property-card";
@@ -32,6 +32,9 @@ export function ExploreView({
   initialQuery?: string;
 }) {
   const [query, setQuery] = useState(initialQuery ?? "");
+  // The map starts small. With a handful of listings the cards are the thing
+  // worth reading, and at half the width their titles were truncating.
+  const [mapExpanded, setMapExpanded] = useState(false);
   const [maxDistance, setMaxDistance] = useState(MAX_DISTANCE);
   const [acreRange, setAcreRange] = useState<[number, number]>([0, MAX_ACRES]);
   const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
@@ -201,7 +204,11 @@ export function ExploreView({
           child refuses to shrink below its content and the overflow lands on
           the page instead of inside the list. */}
       <div className="mx-auto flex w-full max-w-7xl gap-4 px-4 py-4 sm:px-6 lg:min-h-0 lg:flex-1 lg:px-8">
-        <div className="flex min-w-0 flex-1 flex-col lg:min-h-0 lg:max-w-[46%]">
+        <div
+          className={`flex min-w-0 flex-1 flex-col lg:min-h-0 ${
+            mapExpanded ? "lg:max-w-[38%]" : "lg:max-w-[64%]"
+          }`}
+        >
           <div className="aa-scroll lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
             <div className="grid grid-cols-1 gap-4 pb-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
               {filtered.length === 0 ? (
@@ -224,10 +231,31 @@ export function ExploreView({
           </div>
         </div>
 
-        {/* isolate for the same reason as the corridor map: Leaflet's panes
+        {/* The listings lead; the map supports them.
+            isolate for the same reason as the corridor map: Leaflet's panes
             outrank the site header without a stacking context to sit in. */}
         <div className="relative isolate z-0 hidden min-h-0 flex-1 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/70 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:block">
           <PropertyMap properties={filtered} hoveredSlug={hoveredSlug} onHover={setHoveredSlug} />
+
+          {/* Above Leaflet's own controls, which start at z-index 400. */}
+          <button
+            type="button"
+            onClick={() => setMapExpanded((v) => !v)}
+            aria-pressed={mapExpanded}
+            className="absolute right-3 top-3 z-[500] inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/90 px-3 py-1.5 text-xs font-medium text-foreground shadow-[0_6px_18px_rgba(15,23,42,0.12)] backdrop-blur transition-colors hover:bg-background"
+          >
+            {mapExpanded ? (
+              <>
+                <Minimize2 className="h-3.5 w-3.5" />
+                Shrink map
+              </>
+            ) : (
+              <>
+                <Maximize2 className="h-3.5 w-3.5" />
+                Expand map
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>

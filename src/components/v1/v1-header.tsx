@@ -40,7 +40,7 @@ export function V1Header() {
             different wordmark. Over the video it is inverted to white: the
             artwork is dark ink meant for the cream background, and unmodified
             it disappears into the footage. */}
-        <Link href="/v1" className="relative block h-11 w-[132px] shrink-0 sm:h-12 sm:w-[150px]">
+        <Link href="/" className="relative block h-11 w-[132px] shrink-0 sm:h-12 sm:w-[150px]">
           <Image
             src="/brand/logo.png"
             alt="A for Acre"

@@ -132,7 +132,7 @@ export function HeroShowcase() {
             <Link
               key={`${copy}-${item.label}`}
               data-poster
-              href={`/explore?q=${encodeURIComponent(item.tag)}`}
+              href="/explore"
               aria-hidden={copy !== 0}
               tabIndex={copy === 0 ? undefined : -1}
               onPointerDown={() => setTaken(true)}
