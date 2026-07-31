@@ -233,6 +233,58 @@
   }
 }
 
+/* Scrollbars in the brand palette rather than the platform's.
+
+   A default Chromium scrollbar is a grey slab on a white track, which reads as
+   a piece of the browser sitting on top of the page — most obvious in the admin
+   sidebar, where it lands on deep green. Both rules below draw the same shape:
+   a thin, inset, rounded thumb on no track at all, tinted to whatever it sits
+   on. `scrollbar-width`/`scrollbar-color` cover Firefox, which has no
+   pseudo-elements for this; the `::-webkit-` block covers everything else.
+
+   Deliberately still visible on hover rather than hidden — these are panels a
+   person scrolls to find something, so the position indicator earns its space.
+   Rails that are meant to be dragged use `[scrollbar-width:none]` instead. */
+.aa-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--foreground) 22%, transparent) transparent;
+}
+.aa-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.aa-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.aa-scroll::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklab, var(--foreground) 20%, transparent);
+  border-radius: 9999px;
+}
+.aa-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in oklab, var(--foreground) 34%, transparent);
+}
+
+/* The sidebar version. Same geometry, tinted in the cream the nav text uses so
+   it belongs to the panel instead of interrupting it. */
+.aa-scroll-dark {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(237 230 213 / 0.22) transparent;
+}
+.aa-scroll-dark::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.aa-scroll-dark::-webkit-scrollbar-track {
+  background: transparent;
+}
+.aa-scroll-dark::-webkit-scrollbar-thumb {
+  background-color: rgb(237 230 213 / 0.22);
+  border-radius: 9999px;
+}
+.aa-scroll-dark::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(237 230 213 / 0.4);
+}
+
 /* Leaflet popup content is a plain DOM node outside Tailwind's reach — override
    its default padding/rounding so the property-card popup image can go full-bleed. */
 .property-popup .leaflet-popup-content-wrapper {

@@ -15,7 +15,8 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     pathname.startsWith("/partner") ||
     pathname === "/capture" ||
     pathname === "/match" ||
-    pathname === "/zoom";
+    pathname === "/zoom" ||
+    pathname === "/v1";
 
   if (isBareRoute) {
     return <main className="flex-1">{children}</main>;

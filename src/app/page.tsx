@@ -61,9 +61,14 @@ export default async function Home() {
         aria-hidden
         className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
       >
-        <div className="animate-drift-slow absolute left-[-12%] top-[-10%] h-[620px] w-[620px] rounded-full bg-accent/14 blur-3xl" />
-        <div className="animate-drift-slower absolute right-[-10%] top-[6%] h-[560px] w-[560px] rounded-full bg-primary/12 blur-3xl" />
-        <div className="animate-drift-slow absolute left-[30%] top-[48%] h-[460px] w-[460px] rounded-full bg-[#e0bd7c]/10 blur-3xl [animation-delay:-9s]" />
+        {/* Sized in viewport widths on a phone, pixels from `sm` up. At 620px
+            across a 390px screen every blob overlapped every other one and the
+            whole layer washed out to a single flat tint — the colour was there,
+            the variation was not. Smaller and a touch stronger gives them room
+            to read as separate blooms. */}
+        <div className="animate-drift-slow absolute left-[-25%] top-[-6%] h-[85vw] w-[85vw] rounded-full bg-accent/22 blur-3xl sm:h-[620px] sm:w-[620px] sm:bg-accent/14" />
+        <div className="animate-drift-slower absolute right-[-25%] top-[18%] h-[80vw] w-[80vw] rounded-full bg-primary/18 blur-3xl sm:h-[560px] sm:w-[560px] sm:bg-primary/12" />
+        <div className="animate-drift-slow absolute left-[10%] top-[58%] h-[75vw] w-[75vw] rounded-full bg-[#e0bd7c]/18 blur-3xl [animation-delay:-9s] sm:left-[30%] sm:h-[460px] sm:w-[460px] sm:bg-[#e0bd7c]/10" />
       </div>
 
       <div className="relative pt-16 sm:pt-24 lg:pt-32">
@@ -86,14 +91,18 @@ export default async function Home() {
 
         {/* No card, no border. The map is the section, not something sitting
             inside one. Infrastructure carries it; our listings are context. */}
-        <div id="corridor" className="relative mt-14 scroll-mt-24 lg:mt-20">
+        <div className="relative mt-14 lg:mt-20">
           <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
             {/* On a phone the map leads: the point of this section is where the
                 corridor is, and a list of project names lands better once you
                 have seen them placed. Side by side, reading order wins and the
                 text goes first. */}
             <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-              <div className="order-2 lg:order-1">
+              {/* The anchor sits on the text, not on the section wrapper. On a
+                  phone the map is ordered first, so anchoring the wrapper
+                  landed "Learn more" on the map — the thing it is meant to
+                  explain rather than the explanation. */}
+              <div id="corridor" className="order-2 scroll-mt-24 lg:order-1">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Why south Bengaluru</p>
                 <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
                   Everything being built south of Bengaluru.
@@ -126,7 +135,7 @@ export default async function Home() {
                 </div>
               </div>
 
-              <div className="order-1 h-[46dvh] max-h-[21rem] sm:h-[22rem] sm:max-h-none lg:order-2 lg:h-[26rem]">
+              <div className="order-1 h-[34dvh] max-h-[16rem] sm:h-[22rem] sm:max-h-none lg:order-2 lg:h-[26rem]">
                 <SouthBangaloreMapView areas={coverage} />
               </div>
             </div>

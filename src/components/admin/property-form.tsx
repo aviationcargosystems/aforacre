@@ -176,7 +176,7 @@ export function PropertyForm({
       {/* Steps are hidden, never unmounted: an unmounted step's inputs leave
           the form, so anything typed on step four would be dropped the moment
           someone stepped back to check the pin. */}
-      <div className="px-4 py-6 sm:px-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+      <div className="aa-scroll px-4 py-6 sm:px-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
         <div className="mx-auto max-w-6xl">
           {uploading && (
             <p className="mb-4 flex items-center gap-2 rounded-md border border-border bg-background px-4 py-2.5 text-sm text-muted-foreground">

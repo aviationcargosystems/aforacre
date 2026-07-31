@@ -69,7 +69,7 @@ export function AdminSidebarNav({ counts }: { counts: AdminAttentionCounts }) {
   const pathname = usePathname();
 
   return (
-    <nav className="flex-1 space-y-5 overflow-y-auto">
+    <nav className="aa-scroll-dark flex-1 space-y-5 overflow-y-auto">
       {ADMIN_NAV.map((group) => (
         <div key={group.label ?? "root"} className="space-y-1">
           {group.label && (

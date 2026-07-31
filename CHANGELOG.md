@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-31 14:46 IST · Design prototype at /v1, branded scrollbars, homepage fixes
+
+- New prototype route /v1 — a full interpretation of the reference layout, parked beside the live homepage so the two can be compared without either disturbing the other. Full-bleed video hero with the three growth anchors as floating pins, a land-finder panel, corridor cards, experience tiles, featured rail, journey band and a stats strip. It reads the live catalogue; nothing is seeded to make it look fuller than the data is, so the counts read zero until listings exist. Three experience tiles say "Photo needed" rather than carry a stock photo of somewhere that is not this corridor.
+- User-facing: the land-finder panel collects size and budget but cannot filter on them — /explore only accepts free text, so location, purpose and tag are composed into that. Structured filters need /explore to gain real query params first.
+- Scrollbars are drawn in the brand palette instead of the platform's: a thin rounded thumb on no track, cream in the admin sidebar and foreground-tinted on light panels. Applied to the admin nav, the explore listing column and the property form body.
+- Homepage "Learn more" now lands on the corridor heading rather than the map. The anchor was on the section wrapper, and on a phone the map is ordered first inside it, so the button dropped you onto the thing the section explains instead of the explanation.
+- Homepage corridor map is shorter on mobile, and the ambient gradients read again. They were rendering all along — three blobs up to 620px wide with a 64px blur across a 390px screen all overlapped, so the layer flattened to a single tint. Sized in viewport widths below sm, at slightly higher opacity. Desktop is unchanged.
+
 ## 2026-07-30 02:15 IST · Fix property saving
 
 - Property saving failed after the write, not during it. revalidatePublicPaths still revalidated /journeys/[slug], a route the rebuild deleted; the call outlived the route and threw once the save had already succeeded, so the request errored and never redirected.
