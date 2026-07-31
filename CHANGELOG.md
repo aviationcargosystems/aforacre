@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-31 19:20 IST · Shelf docked and looping, journey reworked as a path
+
+- The hero shelf is docked on the same baseline as the assurance bar, starts at exactly half the viewport and bleeds off the right edge. It loops forever in both directions: the track holds the seven cards three times and the scroll position is kept inside the middle copy, shifted by exactly one copy whenever it crosses a boundary — instantly, at a point where the copies are pixel-identical, so the jump cannot be seen.
+- Three copies rather than two, and that is not arbitrary. With two, the browser clamps scrollLeft to scrollWidth − clientWidth, which sits *below* the point a forward wrap needs to fire, so the rail silently dead-ended on the last card. Three puts both thresholds inside the reachable range and leaves a full copy of track behind for backwards dragging.
+- On a phone the assurances now come before the shelf: the claim belongs with the copy above it, and the shelf is the thing you scroll.
+- The journey section is a path rather than a legend. Five photo cards with 01–05 ordinals, an icon straddling each image edge, and a dashed curve arcing across the row with waypoints on it. Four images are the category photography already on the page; the paperwork step got its own, since nothing in a farmland set says "title verification".
+- The stats band matches: icon disc, large figure, label and a line of explanation. Values stay computed — curated properties, villages, percentage document-verified, acres listed — so three of the four read zero until the catalogue has something in it.
+
 ## 2026-07-31 18:05 IST · /v1 hero rebuilt, branded scroll, all tags on the card
 
 - The /v1 hero is now headline left, poster shelf right, on a two-way scrim. "Find My Land" is the single action, with the cost of pressing it stated ("Takes 2 minutes"), and the four assurances read as one bordered bar rather than four loose lines.

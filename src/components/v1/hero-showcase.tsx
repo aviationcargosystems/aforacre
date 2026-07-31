@@ -8,94 +8,135 @@ import { EXPERIENCES } from "@/components/v1/experiences";
 import { DragRail } from "@/components/drag-rail";
 
 /**
- * The hero's shelf of category posters.
+ * The hero's shelf of category posters — docked bottom-right, running off the
+ * edge of the screen, looping forever.
  *
- * Tall, image-led cards inside a bounded glass panel, with the arrows straddling
- * its left and right edges. The panel matters: without it the cards floated on
- * the footage and the one at the edge always looked cut off rather than
- * scrollable.
+ * The track holds the seven cards three times over and the scroll position is
+ * kept inside the middle copy: cross either boundary and it is shifted back by
+ * exactly one copy — instantly, no animation, at a moment when the copies are
+ * pixel-identical, so the jump cannot be seen. The result is a rail you can
+ * drag, wheel, arrow or leave alone in either direction without ever reaching
+ * an end.
  *
- * It is a real scroller — native touch and wheel, pointer drag via DragRail,
- * plus the arrows — that also advances itself every few seconds until somebody
- * takes hold of it. Scroll snapping means every resting position lands on a
- * card boundary rather than mid-poster.
+ * It bleeds off the right edge on purpose: a card cut by the viewport says
+ * "there is more" far better than a tidy boundary does. That is also why there
+ * is no snapping — a resting position mid-card is correct here.
  */
 
-const ADVANCE_MS = 3600;
+const ADVANCE_MS = 3200;
+
+/**
+ * Three, not two. See the wrap below — with two copies the browser's scroll
+ * clamp sits below the forward wrap threshold, so the rail dead-ends.
+ */
+const COPIES = 3;
 
 export function HeroShowcase() {
   const railRef = useRef<HTMLDivElement>(null);
   const [taken, setTaken] = useState(false);
-  const [atStart, setAtStart] = useState(true);
-  const [atEnd, setAtEnd] = useState(false);
+  /** Guards the wrap against re-entering from the scroll it causes itself. */
+  const wrapping = useRef(false);
 
-  const readEdges = useCallback(() => {
+  const wrap = useCallback(() => {
     const rail = railRef.current;
-    if (!rail) return;
-    setAtStart(rail.scrollLeft <= 2);
-    // 2px of slack: fractional layout widths mean scrollLeft rarely reaches the
-    // maximum exactly, which would leave the forward arrow permanently enabled.
-    setAtEnd(rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 2);
+    if (!rail || wrapping.current) return;
+    const copy = rail.scrollWidth / COPIES;
+    if (copy <= 0) return;
+    // The position is kept inside the middle copy, so there is always a full
+    // copy of track on both sides and neither direction can run out.
+    //
+    // Two copies cannot do this. A browser clamps scrollLeft to
+    // scrollWidth - clientWidth, which with two copies sits *below* the point
+    // where a forward wrap would need to fire — so the rail silently
+    // dead-ended at the last card instead of looping. Three copies put both
+    // thresholds comfortably inside the reachable range.
+    if (rail.scrollLeft >= copy * 2) {
+      wrapping.current = true;
+      rail.scrollLeft -= copy;
+      wrapping.current = false;
+    } else if (rail.scrollLeft < copy) {
+      wrapping.current = true;
+      rail.scrollLeft += copy;
+      wrapping.current = false;
+    }
   }, []);
 
-  const step = useCallback(
-    (direction: 1 | -1) => {
-      const rail = railRef.current;
-      if (!rail) return;
-      const card = rail.querySelector<HTMLElement>("[data-poster]");
-      const by = (card?.offsetWidth ?? 150) + 12;
-      rail.scrollBy({ left: direction * by, behavior: "smooth" });
-      // Re-read the edges once the smooth scroll has landed. The scroll event
-      // alone is not enough: at the last card scrollBy has nowhere to go, fires
-      // no scroll event, and the forward arrow would sit there enabled and
-      // doing nothing.
-      window.setTimeout(readEdges, 450);
-    },
-    [readEdges]
-  );
+  const step = useCallback((direction: 1 | -1) => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const card = rail.querySelector<HTMLElement>("[data-poster]");
+    const by = (card?.offsetWidth ?? 168) + 12;
+    rail.scrollBy({ left: direction * by, behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    // Start in the middle copy, so there is a full copy of track behind as well
+    // as ahead and the very first backwards drag has somewhere to go.
+    rail.scrollLeft = rail.scrollWidth / COPIES;
+
+    rail.addEventListener("scroll", wrap, { passive: true });
+    return () => rail.removeEventListener("scroll", wrap);
+  }, [wrap]);
 
   useEffect(() => {
     if (taken) return;
-    const id = window.setInterval(() => {
-      const rail = railRef.current;
-      if (!rail) return;
-      const end = rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 2;
-      if (end) {
-        rail.scrollTo({ left: 0, behavior: "smooth" });
-        window.setTimeout(readEdges, 450);
-      } else {
-        step(1);
-      }
-    }, ADVANCE_MS);
+    const id = window.setInterval(() => step(1), ADVANCE_MS);
     return () => window.clearInterval(id);
-  }, [taken, step, readEdges]);
-
-  useEffect(() => {
-    const rail = railRef.current;
-    if (!rail) return;
-    readEdges();
-    rail.addEventListener("scroll", readEdges, { passive: true });
-    return () => rail.removeEventListener("scroll", readEdges);
-  }, [readEdges]);
+  }, [taken, step]);
 
   return (
     <div className="relative min-w-0">
-      <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/65">
-        Browse by experience
-      </p>
+      <div className="mb-2.5 flex items-center gap-3 pl-4 sm:pl-6 lg:pl-0">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/65">
+          Browse by experience
+        </p>
+        {/* Both controls sit at the leading edge. The rail runs off the right of
+            the screen, so an arrow parked out there would be half off-screen. */}
+        <div className="flex gap-1.5">
+          <button
+            type="button"
+            onClick={() => {
+              setTaken(true);
+              step(-1);
+            }}
+            aria-label="Previous"
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15 text-white ring-1 ring-inset ring-white/25 backdrop-blur transition-colors hover:bg-white/30"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setTaken(true);
+              step(1);
+            }}
+            aria-label="Next"
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15 text-white ring-1 ring-inset ring-white/25 backdrop-blur transition-colors hover:bg-white/30"
+          >
+            <ChevronRight className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
 
-      <div className="relative rounded-[1.5rem] bg-white/[0.07] p-3 ring-1 ring-inset ring-white/15 backdrop-blur-md">
-        <DragRail
-          innerRef={railRef}
-          className="flex snap-x snap-mandatory gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {EXPERIENCES.map((item) => (
+      <DragRail
+        innerRef={railRef}
+        className="flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {/* Rendered three times — the extra copies are what the wrap lands on.
+            They are hidden from assistive tech and untabbable, so the shelf
+            reads as seven cards rather than twenty-one. */}
+        {Array.from({ length: COPIES }, (_, copy) =>
+          EXPERIENCES.map((item) => (
             <Link
-              key={item.label}
+              key={`${copy}-${item.label}`}
               data-poster
               href={`/explore?q=${encodeURIComponent(item.tag)}`}
+              aria-hidden={copy !== 0}
+              tabIndex={copy === 0 ? undefined : -1}
               onPointerDown={() => setTaken(true)}
-              className="group relative block h-[230px] w-[150px] shrink-0 snap-start overflow-hidden rounded-xl ring-1 ring-inset ring-white/15 sm:h-[260px] sm:w-[168px]"
+              className="group relative block h-[230px] w-[150px] shrink-0 overflow-hidden rounded-xl ring-1 ring-inset ring-white/15 sm:h-[250px] sm:w-[168px]"
             >
               <Image
                 src={item.image}
@@ -113,36 +154,9 @@ export function HeroShowcase() {
                 <span className="mt-0.5 block truncate text-[11px] text-white/70">{item.body}</span>
               </span>
             </Link>
-          ))}
-        </DragRail>
-
-        {/* Straddling the panel edge, so they read as controls for the shelf
-            rather than as two more things inside it. */}
-        <button
-          type="button"
-          onClick={() => {
-            setTaken(true);
-            step(-1);
-          }}
-          disabled={atStart}
-          aria-label="Previous"
-          className="absolute -left-4 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[#0e241b]/85 text-white ring-1 ring-inset ring-white/25 backdrop-blur transition-opacity hover:bg-[#0e241b] disabled:opacity-0"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setTaken(true);
-            step(1);
-          }}
-          disabled={atEnd}
-          aria-label="Next"
-          className="absolute -right-4 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[#0e241b]/85 text-white ring-1 ring-inset ring-white/25 backdrop-blur transition-opacity hover:bg-[#0e241b] disabled:opacity-0"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
-      </div>
+          ))
+        )}
+      </DragRail>
     </div>
   );
 }

@@ -116,13 +116,47 @@ const CORRIDOR_EXTRAS = [
   },
 ];
 
-/** The path from first visit to owning something, as the reference frames it. */
+/**
+ * The path from first visit to owning something.
+ *
+ * Each step carries a photograph, because the five stages are the argument of
+ * this section and five icons on a flat field made them read as a legend rather
+ * than as a journey. Four of the images are the category photography already on
+ * the page; the paperwork step needed its own, since nothing in a farmland set
+ * says "title verification".
+ */
 const JOURNEY_STEPS = [
-  { icon: ScanSearch, title: "Discover yourself", body: "Let AFORACRE understand your intent." },
-  { icon: MapPinned, title: "Personalised matches", body: "Land that fits how you want to live." },
-  { icon: CalendarCheck, title: "Visit and shortlist", body: "We plan the route and come with you." },
-  { icon: FileCheck2, title: "Buy with confidence", body: "RTC, khata and survey verified first." },
-  { icon: Sprout, title: "Build and grow", body: "Fencing, borewell, power — and who does it." },
+  {
+    icon: ScanSearch,
+    title: "Discover yourself",
+    body: "Tell us your vision, needs and goals. Four questions is usually enough.",
+    image: EXPERIENCES[1].image,
+  },
+  {
+    icon: MapPinned,
+    title: "Personalised matches",
+    body: "We shortlist farmland that actually fits how you want to live.",
+    image: EXPERIENCES[5].image,
+  },
+  {
+    icon: CalendarCheck,
+    title: "Visit and shortlist",
+    body: "We plan the route and come with you, so you stand on the land.",
+    image: EXPERIENCES[0].image,
+  },
+  {
+    icon: FileCheck2,
+    title: "Buy with confidence",
+    body: "RTC, khata and survey numbers verified before you commit to anything.",
+    image:
+      "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    icon: Sprout,
+    title: "Build and grow",
+    body: "Fencing, borewell, power — and the people who do each of them.",
+    image: EXPERIENCES[6].image,
+  },
 ];
 
 function verifiedFully(property: Property): boolean {
@@ -162,11 +196,37 @@ export default async function V1Page() {
   const verifiedCount = properties.filter(verifiedFully).length;
   const verifiedPct = properties.length > 0 ? Math.round((verifiedCount / properties.length) * 100) : 0;
 
+  /**
+   * Computed, never claimed. The reference band shows "50+ / 12+ / 100% / 0%";
+   * three of those four here come straight off the catalogue and will read zero
+   * until it has something in it, which is the honest state of a new site. Only
+   * the last is a policy rather than a measurement, and it is one we control.
+   */
   const STATS = [
-    { icon: ShieldCheck, value: `${verifiedPct}%`, label: "Listings verified" },
-    { icon: Sprout, value: totalAcres > 0 ? totalAcres.toFixed(1) : "0", label: "Acres listed" },
-    { icon: MapPinned, value: `${CORE_REGIONS.length}`, label: "Villages we cover" },
-    { icon: FileCheck2, value: "0%", label: "Hidden charges" },
+    {
+      icon: ShieldCheck,
+      value: `${properties.length}`,
+      label: "Curated properties",
+      note: "Handpicked farmland with clear titles.",
+    },
+    {
+      icon: MapPinned,
+      value: `${CORE_REGIONS.length}`,
+      label: "Villages",
+      note: "Across south Bengaluru and its growth corridors.",
+    },
+    {
+      icon: FileCheck2,
+      value: `${verifiedPct}%`,
+      label: "Document verified",
+      note: "RTC, khata and survey checked before listing.",
+    },
+    {
+      icon: Sprout,
+      value: totalAcres > 0 ? `${totalAcres.toFixed(1)}` : "0",
+      label: "Acres listed",
+      note: "Everything we currently have on the ground.",
+    },
   ];
 
   return (
@@ -205,17 +265,9 @@ export default async function V1Page() {
             className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,18,14,0.88)_0%,rgba(8,18,14,0.55)_42%,rgba(8,18,14,0.05)_78%)]"
           />
 
-          <div className="relative mx-auto flex min-h-[86dvh] max-w-[1400px] flex-col justify-center px-4 pb-14 pt-28 sm:px-6 lg:px-10">
-            {/* Headline left, shelf right, both vertically centred — the two
-                halves of the reference. Below lg the shelf drops under the copy
-                rather than competing with it for width. */}
-            {/* `grid-cols-1` and `min-w-0` are both load-bearing, not tidiness.
-                A grid item's default `min-width: auto` lets it grow to its
-                content, and the shelf's content is seven 168px posters — so
-                below lg the single column stretched to ~1150px, dragging the
-                headline out with it, clipped by the hero's overflow. */}
-            <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,640px)] lg:gap-12">
-              <div className="min-w-0">
+          <div className="relative flex min-h-[86dvh] flex-col justify-end pb-10 pt-28 lg:pb-14">
+            <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-10">
+              <div className="max-w-2xl">
                 <h1 className="font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl">
                   Curated farmland around South Bengaluru
                 </h1>
@@ -240,23 +292,42 @@ export default async function V1Page() {
                   </p>
                 </div>
               </div>
-
-              <HeroShowcase />
             </div>
 
-            {/* The assurances read as one claim rather than four loose lines, so
-                they get a single bordered bar with dividers. */}
-            <ul className="mt-12 flex w-fit flex-wrap items-center gap-y-3 rounded-2xl px-1 ring-1 ring-inset ring-white/20 backdrop-blur-sm sm:mt-14">
-              {HERO_ASSURANCES.map((item) => (
-                <li
-                  key={item.label}
-                  className="flex items-center gap-2 border-white/15 px-4 py-3 text-sm font-medium text-white/90 [&:not(:first-child)]:sm:border-l"
-                >
-                  <item.icon className="h-4 w-4 text-white/70" />
-                  {item.label}
-                </li>
-              ))}
-            </ul>
+            {/* The bottom line of the hero: assurances on the left, the shelf
+                docked beside them on the same baseline and running off the right
+                edge of the screen.
+
+                This row deliberately sits outside the centred container. The
+                left cell re-creates the container's gutter itself, while the
+                right cell starts at exactly half the viewport and bleeds to the
+                edge — which a max-width container cannot do.
+
+                Stacked on a phone the assurances come first and the shelf
+                second: the claim belongs with the copy above it, and the shelf
+                is the thing you scroll. */}
+            <div className="mt-12 grid grid-cols-1 items-end gap-8 lg:mt-14 lg:grid-cols-2">
+              <div className="min-w-0 px-4 sm:px-6 lg:pl-[max(2.5rem,calc((100vw-1400px)/2+2.5rem))] lg:pr-0">
+                <ul className="flex w-fit flex-wrap items-center gap-y-3 rounded-2xl px-1 ring-1 ring-inset ring-white/20 backdrop-blur-sm">
+                  {HERO_ASSURANCES.map((item) => (
+                    <li
+                      key={item.label}
+                      className="flex items-center gap-2 border-white/15 px-4 py-3 text-sm font-medium text-white/90 [&:not(:first-child)]:sm:border-l"
+                    >
+                      <item.icon className="h-4 w-4 text-white/70" />
+                      {item.label}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* min-w-0: a grid item defaults to min-width:auto, so without it
+                  the column grows to the rail's intrinsic width — fourteen
+                  posters — and drags the whole layout sideways. */}
+              <div className="min-w-0">
+                <HeroShowcase />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -435,33 +506,75 @@ export default async function V1Page() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#ede6d5]/50">
               Your journey with A for Acre
             </p>
-            <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight text-[#ede6d5] sm:text-4xl">
-              From discovery to your dream farm
+            <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight text-[#ede6d5] sm:text-5xl">
+              From discovery
+              <br className="hidden sm:block" /> to your dream farm
             </h2>
+            <p className="mt-5 max-w-md text-sm leading-relaxed text-[#ede6d5]/65">
+              A simple, transparent process for owning curated farmland around south Bengaluru.
+            </p>
 
-            {/* The dashed rule runs behind the row at the icons' centre line, so
-                the five steps read as one path rather than five tiles. It is
-                drawn only from sm up, where the steps actually sit in a row. */}
             <div className="relative mt-10">
-              <span
+              {/* The path itself. A curve that rises and falls across the row
+                  reads as travel in a way a straight rule does not, and the two
+                  dots sit on it as waypoints. Drawn only from lg up, where the
+                  five cards actually sit side by side; stacked, there is no
+                  line to draw. */}
+              <svg
                 aria-hidden
-                className="aa-flow-path absolute left-[10%] right-[10%] top-[22px] hidden border-t border-dashed border-[#ede6d5]/18 sm:block"
-              />
-              <ol className="relative grid gap-8 sm:grid-cols-3 lg:grid-cols-5">
+                viewBox="0 0 1000 60"
+                preserveAspectRatio="none"
+                className="aa-flow-path absolute -top-8 left-[6%] right-[6%] hidden h-10 w-[88%] lg:block"
+              >
+                <path
+                  d="M0 52 C 120 6, 260 6, 380 34 S 620 62, 760 22 S 940 4, 1000 30"
+                  fill="none"
+                  stroke="rgba(224,189,124,0.45)"
+                  strokeWidth="2"
+                  strokeDasharray="7 9"
+                  strokeLinecap="round"
+                />
+                <circle cx="380" cy="34" r="7" fill="#e0bd7c" />
+                <circle cx="760" cy="22" r="7" fill="#e0bd7c" />
+              </svg>
+
+              <ol className="relative grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4">
                 {JOURNEY_STEPS.map((step, i) => (
-                  <li key={step.title} className={`aa-flow-step aa-flow-step-${i} sm:text-center`}>
-                    {/* Filled cream, not an outline. Five thin rings on a dark
-                        field read as placeholders; a solid disc reads as a
-                        station on the path, and the ordinal says where you are
-                        on it without a caption. */}
-                    <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-[#ede6d5] shadow-[0_8px_20px_rgba(0,0,0,0.28)] sm:mx-auto">
-                      <step.icon className="h-4 w-4 text-[#0e241b]" />
-                      <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">
-                        {i + 1}
+                  <li
+                    key={step.title}
+                    className={`aa-flow-step aa-flow-step-${i} flex flex-col overflow-hidden rounded-2xl bg-white/[0.05] ring-1 ring-inset ring-white/12`}
+                  >
+                    <div className="relative aspect-[4/3] w-full">
+                      <Image
+                        src={step.image}
+                        alt=""
+                        fill
+                        sizes="(max-width: 1024px) 45vw, 240px"
+                        className="object-cover"
+                      />
+                      <span
+                        aria-hidden
+                        className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,14,0.35)_0%,rgba(8,18,14,0.1)_45%,rgba(14,36,27,0.9)_100%)]"
+                      />
+                      {/* The ordinal, so the row reads in sequence rather than
+                          as five parallel options. */}
+                      <span className="absolute left-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-[#0e241b]/80 font-display-alt text-[11px] font-bold text-[#e0bd7c] ring-1 ring-inset ring-[#e0bd7c]/40 backdrop-blur">
+                        {String(i + 1).padStart(2, "0")}
                       </span>
-                    </span>
-                    <h3 className="mt-4 text-sm font-semibold text-[#ede6d5]">{step.title}</h3>
-                    <p className="mt-1.5 text-xs leading-relaxed text-[#ede6d5]/60">{step.body}</p>
+                      {/* Straddling the image edge, which is what ties the
+                          picture to the words underneath it. */}
+                      <span className="absolute -bottom-5 left-4 flex h-10 w-10 items-center justify-center rounded-full bg-[#143226] ring-1 ring-inset ring-[#e0bd7c]/30">
+                        <step.icon className="h-4 w-4 text-[#e0bd7c]" />
+                      </span>
+                    </div>
+
+                    <div className="flex flex-1 flex-col px-4 pb-5 pt-8">
+                      <h3 className="font-heading text-base font-semibold leading-snug text-[#ede6d5]">
+                        {step.title}
+                      </h3>
+                      <span aria-hidden className="mt-2.5 block h-px w-8 bg-[#e0bd7c]/70" />
+                      <p className="mt-3 text-xs leading-relaxed text-[#ede6d5]/62">{step.body}</p>
+                    </div>
                   </li>
                 ))}
               </ol>
@@ -494,25 +607,30 @@ export default async function V1Page() {
       </section>
 
       {/* --------------------------------------------------------------- Numbers */}
-      <footer className="bg-[#0b1c15] py-10">
-        <div className="mx-auto grid max-w-[1400px] gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:px-10">
-          <dl className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+      <footer className="border-t border-white/10 bg-[#0b1c15] py-12">
+        <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10">
+          <dl className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {STATS.map((stat) => (
-              <div key={stat.label} className="flex items-center gap-3">
-                <stat.icon className="h-6 w-6 shrink-0 text-[#ede6d5]/45" />
+              <div key={stat.label} className="flex items-start gap-4">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/[0.06] ring-1 ring-inset ring-[#e0bd7c]/25">
+                  <stat.icon className="h-5 w-5 text-[#e0bd7c]" />
+                </span>
                 <div className="min-w-0">
-                  <dd className="font-heading text-lg font-semibold text-[#ede6d5]">{stat.value}</dd>
-                  <dt className="truncate text-[11px] text-[#ede6d5]/55">{stat.label}</dt>
+                  <dd className="font-heading text-3xl font-semibold leading-none text-[#ede6d5]">
+                    {stat.value}
+                  </dd>
+                  <dt className="mt-1.5 text-sm font-semibold text-[#ede6d5]">{stat.label}</dt>
+                  <p className="mt-1 text-[11px] leading-relaxed text-[#ede6d5]/50">{stat.note}</p>
                 </div>
               </div>
             ))}
           </dl>
 
-          <div className="lg:text-right">
-            <p className="font-heading text-xl font-semibold text-[#ede6d5]">A for Acre</p>
-            <p className="mt-1 text-[11px] text-[#ede6d5]/45">
+          <div className="mt-10 flex flex-wrap items-end justify-between gap-4 border-t border-white/10 pt-6">
+            <p className="text-[11px] text-[#ede6d5]/45">
               Curated farmland around south Bengaluru · design prototype
             </p>
+            <p className="font-heading text-xl font-semibold text-[#ede6d5]">A for Acre</p>
           </div>
         </div>
       </footer>
