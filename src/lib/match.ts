@@ -124,7 +124,12 @@ function budgetComponent(plot: MatchablePlot, answers: QuizAnswers) {
 }
 
 function driveComponent(plot: MatchablePlot, answers: QuizAnswers) {
-  const choice = (answers.drive ?? [])[0] ?? "any";
+  // The drive-time question is gone — it duplicated a filter /explore already
+  // has, and the whole belt is inside 90 minutes anyway. Every plot now scores
+  // the full weight and the component only contributes its "about N minutes"
+  // line, which is still worth telling somebody.
+  void answers;
+  const choice = "any";
   const minutes = driveMinutesFromCity(plot);
   if (minutes === null) return { points: W_DRIVE * 0.5, reason: null as MatchReason | null };
 

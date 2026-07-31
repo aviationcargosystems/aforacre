@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Maximize2, Minimize2, Search, SlidersHorizontal, X } from "lucide-react";
+import { List, Map, Maximize2, Minimize2, Search, SlidersHorizontal, X } from "lucide-react";
 import type { Property, WaterSource } from "@/lib/types";
 import { formatINR } from "@/lib/tax";
 import { PropertyCard } from "@/components/property-card";
@@ -35,6 +35,9 @@ export function ExploreView({
   // The map starts small. With a handful of listings the cards are the thing
   // worth reading, and at half the width their titles were truncating.
   const [mapExpanded, setMapExpanded] = useState(false);
+  // On a phone the map and the list swap places rather than sitting side by
+  // side; there is not room for both, and the map was simply absent before.
+  const [mobileMap, setMobileMap] = useState(false);
   const [maxDistance, setMaxDistance] = useState(MAX_DISTANCE);
   const [acreRange, setAcreRange] = useState<[number, number]>([0, MAX_ACRES]);
   const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
@@ -193,6 +196,18 @@ export function ExploreView({
               </SheetContent>
             </Sheet>
 
+            {/* Phone only. Above lg the map is already on screen beside the
+                list, so this button would be a control for something visible. */}
+            <Button
+              variant="pill-outline"
+              className="shrink-0 rounded-full lg:hidden"
+              onClick={() => setMobileMap((v) => !v)}
+              aria-pressed={mobileMap}
+            >
+              {mobileMap ? <List className="h-4 w-4 sm:mr-1.5" /> : <Map className="h-4 w-4 sm:mr-1.5" />}
+              <span className="hidden sm:inline">{mobileMap ? "List" : "Map"}</span>
+            </Button>
+
             <span className="hidden shrink-0 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary sm:inline">
               {filtered.length} of {properties.length}
             </span>
@@ -205,9 +220,9 @@ export function ExploreView({
           the page instead of inside the list. */}
       <div className="mx-auto flex w-full max-w-7xl gap-4 px-4 py-4 sm:px-6 lg:min-h-0 lg:flex-1 lg:px-8">
         <div
-          className={`flex min-w-0 flex-1 flex-col lg:min-h-0 ${
-            mapExpanded ? "lg:max-w-[38%]" : "lg:max-w-[64%]"
-          }`}
+          className={`min-w-0 flex-1 flex-col lg:flex lg:min-h-0 ${
+            mobileMap ? "hidden" : "flex"
+          } ${mapExpanded ? "lg:max-w-[38%]" : "lg:max-w-[64%]"}`}
         >
           <div className="aa-scroll lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
             <div className="grid grid-cols-1 gap-4 pb-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
@@ -234,7 +249,11 @@ export function ExploreView({
         {/* The listings lead; the map supports them.
             isolate for the same reason as the corridor map: Leaflet's panes
             outrank the site header without a stacking context to sit in. */}
-        <div className="relative isolate z-0 hidden min-h-0 flex-1 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/70 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:block">
+        <div
+          className={`relative isolate z-0 min-h-0 flex-1 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/70 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:block ${
+            mobileMap ? "block h-[70dvh]" : "hidden"
+          }`}
+        >
           <PropertyMap properties={filtered} hoveredSlug={hoveredSlug} onHover={setHoveredSlug} />
 
           {/* Above Leaflet's own controls, which start at z-index 400. */}
@@ -242,7 +261,7 @@ export function ExploreView({
             type="button"
             onClick={() => setMapExpanded((v) => !v)}
             aria-pressed={mapExpanded}
-            className="absolute right-3 top-3 z-[500] inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/90 px-3 py-1.5 text-xs font-medium text-foreground shadow-[0_6px_18px_rgba(15,23,42,0.12)] backdrop-blur transition-colors hover:bg-background"
+            className="absolute right-3 top-3 z-[500] hidden items-center gap-1.5 lg:inline-flex rounded-full border border-border/70 bg-background/90 px-3 py-1.5 text-xs font-medium text-foreground shadow-[0_6px_18px_rgba(15,23,42,0.12)] backdrop-blur transition-colors hover:bg-background"
           >
             {mapExpanded ? (
               <>

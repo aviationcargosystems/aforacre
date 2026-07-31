@@ -92,24 +92,7 @@ const GOAL_WEIGHTS: Record<string, Weights> = {
   "not-sure": {},
 };
 
-const TIMELINE_WEIGHTS: Record<string, Weights> = {
-  immediately: { working_farmer: 5, weekend_naturalist: 4, future_farmer: 3 },
-  "within-2-years": { legacy_builder: 4, future_farmer: 4, weekend_naturalist: 2 },
-  "after-retirement": { escape_artist: 7, legacy_builder: 3 },
-  "pure-investment": { investor: 9 },
-};
 
-const IDENTITY_WEIGHTS: Record<string, Weights> = {
-  founder: { investor: 3, weekend_naturalist: 2 },
-  cxo: { weekend_naturalist: 3, legacy_builder: 2 },
-  tech: { weekend_naturalist: 3, future_farmer: 2 },
-  doctor: { escape_artist: 3, legacy_builder: 2 },
-  nri: { investor: 4, legacy_builder: 3 },
-  "business-owner": { investor: 3, working_farmer: 2 },
-  investor: { investor: 5 },
-  farmer: { working_farmer: 6 },
-  "family-office": { investor: 4, legacy_builder: 4 },
-};
 
 const INVOLVEMENT_WEIGHTS: Record<string, Weights> = {
   "visit-occasionally": { investor: 5, weekend_naturalist: 2 },
@@ -144,9 +127,10 @@ function apply(totals: Record<PersonaKey, number>, weights: Weights | undefined)
 export function scorePersonas(answers: QuizAnswers): Record<PersonaKey, number> {
   const totals = Object.fromEntries(PERSONA_KEYS.map((key) => [key, 0])) as Record<PersonaKey, number>;
 
+  // Timeline and identity were dropped with their questions. Their weight
+  // tables are gone rather than left dangling: a persona inferred from a
+  // question nobody is asked is an inference from nothing.
   (answers.goals ?? []).forEach((goal) => apply(totals, GOAL_WEIGHTS[goal]));
-  (answers.timeline ?? []).forEach((value) => apply(totals, TIMELINE_WEIGHTS[value]));
-  (answers.identity ?? []).forEach((value) => apply(totals, IDENTITY_WEIGHTS[value]));
   (answers.involvement ?? []).forEach((value) => apply(totals, INVOLVEMENT_WEIGHTS[value]));
   (answers.excites ?? []).forEach((value) => apply(totals, EXCITES_WEIGHTS[value]));
 

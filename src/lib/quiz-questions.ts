@@ -1,11 +1,17 @@
 /**
- * The seven questions, in order.
+ * The four questions, in order.
+ *
+ * These are the four the spec defines, and only those four. The flow used to
+ * ask seven — timeline, identity and drive-time were added on top — which made
+ * a "takes 2 minutes" promise into something people abandon halfway. Timeline
+ * and identity fed nothing but persona flavour text, and drive-time duplicated
+ * a filter that already exists on /explore.
  *
  * Plain data with no imports, so the same question set can drive the web flow
  * and a future WhatsApp or voice flow without either drifting.
  */
 
-export type QuestionId = "goals" | "timeline" | "identity" | "involvement" | "excites" | "drive" | "budget";
+export type QuestionId = "goals" | "involvement" | "excites" | "budget";
 
 export interface QuizOption {
   value: string;
@@ -31,42 +37,12 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     helper: "Pick as many as apply.",
     multi: true,
     options: [
-      { value: "weekend-farm", label: "Weekend farm", icon: "TentTree" },
-      { value: "farmhouse", label: "Build a farmhouse", icon: "Home" },
+      { value: "weekend-farm", label: "Weekend farmhouse", icon: "TentTree" },
       { value: "investment", label: "Long-term investment", icon: "TrendingUp" },
       { value: "organic", label: "Organic farming", icon: "Leaf" },
       { value: "commercial", label: "Commercial farming", icon: "Tractor" },
       { value: "retirement", label: "Retirement home", icon: "Armchair" },
-      { value: "legacy", label: "Family legacy", icon: "Users" },
-      { value: "eco-tourism", label: "Eco tourism", icon: "Compass" },
       { value: "not-sure", label: "Not sure yet", icon: "HelpCircle" },
-    ],
-  },
-  {
-    id: "timeline",
-    prompt: "When do you see yourself using this land?",
-    multi: false,
-    options: [
-      { value: "immediately", label: "Immediately", icon: "Zap" },
-      { value: "within-2-years", label: "Within 2 years", icon: "CalendarClock" },
-      { value: "after-retirement", label: "After retirement", icon: "Hourglass" },
-      { value: "pure-investment", label: "Pure investment, I may never use it", icon: "LineChart" },
-    ],
-  },
-  {
-    id: "identity",
-    prompt: "Which best describes you?",
-    multi: false,
-    options: [
-      { value: "founder", label: "Founder", icon: "Rocket" },
-      { value: "cxo", label: "CXO", icon: "Briefcase" },
-      { value: "tech", label: "Tech professional", icon: "Laptop" },
-      { value: "doctor", label: "Doctor", icon: "Stethoscope" },
-      { value: "nri", label: "NRI", icon: "Plane" },
-      { value: "business-owner", label: "Business owner", icon: "Store" },
-      { value: "investor", label: "Investor", icon: "PiggyBank" },
-      { value: "farmer", label: "Farmer", icon: "Wheat" },
-      { value: "family-office", label: "Family office", icon: "Landmark" },
     ],
   },
   {
@@ -77,7 +53,6 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
       { value: "visit-occasionally", label: "Visit occasionally", icon: "CalendarDays" },
       { value: "spend-weekends", label: "Spend weekends there", icon: "Sun" },
       { value: "actively-farm", label: "Actively farm it myself", icon: "Shovel" },
-      { value: "managed-farm", label: "Have it managed for me", icon: "ClipboardList" },
       { value: "hire-team", label: "Hire a team to run it", icon: "UsersRound" },
     ],
   },
@@ -91,24 +66,8 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
       { value: "mountain-views", label: "Mountain views", icon: "Mountain" },
       { value: "dense-forest", label: "Dense forest", icon: "Trees" },
       { value: "water-body", label: "Water body", icon: "Waves" },
-      { value: "fruit-orchard", label: "Fruit orchard", icon: "Apple" },
-      { value: "silence", label: "Silence", icon: "VolumeX" },
-      { value: "wildlife", label: "Wildlife", icon: "Bird" },
-      { value: "sunrise", label: "Sunrise", icon: "Sunrise" },
+      { value: "plantations", label: "Plantations", icon: "Apple" },
       { value: "investment-growth", label: "Investment growth", icon: "ChartLine" },
-      { value: "privacy", label: "Privacy", icon: "Lock" },
-    ],
-  },
-  {
-    id: "drive",
-    prompt: "How far are you willing to drive from Bengaluru?",
-    multi: false,
-    options: [
-      { value: "45", label: "45 minutes", icon: "Timer" },
-      { value: "60", label: "1 hour", icon: "Clock" },
-      { value: "90", label: "90 minutes", icon: "Clock4" },
-      { value: "120", label: "2 hours", icon: "Clock12" },
-      { value: "any", label: "No preference", icon: "Infinity" },
     ],
   },
   {

@@ -23,6 +23,7 @@ import { V1Header } from "@/components/v1/v1-header";
 import { GrowthMapDialog } from "@/components/v1/growth-map-dialog";
 import { HeroShowcase } from "@/components/v1/hero-showcase";
 import { JourneySteps } from "@/components/v1/journey-steps";
+import { SiteFooter } from "@/components/site-footer";
 import { GeographySection } from "@/components/v1/geography-section";
 import { EXPERIENCES } from "@/components/v1/experiences";
 import { GROWTH_ANCHORS } from "@/lib/anchors";
@@ -115,62 +116,7 @@ const CORRIDOR_EXTRAS = [
 ];
 
 
-/**
- * Social marks, drawn here rather than imported.
- *
- * Lucide dropped its brand icons, so there is no `Instagram` or `Facebook` to
- * import any more. These are the two glyphs at the same 24px grid and stroke
- * weight as the rest of the icon set, so they sit in the row without looking
- * borrowed.
- */
-function InstagramMark(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <rect width="20" height="20" x="2" y="2" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="0.75" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
 
-function FacebookMark(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-    </svg>
-  );
-}
-
-/** Placeholder handles until the real accounts are confirmed. */
-const SOCIALS = [
-  { label: "Instagram", href: "https://instagram.com/aforacre", icon: InstagramMark },
-  { label: "Facebook", href: "https://facebook.com/aforacre", icon: FacebookMark },
-];
-
-/**
- * Footer navigation. Every href points at a route that exists — a dead link in
- * a footer is worse than a shorter footer.
- */
-const FOOTER_LINKS = [
-  {
-    title: "Explore",
-    links: [
-      { label: "All land", href: "/explore" },
-      { label: "Find my land", href: "/match" },
-      { label: "Growth corridor", href: "/#corridor" },
-      { label: "By experience", href: "/#experience" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { label: "How it works", href: "/#journey" },
-      { label: "Featured land", href: "/#featured" },
-      { label: "Our geography", href: "/#geography" },
-      { label: "Admin console", href: "/admin" },
-    ],
-  },
-];
 
 export default async function Home() {
   const properties = await getAllProperties();
@@ -563,135 +509,7 @@ export default async function Home() {
 
       <GeographySection />
 
-      {/* --------------------------------------------------------------- Numbers */}
-      <footer className="border-t border-white/10 bg-[#0b1c15] py-12">
-        <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-10">
-          <dl className="grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-4">
-            {STATS.map((stat, i) => (
-              <div key={stat.label} className={`aa-rise aa-rise-${i} flex items-start gap-4`}>
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/[0.06] ring-1 ring-inset ring-[#e0bd7c]/25">
-                  <stat.icon className="h-5 w-5 text-[#e0bd7c]" />
-                </span>
-                <div className="min-w-0">
-                  <dd className="font-heading text-3xl font-semibold leading-none text-[#ede6d5]">
-                    {stat.value}
-                  </dd>
-                  <dt className="mt-1.5 text-sm font-semibold text-[#ede6d5]">{stat.label}</dt>
-                  <p className="mt-1 text-[11px] leading-relaxed text-[#ede6d5]/50">{stat.note}</p>
-                </div>
-              </div>
-            ))}
-          </dl>
-
-          {/* A real footer under the numbers, not a one-line strip. The brand
-              lockup leads, because this is the last thing on the page and the
-              name is what should stay with somebody. */}
-          {/* Two-up from the smallest screen. Stacked one per row, three short
-              link lists read as one long undifferentiated column. */}
-          <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-9 border-t border-white/10 pt-10 lg:grid-cols-[minmax(0,1.6fr)_repeat(2,minmax(0,1fr))] lg:gap-8">
-            <div className="col-span-2 lg:col-span-1">
-              <div className="relative h-12 w-[150px]">
-                <Image
-                  src="/brand/logo.png"
-                  alt="A for Acre"
-                  fill
-                  sizes="150px"
-                  className="object-contain object-left brightness-0 invert"
-                />
-              </div>
-              <p className="mt-4 max-w-xs text-xs leading-relaxed text-[#ede6d5]/55">
-                Curated farmland around south Bengaluru. Verified on the ground and on paper before
-                it reaches you.
-              </p>
-              {/* Selling is one action, so it is a button rather than a column
-                  of links. Field capture used to sit here as a third item — it
-                  is a staff tool and has no business in a public footer. */}
-              <Link
-                href="/submit-land"
-                className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#ede6d5] px-5 py-2.5 text-xs font-semibold text-[#0e241b] transition-transform hover:-translate-y-0.5"
-              >
-                List your land <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-
-            {FOOTER_LINKS.map((group) => (
-              <div key={group.title}>
-                <p className="font-display-alt text-[11px] font-bold uppercase tracking-[0.16em] text-[#e0bd7c]">
-                  {group.title}
-                </p>
-                <ul className="mt-4 space-y-2.5">
-                  {group.links.map((link) => (
-                    <li key={link.label}>
-                      <Link
-                        href={link.href}
-                        className="text-xs text-[#ede6d5]/65 transition-colors hover:text-[#ede6d5]"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          {/* The oversized wordmark. It is the last thing on the page and the
-              one thing worth leaving behind, so it gets the room. Purely
-              decorative here — the real link is the lockup above — so it is
-              hidden from assistive tech rather than read out twice. */}
-          {/* The same lockup the header uses, at scale. Setting the words in
-              Playfair beside the icon was a second wordmark that did not quite
-              match the real one — this is the artwork itself, inverted to sit
-              on the dark band. */}
-          <div aria-hidden className="mt-14 select-none px-4">
-            <div className="relative mx-auto h-[22vw] w-full max-w-[1180px] lg:h-56">
-              <Image
-                src="/brand/logo.png"
-                alt=""
-                fill
-                sizes="1180px"
-                className="object-contain opacity-[0.1] brightness-0 invert"
-              />
-            </div>
-          </div>
-
-          <div className="mt-8 flex flex-col items-center gap-5 border-t border-white/10 pt-7">
-            <div className="flex gap-3">
-              {SOCIALS.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  aria-label={social.label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-inset ring-white/15 text-[#ede6d5]/70 transition-colors hover:bg-white/10 hover:text-[#ede6d5]"
-                >
-                  <social.icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
-
-            <p className="text-[11px] text-[#ede6d5]/45">
-              © {new Date().getFullYear()} A for Acre. All rights reserved.
-            </p>
-            {/* "BCON" is left as plain text until there is a URL to point it
-                at. An invented destination in a footer is a broken link that
-                nobody notices for months. */}
-            <p className="flex items-center gap-1.5 text-[11px] text-[#ede6d5]/45">
-              Built with <span aria-hidden>❤️</span>
-              <span className="sr-only">love</span> at{" "}
-              <a
-                href="https://bconclub.com"
-                target="_blank"
-                rel="noreferrer noopener"
-                className="font-display-alt font-bold tracking-[0.08em] text-[#e0bd7c] underline-offset-4 transition-colors hover:text-[#f0d49a] hover:underline"
-              >
-                BCON
-              </a>
-            </p>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter stats={STATS} />
     </div>
   );
 }
